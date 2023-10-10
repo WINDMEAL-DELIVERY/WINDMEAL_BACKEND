@@ -11,10 +11,10 @@ import java.util.function.Function;
 public class Money {
 //    public static final Money ZERO = Money.wons(0);
 
-    private int amount;
+    private int price;
 
-    public Money(int amount) {
-        this.amount = amount;
+    public Money(int price) {
+        this.price = price;
     }
 
     public Money() {

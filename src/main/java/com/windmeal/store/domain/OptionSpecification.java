@@ -18,7 +18,7 @@ public class OptionSpecification {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "menu_id")
+    @JoinColumn(name = "option_group_id")
     private OptionGroup optionGroup;
 
     private String name;

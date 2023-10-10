@@ -4,7 +4,7 @@ import com.windmeal.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.geo.Point;
+import org.locationtech.jts.geom.Point;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -27,6 +27,6 @@ public class Store {
     private LocalDateTime openTime;
 
     private LocalDateTime closeTime;
-
+    @Column( columnDefinition = "Point")
     private Point location;
 }
