@@ -39,7 +39,7 @@ jobs:
 
     - name: Build with Gradle
       run: |
-        ./gradlew build -x check
+        ./gradlew build
 
     - name: web docker build and push
       run: |
