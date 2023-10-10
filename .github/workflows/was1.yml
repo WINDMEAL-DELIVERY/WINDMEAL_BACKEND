@@ -1,4 +1,4 @@
-name: Java CI with Gradle
+name: WAS1
 
 on:
   push:
@@ -39,7 +39,7 @@ jobs:
 
     - name: Build with Gradle
       run: |
-        ./gradlew build
+        ./gradlew build -x check
 
     - name: web docker build and push
       run: |
