@@ -44,8 +44,8 @@ jobs:
     - name: web docker build and push
       run: |
         docker login -u ${{ secrets.WAS1_DOCKER_USERNAME }} -p ${{ secrets.WAS1_DOCKER_PASSWORD }}
-        docker build -t ${{ secrets.WAS1_DOCKER_REPO }}/cokiri .
-        docker push ${{ secrets.WAS1_DOCKER_REPO }}/cokiri 
+        docker build -t ${{ secrets.WAS1_DOCKER_REPO }}/windmeal .
+        docker push ${{ secrets.WAS1_DOCKER_REPO }}/windmeal 
 
     - name: executing remote ssh commands using password
       uses: appleboy/ssh-action@v0.1.7
