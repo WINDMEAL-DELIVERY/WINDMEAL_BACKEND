@@ -6,7 +6,7 @@ import com.windmeal.model.BaseTimeEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.geo.Point;
+import org.locationtech.jts.geom.Point;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -24,7 +24,7 @@ public class DeliveryRequest extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", updatable = false)
     private Member courier;
-
+    @Column( columnDefinition = "POINT")
     private Point location;
 
     private LocalDateTime arrivalTime;
