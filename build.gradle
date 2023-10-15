@@ -54,6 +54,9 @@ dependencies {
 	implementation 'org.hibernate:hibernate-spatial:5.6.15.Final'
 	implementation 'com.querydsl:querydsl-spatial'
 
+	//redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
 	//querydsl
 	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
 	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
