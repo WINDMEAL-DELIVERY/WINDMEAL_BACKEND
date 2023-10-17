@@ -12,8 +12,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Entity
-//@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Store {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,6 +25,9 @@ public class Store {
 
     private String name;
 
+    private String phoneNumber;
+
+    private String photo;
     private LocalDateTime openTime;
 
     private LocalDateTime closeTime;
@@ -34,9 +36,12 @@ public class Store {
 
 
     @Builder
-    public Store(Member owner, String name, LocalDateTime openTime, LocalDateTime closeTime, Point location) {
+
+    public Store(Member owner, String name, String phoneNumber, String photo, LocalDateTime openTime, LocalDateTime closeTime, Point location) {
         this.owner = owner;
         this.name = name;
+        this.phoneNumber = phoneNumber;
+        this.photo = photo;
         this.openTime = openTime;
         this.closeTime = closeTime;
         this.location = location;
