@@ -36,7 +36,6 @@ public class Store {
 
 
     @Builder
-
     public Store(Member owner, String name, String phoneNumber, String photo, LocalDateTime openTime, LocalDateTime closeTime, Point location) {
         this.owner = owner;
         this.name = name;
