@@ -1,11 +1,11 @@
 package com.windmeal.store.service;
 
 
-import com.windmeal.store.domain.Store;
 import com.windmeal.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 
 @RequiredArgsConstructor
@@ -13,13 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class StoreService {
 
     private final StoreRepository storeRepository;
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
 
-    @Transactional
-    public Store save(){
-        return storeRepository.save(new Store());
-    }
-    @Transactional(readOnly = true)
-    public Store find(Long storeId) {
-        return storeRepository.findById(storeId).orElseThrow();
-    }
+
 }
