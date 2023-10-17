@@ -15,6 +15,5 @@ public class Category {
     @Column(name = "category_id")
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    private CategoryType name;
+    private String name;
 }
