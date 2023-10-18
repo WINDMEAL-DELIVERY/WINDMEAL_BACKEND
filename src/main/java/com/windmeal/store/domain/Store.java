@@ -1,6 +1,7 @@
 package com.windmeal.store.domain;
 
 import com.windmeal.member.domain.Member;
+import com.windmeal.store.dto.request.StoreUpdateRequest;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -36,7 +37,6 @@ public class Store {
 
 
     @Builder
-
     public Store(Member owner, String name, String phoneNumber, String photo, LocalTime openTime, LocalTime closeTime, Point location) {
         this.owner = owner;
         this.name = name;
@@ -45,5 +45,18 @@ public class Store {
         this.openTime = openTime;
         this.closeTime = closeTime;
         this.location = location;
+    }
+
+    public void updatePhoto(String updatePhoto) {
+        this.photo=updatePhoto;
+    }
+
+    public void updateInfo(StoreUpdateRequest updateRequest) {
+        this.name= updateRequest.getName();
+        this.phoneNumber=updateRequest.getPhoneNumber();
+        this.closeTime=updateRequest.getCloseTime();
+        this.openTime=updateRequest.getOpenTime();
+        this.location = new Point(updateRequest.getLatitude(), updateRequest.getLongitude());
+
     }
 }

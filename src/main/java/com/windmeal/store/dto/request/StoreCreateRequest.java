@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.geo.Point;
 
+import javax.validation.constraints.NotBlank;
 import java.time.LocalTime;
 
 @Getter
@@ -18,6 +19,7 @@ public class StoreCreateRequest {
 
     private Long memberId;
 
+    @NotBlank(message = "가게 이름은 빈칸일 수 없습니다.")
     private String name;
 
     private String phoneNumber;

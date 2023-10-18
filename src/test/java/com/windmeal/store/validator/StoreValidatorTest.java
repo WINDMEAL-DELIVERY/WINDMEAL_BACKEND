@@ -38,5 +38,8 @@ class StoreValidatorTest {
         assertThat(storeValidator.validateStoreIsOpen(openTime,closeTime,closeTimeExactly)).isTrue();
         assertThat(storeValidator.validateStoreIsOpen(openTime,closeTime,closeTimeAfter1)).isFalse();
 
+        assertThat(storeValidator.validateStoreIsOpen(openTime,null,closeTimeAfter1)).isTrue();
+        assertThat(storeValidator.validateStoreIsOpen(null,null,closeTimeAfter1)).isTrue();
+        assertThat(storeValidator.validateStoreIsOpen(null,closeTime,closeTimeAfter1)).isTrue();
     }
 }

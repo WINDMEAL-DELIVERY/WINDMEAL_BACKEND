@@ -31,11 +31,11 @@ public class S3Util {
         if(!file.getContentType().contains("image")) throw new S3Exception(ErrorCode.S3_TYPE_EXCEPTION,"이미지만 업로드할 수 있습니다.");
 
         String fileName = UUID.randomUUID().toString();
-
-        return fileUpload(file, fileName);
+        fileUpload(file, fileName);
+        return fileName;
     }
 
-    private String fileUpload(MultipartFile file, String fileName) {
+    private void fileUpload(MultipartFile file, String fileName) {
         try {
 
             ObjectMetadata metadata = new ObjectMetadata();
@@ -44,20 +44,18 @@ public class S3Util {
 
             s3Client.putObject(new PutObjectRequest(bucket, fileName, file.getInputStream(), metadata)
                     .withCannedAcl(CannedAccessControlList.PublicRead));
-            return s3Client.getUrl(bucket , fileName).toString();
 
         } catch (IOException | AmazonClientException e) {
             throw new S3Exception(S3_ERROR,"잠시 후 다시 시도해 주세요.");
         }
     }
 
-    public void delete(String fileName, String dirName) {
-
-        s3Client.deleteObject(bucket + "/" + dirName, fileName);
-    }
-
-    public String getDefaultProfileUrl() {
-        return s3Client.getUrl(bucket + "/" + "profile", "default.png").toString();
+    public void delete(String fileName) {
+        try{
+            s3Client.deleteObject(bucket , fileName);
+        }catch (AmazonClientException e) {
+            throw new S3Exception(S3_ERROR,"잠시 후 다시 시도해 주세요.");
+        }
     }
 
 }

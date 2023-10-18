@@ -9,6 +9,8 @@ public class StoreValidator {
 
     public boolean validateStoreIsOpen(LocalTime openTime, LocalTime closeTime,LocalTime now){
 
+        if(openTime==null||closeTime==null) return true;
+
         if(now.isBefore(openTime)||now.isAfter(closeTime)) return false;
         else return true;
 
