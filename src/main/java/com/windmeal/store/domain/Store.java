@@ -5,10 +5,10 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.locationtech.jts.geom.Point;
+import org.springframework.data.geo.Point;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Getter
 @Entity
@@ -28,15 +28,16 @@ public class Store {
     private String phoneNumber;
 
     private String photo;
-    private LocalDateTime openTime;
+    private LocalTime openTime;
 
-    private LocalDateTime closeTime;
-    @Column( columnDefinition = "Point")
+    private LocalTime closeTime;
+
     private Point location;
 
 
     @Builder
-    public Store(Member owner, String name, String phoneNumber, String photo, LocalDateTime openTime, LocalDateTime closeTime, Point location) {
+
+    public Store(Member owner, String name, String phoneNumber, String photo, LocalTime openTime, LocalTime closeTime, Point location) {
         this.owner = owner;
         this.name = name;
         this.phoneNumber = phoneNumber;
