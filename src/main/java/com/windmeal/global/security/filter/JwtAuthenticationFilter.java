@@ -1,7 +1,8 @@
-package com.windmeal.global.filters;
+package com.windmeal.global.security.filter;
 
 
 import com.windmeal.global.token.util.TokenProvider;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -21,6 +22,7 @@ import static com.windmeal.global.constants.JwtConstants.BEARER_PREFIX;
 /**
  * JwtAuthenticationFilter는 HTTP 요청을 가로채서, 헤더를 조사하여 토큰값을 얻어 AuthenticationToken, 즉 인증용 객체를 생성한다.
  */
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // OncePerRequestFilter는 요청당 한번만 동작하는 필터
     private final TokenProvider tokenProvider;
@@ -40,6 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 Authentication authenticated = authenticationManager.authenticate(authentication);
                 SecurityContextHolder.getContext().setAuthentication(authenticated);
             } catch (AuthenticationException authenticationException) {
+                log.error("인증 실패 - JwtAuthenticationFilter");
                 SecurityContextHolder.clearContext();
             }
         }

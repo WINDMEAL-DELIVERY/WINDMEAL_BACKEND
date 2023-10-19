@@ -1,6 +1,6 @@
 package com.windmeal.global.configuration.security;
 
-import com.windmeal.global.filters.JwtAuthenticationFilter;
+import com.windmeal.global.security.filter.JwtAuthenticationFilter;
 import com.windmeal.global.token.util.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;

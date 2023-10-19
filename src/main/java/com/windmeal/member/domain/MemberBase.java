@@ -21,15 +21,12 @@ public class MemberBase  extends BaseTimeEntity {
 
     private String email;
 
-    private String password;
-
     @Enumerated(value = EnumType.STRING)
     private Authority authority;
 
 
-    public MemberBase(String email, String password, Authority authority) {
+    public MemberBase(String email, Authority authority) {
         this.email = email;
-        this.password = password;
         this.authority = authority;
     }
 }
