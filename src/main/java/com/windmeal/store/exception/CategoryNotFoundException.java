@@ -6,6 +6,7 @@ import com.windmeal.global.exception.GeneralException;
 public class CategoryNotFoundException extends GeneralException {
 
 
+
     public CategoryNotFoundException(ErrorCode errorCode, String message) {
         super(errorCode, message);
     }
