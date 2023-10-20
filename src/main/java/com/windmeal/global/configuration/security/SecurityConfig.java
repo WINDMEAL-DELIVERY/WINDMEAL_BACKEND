@@ -71,7 +71,7 @@ public class SecurityConfig {
 //                .and()
 //                .redirectionEndpoint()  // oauth 인증 후 리다이렉트되는 엔드 포인트를 지정한다. 아래의 uri에 대해서 리다이렉트를 허용한다.
 //                .baseUri("/*/oauth2/code/google");
-
+//
 //                .and()
 //                .userInfoEndpoint()
 //                .userService()   // 여기서 지정한 userService() 메서드에서 사용자, 즉 resource owner의 정보를 받는다.
