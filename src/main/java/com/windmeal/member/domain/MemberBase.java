@@ -24,7 +24,6 @@ public class MemberBase  extends BaseTimeEntity {
     @Enumerated(value = EnumType.STRING)
     private Authority authority;
 
-
     public MemberBase(String email, Authority authority) {
         this.email = email;
         this.authority = authority;

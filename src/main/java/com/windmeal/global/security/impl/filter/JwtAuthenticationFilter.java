@@ -1,4 +1,4 @@
-package com.windmeal.global.security.filter;
+package com.windmeal.global.security.impl.filter;
 
 
 import com.windmeal.global.token.util.TokenProvider;

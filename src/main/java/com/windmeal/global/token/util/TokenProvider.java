@@ -64,12 +64,12 @@ public class TokenProvider implements InitializingBean {
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim(AUTHORITIES_KEY, authorities)
-                .signWith(key, SignatureAlgorithm.ES512)
+                .signWith(key, SignatureAlgorithm.HS512)
                 .setIssuedAt(currentDate)
                 .setExpiration(accessValidity)
                 .compact();
         String refreshToken = Jwts.builder()
-                .signWith(key, SignatureAlgorithm.ES512)
+                .signWith(key, SignatureAlgorithm.HS512)
                 .setExpiration(refreshValidity)
                 .setIssuedAt(currentDate)
                 .compact();
