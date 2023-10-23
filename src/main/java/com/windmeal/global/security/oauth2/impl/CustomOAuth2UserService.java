@@ -10,10 +10,16 @@ import com.windmeal.member.domain.Member;
 import com.windmeal.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 import java.util.Optional;
@@ -24,6 +30,9 @@ import java.util.Optional;
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final MemberRepository memberRepository;
+    private final RestTemplate restTemplate;
+    @Value("${oauth2.provider.google.token-revoke-url}")
+    private String revokeUrl;
 
     /*
     인증이 성공했을 때 호출될 메서드
@@ -36,23 +45,38 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         OAuth2User oAuth2User = super.loadUser(oAuth2UserRequest);
         Map<String, Object> attributes = oAuth2User.getAttributes();
         String providerName = oAuth2UserRequest.getClientRegistration().getRegistrationId().toUpperCase();
-        validateAttributes(attributes);
+        String accessTokenValue = oAuth2UserRequest.getAccessToken().getTokenValue();
+        validateAttributes(attributes, accessTokenValue);
         OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(providerName, attributes);
         Member member = registerIfNewUser(oAuth2UserInfo);
         return UserPrincipal.create(member, oAuth2UserInfo.getAttributes());
     }
 
-    private void validateAttributes(Map<String, Object> userInfoAttributes) {
+    /*
+        현재 클래스까지 왔다는 것은 이미 provider로부터 토큰까지 모두 전달받았다는 것이다.
+        따라서 도메인이 다르거나, 우리가 원하는 정보가 없을 경우에는 다시 발행된 토큰을 취소해줘야 한다.
+        토큰 취소를 위해서 매개변수로 token을 가진다.
+     */
+    private void validateAttributes(Map<String, Object> userInfoAttributes, String token) {
         if(!userInfoAttributes.containsKey("email")) {
             throw new IllegalArgumentException("응답에 email이 존재하지 않습니다.");
         }
         String email = (String)userInfoAttributes.get("email");
         String[] tokens = email.split("@");
         if(!tokens[1].equals("gachon.ac.kr")) {
-            throw new InvalidEmailDomainException(ErrorCode.VALIDATION_ERROR, "가천대학교 계정이 아닙니다.");
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+            ResponseEntity<String> response = restTemplate.postForEntity(revokeUrl + "?token=" + token, headers, String.class);
+            if(response.getStatusCode().is2xxSuccessful()) {
+                log.info("토큰이 취소되었습니다.");
+            } else {
+                log.info("토큰이 취소에 실패하였습니다.");
+            }
+            throw new InvalidEmailDomainException(ErrorCode.VALIDATION_ERROR, "가천대학교 계정이 아닙니다. 토큰을 취소합니다.");
         }
     }
 
+    @Transactional
     private Member registerIfNewUser(OAuth2UserInfo oAuth2UserInfo) {
         Optional<Member> optionalMember = memberRepository.findByEmail(oAuth2UserInfo.getEmail());
         Member member;
@@ -72,9 +96,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .department(personalInfos[1])
                 .authority(Authority.ROLE_USER)
                 .build();
-        // 학교 계정일 경우 여기까지는 잘 온다.
-        // TODO 학교 계정이 아닐 경우 롤백같은 처리를 제대로 해줘야 할 것 같다. 지금은 가입이 되지만 값은 들어가있지 않은 이상한 구조이다.
-        // TODO 닉네임 입력을 받아야 하는데, 인증 과정 한가운데에서 받을 방법은 없어보인다. 가입이 완료된 후 별도로 다시 받아서 설정해줘야 할 것 같다.
+        // TODO 닉네임 입력을 받아야 하는데, 가입이 완료된 후 별도로 다시 받아서 설정해줘야 할 것 같다.
         return member;
     }
 }

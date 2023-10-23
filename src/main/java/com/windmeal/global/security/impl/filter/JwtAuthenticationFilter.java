@@ -38,14 +38,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String jwt = resolveToken(request);
         if(StringUtils.hasText(jwt)) {
             try{
+                // jwt로부터 인증 객체를 생성한다. (이 시점에서의 인증 객체는 아직 인증이 되지 않은 상태이다.)
                 Authentication authentication = tokenProvider.getAuthentication(jwt);
+                /*
+                    authenticationManager의 authenticate 메서드를 실행하여 인증 객체에 대해 인증을 수행한다.
+                    내부적으로 provider manager (authenticationManager의 구현체)가 알맞은 provider를 찾아서 인증을 진행한다.
+                    windmeal에서는 provider를 따로 커스텀하여 사용하지 않고, usernamePasswordAuthenticationFilter를 타기 때문에
+                    해당 부분을 담당하는 provider가 호출될 것이다.
+                 */
                 Authentication authenticated = authenticationManager.authenticate(authentication);
+                // 인증이 완료된 인증 객체에 대해서 security session (context)에 저장해준다.
                 SecurityContextHolder.getContext().setAuthentication(authenticated);
             } catch (AuthenticationException authenticationException) {
                 log.error("인증 실패 - JwtAuthenticationFilter");
                 SecurityContextHolder.clearContext();
             }
         }
+        // TODO 헤더가 resolveToken의 반환값이 null인 경우에 대한 처리?
         filterChain.doFilter(request, response);
     }
 
