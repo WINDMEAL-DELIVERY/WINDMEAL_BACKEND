@@ -1,19 +1,16 @@
 package com.windmeal.store.service;
 
-import com.windmeal.global.exception.GeneralException;
 import com.windmeal.store.domain.Category;
 import com.windmeal.store.dto.request.CategoryCreateRequest;
 import com.windmeal.store.dto.request.CategoryUpdateRequest;
 import com.windmeal.store.dto.response.CategoryResponse;
 import com.windmeal.store.exception.CategoryNotFoundException;
-import com.windmeal.store.repository.CategoryRepository;
+import com.windmeal.store.repository.CategoryJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -25,7 +22,7 @@ class CategoryServiceTest {
     private CategoryService categoryService;
 
     @Autowired
-    private CategoryRepository categoryRepository;
+    private CategoryJpaRepository categoryJpaRepository;
 
     @DisplayName("신규 카테고리를 등록한다.")
     @Test
@@ -54,7 +51,7 @@ class CategoryServiceTest {
         categoryService.updateCategory(updateRequest);
 
         //then
-        Category findCategory = categoryRepository.findById(updateRequest.getId()).get();
+        Category findCategory = categoryJpaRepository.findById(updateRequest.getId()).get();
 
         assertThat(findCategory).extracting("id","name")
                         .containsExactly(updateRequest.getId(),updateName);
@@ -87,7 +84,7 @@ class CategoryServiceTest {
         categoryService.deleteCategory(updateRequest);
 
         //then
-        Category findCategory = categoryRepository.findById(savedCategory.getId()).orElse(null);
+        Category findCategory = categoryJpaRepository.findById(savedCategory.getId()).orElse(null);
         assertThat(findCategory)
                 .isNull();
     }
@@ -127,6 +124,6 @@ class CategoryServiceTest {
     }
 
     private Category createCategory(CategoryCreateRequest request) {
-        return categoryRepository.save(request.toEntity());
+        return categoryJpaRepository.save(request.toEntity());
     }
 }
