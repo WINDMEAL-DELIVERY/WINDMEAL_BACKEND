@@ -28,11 +28,16 @@ public class S3Util {
     private final AmazonS3Client s3Client;
 
     public String imgUpload(MultipartFile file) {
+        if(file==null) return getDefaultUrl();
         if(!file.getContentType().contains("image")) throw new S3Exception(ErrorCode.S3_TYPE_EXCEPTION,"이미지만 업로드할 수 있습니다.");
 
         String fileName = UUID.randomUUID().toString();
         fileUpload(file, fileName);
         return fileName;
+    }
+
+    private String getDefaultUrl() {
+        return "test";
     }
 
     private void fileUpload(MultipartFile file, String fileName) {
