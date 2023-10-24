@@ -3,14 +3,14 @@ package com.windmeal.store.exception;
 import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.global.exception.GeneralException;
 
-public class CategoryNotFoundException extends GeneralException {
+public class OptionGroupNotFoundException extends GeneralException {
 
 
-  public CategoryNotFoundException(ErrorCode errorCode, String message) {
+  public OptionGroupNotFoundException(ErrorCode errorCode, String message) {
     super(errorCode, message);
   }
 
-  public CategoryNotFoundException(String s) {
+  public OptionGroupNotFoundException(String s) {
     super(s);
   }
 }

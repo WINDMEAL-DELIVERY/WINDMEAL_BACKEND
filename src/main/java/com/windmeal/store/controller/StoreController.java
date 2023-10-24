@@ -16,53 +16,55 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class StoreController {
 
-    private final StoreService storeService;
-    private final S3Util s3Util;
+  private final StoreService storeService;
+  private final S3Util s3Util;
 
-    /**
-     * 가게 생성
-     * @param request
-     * @param file
-     * @return
-     */
-    @PostMapping("/store")
-    public ResultDataResponseDTO createStore(
-            @Valid @RequestPart StoreCreateRequest request,
-            @RequestPart("file") MultipartFile file){
+  /**
+   * 가게 생성
+   *
+   * @param request
+   * @param file
+   * @return
+   */
+  @PostMapping("/store")
+  public ResultDataResponseDTO createStore(
+      @Valid @RequestPart StoreCreateRequest request,
+      @RequestPart(value = "file", required = false) MultipartFile file) {
 
-        String imgUrl = s3Util.imgUpload(file);
-        StoreResponse response = storeService.createStore(request,imgUrl);
-        return ResultDataResponseDTO.of(response);
-    }
+    String imgUrl = s3Util.imgUpload(file);
+    StoreResponse response = storeService.createStore(request, imgUrl);
+    return ResultDataResponseDTO.of(response);
+  }
 
-    /**
-     * 가게 사진 수정
-     * @param file
-     * @param storeId
-     * @return
-     */
-    @PatchMapping("/store/{storeId}/photo")
-    public ResultDataResponseDTO updateStorePhoto(
-            @RequestPart("file") MultipartFile file, @PathVariable Long storeId){
+  /**
+   * 가게 사진 수정
+   *
+   * @param file
+   * @param storeId
+   * @return
+   */
+  @PatchMapping("/store/{storeId}/photo")
+  public ResultDataResponseDTO updateStorePhoto(
+      @RequestPart("file") MultipartFile file, @PathVariable Long storeId) {
 
+    String imgUrl = s3Util.imgUpload(file);
+    String originalPhoto = storeService.updateStorePhoto(storeId, imgUrl);
+    s3Util.delete(originalPhoto);
+    return ResultDataResponseDTO.empty();
+  }
 
-        String imgUrl = s3Util.imgUpload(file);
-        String originalPhoto = storeService.updateStorePhoto(storeId, imgUrl);
-        s3Util.delete(originalPhoto);
-        return ResultDataResponseDTO.empty();
-    }
+  /**
+   * 가게 정보 수정
+   *
+   * @param storeId
+   * @param updateRequest
+   * @return
+   */
+  @PatchMapping("/store/{storeId}/info")
+  public ResultDataResponseDTO updateStoreInfo(
+      @PathVariable Long storeId, @RequestBody StoreUpdateRequest updateRequest) {
 
-    /**
-     * 가게 정보 수정
-     * @param storeId
-     * @param updateRequest
-     * @return
-     */
-    @PatchMapping("/store/{storeId}/info")
-    public ResultDataResponseDTO updateStoreInfo(
-            @PathVariable Long storeId,@RequestBody StoreUpdateRequest updateRequest) {
-
-        storeService.updateStoreInfo(storeId,updateRequest);
-        return ResultDataResponseDTO.empty();
-    }
+    storeService.updateStoreInfo(storeId, updateRequest);
+    return ResultDataResponseDTO.empty();
+  }
 }

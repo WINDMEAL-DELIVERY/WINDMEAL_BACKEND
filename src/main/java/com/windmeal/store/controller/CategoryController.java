@@ -14,29 +14,29 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class CategoryController {
 
-    private final CategoryService categoryService;
+  private final CategoryService categoryService;
 
-    @PostMapping("/category")
-    public ResultDataResponseDTO createCategory(@Valid @RequestBody CategoryCreateRequest request){
+  @PostMapping("/category")
+  public ResultDataResponseDTO createCategory(@Valid @RequestBody CategoryCreateRequest request) {
 
-        CategoryResponse response = categoryService.createCategory(request);
+    CategoryResponse response = categoryService.createCategory(request);
 
-        return ResultDataResponseDTO.of(response);
-    }
+    return ResultDataResponseDTO.of(response);
+  }
 
-    @PatchMapping("/category")
-    public ResultDataResponseDTO updateCategory(@RequestBody CategoryUpdateRequest request){
+  @PatchMapping("/category")
+  public ResultDataResponseDTO updateCategory(@RequestBody CategoryUpdateRequest request) {
 
-        categoryService.updateCategory(request);
+    categoryService.updateCategory(request);
 
-        return ResultDataResponseDTO.empty();
-    }
+    return ResultDataResponseDTO.empty();
+  }
 
-    @DeleteMapping("/category")
-    public ResultDataResponseDTO deleteCategory(@RequestBody CategoryUpdateRequest request){
+  @DeleteMapping("/category")
+  public ResultDataResponseDTO deleteCategory(@RequestBody CategoryUpdateRequest request) {
 
-        categoryService.deleteCategory(request);
+    categoryService.deleteCategory(request);
 
-        return ResultDataResponseDTO.empty();
-    }
+    return ResultDataResponseDTO.empty();
+  }
 }

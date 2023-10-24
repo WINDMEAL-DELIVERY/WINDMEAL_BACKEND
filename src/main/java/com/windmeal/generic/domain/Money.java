@@ -9,7 +9,7 @@ import java.util.function.Function;
 
 @Embeddable
 public class Money {
-//    public static final Money ZERO = Money.wons(0);
+    public static final Money ZERO = Money.wons(0);
 
     private int price;
 
@@ -21,9 +21,9 @@ public class Money {
 
     }
 
-//    public static Money wons(long amount) {
-//        return new Money(BigDecimal.valueOf(amount));
-//    }
+    public static Money wons(int amount) {
+        return new Money(amount);
+    }
 //
 //    public static Money wons(double amount) {
 //        return new Money(BigDecimal.valueOf(amount));
