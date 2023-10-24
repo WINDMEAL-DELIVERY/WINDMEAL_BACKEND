@@ -28,7 +28,7 @@ public class StoreController {
     @PostMapping("/store")
     public ResultDataResponseDTO createStore(
             @Valid @RequestPart StoreCreateRequest request,
-            @RequestPart("file") MultipartFile file){
+            @RequestPart(value = "file",required = false) MultipartFile file){
 
         String imgUrl = s3Util.imgUpload(file);
         StoreResponse response = storeService.createStore(request,imgUrl);
