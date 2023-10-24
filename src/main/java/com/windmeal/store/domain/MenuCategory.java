@@ -2,6 +2,7 @@ package com.windmeal.store.domain;
 
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,4 +23,13 @@ public class MenuCategory {
 
     private String name;
 
+    @Builder
+    public MenuCategory(Store store, String name) {
+        this.store = store;
+        this.name = name;
+    }
+
+    public void updateName(String name) {
+        this.name = name;
+    }
 }
