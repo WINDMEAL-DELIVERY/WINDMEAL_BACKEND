@@ -35,7 +35,7 @@ class CategoryRepositoryImplTest {
 
     //then
     List<Category> all = categoryRepository.findAllByNameIn(categoryNameList);
-    assertThat(all).hasSize(3)
+    assertThat(all).hasSize(4)
         .extracting("name")
         .containsExactlyInAnyOrder("커피","카페","커피챗");
   }
