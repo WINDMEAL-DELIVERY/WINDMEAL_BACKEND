@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CategoryJpaRepository extends JpaRepository<Category,Long> ,CategoryRepository{
+public interface CategoryJpaRepository extends JpaRepository<Category, Long>, CategoryRepository {
 
   List<Category> findAllByNameIn(List<String> categoryName);
 }

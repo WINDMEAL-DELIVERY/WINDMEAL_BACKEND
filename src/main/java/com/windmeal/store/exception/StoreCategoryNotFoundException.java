@@ -6,11 +6,11 @@ import com.windmeal.global.exception.GeneralException;
 public class StoreCategoryNotFoundException extends GeneralException {
 
 
-    public StoreCategoryNotFoundException(String message) {
-        super(message);
-    }
+  public StoreCategoryNotFoundException(String message) {
+    super(message);
+  }
 
-    public StoreCategoryNotFoundException(ErrorCode errorCode, String message) {
-        super(errorCode, message);
-    }
+  public StoreCategoryNotFoundException(ErrorCode errorCode, String message) {
+    super(errorCode, message);
+  }
 }

@@ -16,34 +16,37 @@ import java.time.LocalTime;
 @Builder
 @NoArgsConstructor
 public class StoreResponse {
-    private Long storeId;
-    private Long ownerId;
 
-    private String name;
+  private Long storeId;
+  private Long ownerId;
 
-    private String phoneNumber;
+  private String name;
 
-    private String photo;
-    private LocalTime openTime;
+  private String phoneNumber;
 
-    private LocalTime closeTime;
+  private String photo;
+  private LocalTime openTime;
 
-    private Point location;
+  private LocalTime closeTime;
 
-    private boolean isOpen;
+  private Point location;
 
-    private List<String> categories;
-    public static StoreResponse of(Store store, StoreValidator storeValidator) {
-        return StoreResponse.builder()
-                .storeId(store.getId())
-                .ownerId(store.getOwner().getId())
-                .name(store.getName())
-                .phoneNumber(store.getPhoneNumber())
-                .photo(store.getPhoto())
-                .openTime(store.getOpenTime())
-                .closeTime(store.getCloseTime())
-                .location(store.getLocation())
-                .isOpen(storeValidator.validateStoreIsOpen(store.getOpenTime(),store.getCloseTime(),LocalTime.now()))
-                .build();
-    }
+  private boolean isOpen;
+
+  private List<String> categories;
+
+  public static StoreResponse of(Store store, StoreValidator storeValidator) {
+    return StoreResponse.builder()
+        .storeId(store.getId())
+        .ownerId(store.getOwner().getId())
+        .name(store.getName())
+        .phoneNumber(store.getPhoneNumber())
+        .photo(store.getPhoto())
+        .openTime(store.getOpenTime())
+        .closeTime(store.getCloseTime())
+        .location(store.getLocation())
+        .isOpen(storeValidator.validateStoreIsOpen(store.getOpenTime(), store.getCloseTime(),
+            LocalTime.now()))
+        .build();
+  }
 }

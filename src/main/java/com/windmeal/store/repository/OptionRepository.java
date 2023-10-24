@@ -5,5 +5,5 @@ import java.util.List;
 
 public interface OptionRepository {
 
-  void createOptionSpecs(List<OptionSpecRequest> optionSpecifications,Long option_group_id);
+  void createOptionSpecs(List<OptionSpecRequest> optionSpecifications, Long option_group_id);
 }

@@ -17,50 +17,52 @@ import java.time.LocalTime;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Store {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "store_id")
-    private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member owner;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "store_id")
+  private Long id;
 
-    private String name;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "member_id")
+  private Member owner;
 
-    private String phoneNumber;
+  private String name;
 
-    private String photo;
-    private LocalTime openTime;
+  private String phoneNumber;
 
-    private LocalTime closeTime;
+  private String photo;
+  private LocalTime openTime;
 
-    private Point location;
+  private LocalTime closeTime;
 
-    @OneToMany(mappedBy = "store")
-    private List<StoreCategory> storeCategoryList = new ArrayList<>();
+  private Point location;
 
-    @Builder
-    public Store(Member owner, String name, String phoneNumber, String photo, LocalTime openTime, LocalTime closeTime, Point location) {
-        this.owner = owner;
-        this.name = name;
-        this.phoneNumber = phoneNumber;
-        this.photo = photo;
-        this.openTime = openTime;
-        this.closeTime = closeTime;
-        this.location = location;
-    }
+  @OneToMany(mappedBy = "store")
+  private List<StoreCategory> storeCategoryList = new ArrayList<>();
 
-    public void updatePhoto(String updatePhoto) {
-        this.photo=updatePhoto;
-    }
+  @Builder
+  public Store(Member owner, String name, String phoneNumber, String photo, LocalTime openTime,
+      LocalTime closeTime, Point location) {
+    this.owner = owner;
+    this.name = name;
+    this.phoneNumber = phoneNumber;
+    this.photo = photo;
+    this.openTime = openTime;
+    this.closeTime = closeTime;
+    this.location = location;
+  }
 
-    public void updateInfo(StoreUpdateRequest updateRequest) {
-        this.name= updateRequest.getName();
-        this.phoneNumber=updateRequest.getPhoneNumber();
-        this.closeTime=updateRequest.getCloseTime();
-        this.openTime=updateRequest.getOpenTime();
-        this.location = new Point(updateRequest.getLatitude(), updateRequest.getLongitude());
+  public void updatePhoto(String updatePhoto) {
+    this.photo = updatePhoto;
+  }
 
-    }
+  public void updateInfo(StoreUpdateRequest updateRequest) {
+    this.name = updateRequest.getName();
+    this.phoneNumber = updateRequest.getPhoneNumber();
+    this.closeTime = updateRequest.getCloseTime();
+    this.openTime = updateRequest.getOpenTime();
+    this.location = new Point(updateRequest.getLatitude(), updateRequest.getLongitude());
+
+  }
 }

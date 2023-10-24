@@ -21,8 +21,9 @@ public class OptionService {
   private final OptionGroupJpaRepository optionGroupRepository;
   private final OptionSpecificationJpaRepository optionSpecificationRepository;
   private final MenuJpaRepository menuRepository;
+
   @Transactional
-  public void createOption(OptionCreateRequest request){
+  public void createOption(OptionCreateRequest request) {
     Menu menu = menuRepository.findById(request.getMenuId())
         .orElseThrow(() -> new MenuNotFoundException(
             ErrorCode.NOT_FOUND, "메뉴가 존재하지 않습니다."));

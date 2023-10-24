@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MenuCreateRequest {
+
   private Long menuCategoryId;
 
   @NotBlank(message = "메뉴 이름을 입력해주세요.")
@@ -24,11 +25,11 @@ public class MenuCreateRequest {
   private String description;
 
   @NotNull(message = "금액을 입력해주세요.")
-  @Min(value=0, message="금액은 0원 이상이어야 합니다.")
+  @Min(value = 0, message = "금액은 0원 이상이어야 합니다.")
   private int price;
 
 
-  public Menu toEntity(MenuCategory menuCategory){
+  public Menu toEntity(MenuCategory menuCategory) {
     return Menu.builder()
         .menuCategory(menuCategory)
         .name(this.name)

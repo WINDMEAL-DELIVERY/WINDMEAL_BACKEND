@@ -14,7 +14,7 @@ public class StoreCategoryRepositoryImpl implements StoreCategoryRepository {
   @Override
   public void createStoreCategories(List<Long> categoryIdList, Long storeId) {
     String sql = "INSERT INTO store_category (category_id,store_id)\n"
-        +  "VALUES (?, ?)";
+        + "VALUES (?, ?)";
 
     jdbcTemplate.batchUpdate(sql,
         categoryIdList,

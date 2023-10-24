@@ -9,14 +9,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 @RequiredArgsConstructor
-public class OptionRepositoryImpl implements OptionRepository{
+public class OptionRepositoryImpl implements OptionRepository {
 
   private final JdbcTemplate jdbcTemplate;
 
   @Override
-  public void createOptionSpecs(List<OptionSpecRequest> optionSpecifications,Long option_group_id) {
+  public void createOptionSpecs(List<OptionSpecRequest> optionSpecifications,
+      Long option_group_id) {
     String sql = "INSERT INTO option_specification (option_group_id,name,price)\n"
-        +  "VALUES (?, ?,?)";
+        + "VALUES (?, ?,?)";
 
     jdbcTemplate.batchUpdate(sql,
         optionSpecifications,

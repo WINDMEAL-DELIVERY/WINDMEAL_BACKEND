@@ -16,8 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 /**
- * 메뉴 카테고리 생성
- * 메뉴 카테고리 이름 수정
+ * 메뉴 카테고리 생성 메뉴 카테고리 이름 수정
  */
 @Service
 @RequiredArgsConstructor
@@ -28,7 +27,7 @@ public class MenuCategoryService {
   private final MenuCategoryJpaRepository menuCategoryRepository;
 
   @Transactional
-  public void createMenuCategory(MenuCategoryCreateRequest request){
+  public void createMenuCategory(MenuCategoryCreateRequest request) {
     Store store = storeRepository.findById(request.getStoreId())
         .orElseThrow(() -> new StoreNotFoundException(
             ErrorCode.NOT_FOUND, "가게가 존재하지 않습니다."));
@@ -37,7 +36,7 @@ public class MenuCategoryService {
   }
 
   @Transactional
-  public void updateMenuCategory(MenuCategoryUpdateRequest request){
+  public void updateMenuCategory(MenuCategoryUpdateRequest request) {
     MenuCategory menuCategory = menuCategoryRepository.findById(request.getMenuCategoryId())
         .orElseThrow(
             () -> new MenuCategoryNotFoundException(ErrorCode.NOT_FOUND, "메뉴 카테고리가 존재하지 않습니다."));

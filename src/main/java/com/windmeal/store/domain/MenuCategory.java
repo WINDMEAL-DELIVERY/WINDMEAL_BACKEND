@@ -12,24 +12,25 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MenuCategory {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "menu_category_id")
-    private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_id")
-    private Store store;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "menu_category_id")
+  private Long id;
 
-    private String name;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "store_id")
+  private Store store;
 
-    @Builder
-    public MenuCategory(Store store, String name) {
-        this.store = store;
-        this.name = name;
-    }
+  private String name;
 
-    public void updateName(String name) {
-        this.name = name;
-    }
+  @Builder
+  public MenuCategory(Store store, String name) {
+    this.store = store;
+    this.name = name;
+  }
+
+  public void updateName(String name) {
+    this.name = name;
+  }
 }

@@ -20,7 +20,7 @@ public class MenuService {
   private final MenuCategoryJpaRepository menuCategoryRepository;
 
   @Transactional
-  public void createMenu(MenuCreateRequest request){
+  public void createMenu(MenuCreateRequest request) {
     MenuCategory menuCategory = menuCategoryRepository.findById(request.getMenuCategoryId())
         .orElseThrow(() -> new MenuCategoryNotFoundException(
             ErrorCode.NOT_FOUND, "메뉴 카테고리를 지정해주세요"));

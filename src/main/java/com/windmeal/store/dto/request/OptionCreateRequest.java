@@ -31,11 +31,12 @@ public class OptionCreateRequest {
 
   @Getter
   public class OptionSpecRequest {
+
     private String name;
     private int price;
   }
 
-  public OptionGroup toOptionGroupEntity(Menu menu){
+  public OptionGroup toOptionGroupEntity(Menu menu) {
     return OptionGroup.builder()
         .menu(menu)
         .name(this.name)

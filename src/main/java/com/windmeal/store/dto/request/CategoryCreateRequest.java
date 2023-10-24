@@ -15,12 +15,12 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 public class CategoryCreateRequest {
 
-    @NotBlank(message = "카테고리명은 빈칸이 될 수 없습니다.")
-    private String name;
+  @NotBlank(message = "카테고리명은 빈칸이 될 수 없습니다.")
+  private String name;
 
-    public Category toEntity(){
-        return Category.builder()
-                .name(this.name)
-                .build();
-    }
+  public Category toEntity() {
+    return Category.builder()
+        .name(this.name)
+        .build();
+  }
 }

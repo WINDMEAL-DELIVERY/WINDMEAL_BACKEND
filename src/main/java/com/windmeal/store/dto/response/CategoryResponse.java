@@ -12,14 +12,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CategoryResponse {
 
-    private Long id;
+  private Long id;
 
-    private String name;
+  private String name;
 
-    public static CategoryResponse of(Category category) {
-        return CategoryResponse.builder()
-                .id(category.getId())
-                .name(category.getName())
-                .build();
-    }
+  public static CategoryResponse of(Category category) {
+    return CategoryResponse.builder()
+        .id(category.getId())
+        .name(category.getName())
+        .build();
+  }
 }

@@ -18,33 +18,33 @@ import java.time.LocalTime;
 @NoArgsConstructor
 public class StoreCreateRequest {
 
-    private Long memberId;
+  private Long memberId;
 
-    @NotBlank(message = "가게 이름은 빈칸일 수 없습니다.")
-    private String name;
+  @NotBlank(message = "가게 이름은 빈칸일 수 없습니다.")
+  private String name;
 
-    private String phoneNumber;
+  private String phoneNumber;
 
-    private LocalTime openTime;
+  private LocalTime openTime;
 
-    private LocalTime closeTime;
+  private LocalTime closeTime;
 
-    private Double longitude;
+  private Double longitude;
 
-    private Double latitude;
+  private Double latitude;
 
-    private List<String> categoryList;
+  private List<String> categoryList;
 
-    public Store toEntity(Member member,String imgUrl) {
-        return Store.builder()
-                .owner(member)
-                .name(this.name)
-                .phoneNumber(this.phoneNumber)
-                .photo(imgUrl)
-                .openTime(this.openTime)
-                .closeTime(this.closeTime)
-                .location(new Point(latitude,longitude))
-                .build();
-    }
+  public Store toEntity(Member member, String imgUrl) {
+    return Store.builder()
+        .owner(member)
+        .name(this.name)
+        .phoneNumber(this.phoneNumber)
+        .photo(imgUrl)
+        .openTime(this.openTime)
+        .closeTime(this.closeTime)
+        .location(new Point(latitude, longitude))
+        .build();
+  }
 
 }

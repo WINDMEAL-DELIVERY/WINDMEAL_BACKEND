@@ -4,6 +4,7 @@ import java.util.List;
 
 public interface StoreCategoryRepository {
 
-  void createStoreCategories(List<Long> categoryIdList,Long storeId);
-  void createStoreCategoriesNotExist(List<Long> categoryIdList,Long storeId);
+  void createStoreCategories(List<Long> categoryIdList, Long storeId);
+
+  void createStoreCategoriesNotExist(List<Long> categoryIdList, Long storeId);
 }

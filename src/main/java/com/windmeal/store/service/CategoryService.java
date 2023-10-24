@@ -12,35 +12,33 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * 카테고리 생성
- * 카테고리 삭제
- * 카테고리 수정
+ * 카테고리 생성 카테고리 삭제 카테고리 수정
  */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CategoryService {
 
-    private final CategoryJpaRepository categoryJpaRepository;
+  private final CategoryJpaRepository categoryJpaRepository;
 
-    @Transactional
-    public CategoryResponse createCategory(CategoryCreateRequest request){
-        Category savedCategory = categoryJpaRepository.save(request.toEntity());
-        return CategoryResponse.of(savedCategory);
-    }
+  @Transactional
+  public CategoryResponse createCategory(CategoryCreateRequest request) {
+    Category savedCategory = categoryJpaRepository.save(request.toEntity());
+    return CategoryResponse.of(savedCategory);
+  }
 
-    @Transactional
-    public void updateCategory(CategoryUpdateRequest request){
-        Category category = categoryJpaRepository.findById(request.getId()).orElseThrow(
-                () -> new CategoryNotFoundException(ErrorCode.NOT_FOUND,"카테고리가 존재하지 않습니다."));
-        category.updateName(request.getName());
-    }
+  @Transactional
+  public void updateCategory(CategoryUpdateRequest request) {
+    Category category = categoryJpaRepository.findById(request.getId()).orElseThrow(
+        () -> new CategoryNotFoundException(ErrorCode.NOT_FOUND, "카테고리가 존재하지 않습니다."));
+    category.updateName(request.getName());
+  }
 
-    @Transactional
-    public void deleteCategory(CategoryUpdateRequest request){
-        categoryJpaRepository.findById(request.getId()).orElseThrow(
-                () -> new CategoryNotFoundException(ErrorCode.NOT_FOUND,"카테고리가 존재하지 않습니다."));
-        categoryJpaRepository.deleteById(request.getId());
-    }
+  @Transactional
+  public void deleteCategory(CategoryUpdateRequest request) {
+    categoryJpaRepository.findById(request.getId()).orElseThrow(
+        () -> new CategoryNotFoundException(ErrorCode.NOT_FOUND, "카테고리가 존재하지 않습니다."));
+    categoryJpaRepository.deleteById(request.getId());
+  }
 
 }

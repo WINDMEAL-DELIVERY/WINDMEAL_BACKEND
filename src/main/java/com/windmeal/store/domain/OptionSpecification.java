@@ -13,24 +13,24 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OptionSpecification {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "option_specification_id")
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "option_specification_id")
+  private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "option_group_id")
-    private OptionGroup optionGroup;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "option_group_id")
+  private OptionGroup optionGroup;
 
-    private String name;
+  private String name;
 
-    @Embedded
-    private Money price;
+  @Embedded
+  private Money price;
 
-    @Builder
-    public OptionSpecification(OptionGroup optionGroup, String name, Money price) {
-        this.optionGroup = optionGroup;
-        this.name = name;
-        this.price = price;
-    }
+  @Builder
+  public OptionSpecification(OptionGroup optionGroup, String name, Money price) {
+    this.optionGroup = optionGroup;
+    this.name = name;
+    this.price = price;
+  }
 }
