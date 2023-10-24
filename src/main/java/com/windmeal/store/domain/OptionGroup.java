@@ -1,6 +1,7 @@
 package com.windmeal.store.domain;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,4 +25,13 @@ public class OptionGroup {
     private boolean isEssentialOption; //필수 선택 여부
 
     private boolean isMultipleOption; //다중 선택 여부
+
+    @Builder
+    public OptionGroup(Menu menu, String name, boolean isEssentialOption,
+        boolean isMultipleOption) {
+        this.menu = menu;
+        this.name = name;
+        this.isEssentialOption = isEssentialOption;
+        this.isMultipleOption = isMultipleOption;
+    }
 }

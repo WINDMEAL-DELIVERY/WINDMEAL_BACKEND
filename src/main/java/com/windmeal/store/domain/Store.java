@@ -2,6 +2,8 @@ package com.windmeal.store.domain;
 
 import com.windmeal.member.domain.Member;
 import com.windmeal.store.dto.request.StoreUpdateRequest;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,6 +37,8 @@ public class Store {
 
     private Point location;
 
+    @OneToMany(mappedBy = "store")
+    private List<StoreCategory> storeCategoryList = new ArrayList<>();
 
     @Builder
     public Store(Member owner, String name, String phoneNumber, String photo, LocalTime openTime, LocalTime closeTime, Point location) {

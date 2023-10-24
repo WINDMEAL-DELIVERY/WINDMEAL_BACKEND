@@ -2,6 +2,7 @@ package com.windmeal.store.dto.response;
 
 import com.windmeal.store.domain.Store;
 import com.windmeal.store.validator.StoreValidator;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,6 +32,7 @@ public class StoreResponse {
 
     private boolean isOpen;
 
+    private List<String> categories;
     public static StoreResponse of(Store store, StoreValidator storeValidator) {
         return StoreResponse.builder()
                 .storeId(store.getId())

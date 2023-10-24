@@ -2,6 +2,7 @@ package com.windmeal.store.domain;
 
 import com.windmeal.generic.domain.Money;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -25,4 +26,13 @@ public class Menu {
 
     @Embedded
     private Money price;
+
+
+    @Builder
+    public Menu(MenuCategory menuCategory, String name, String description, Money price) {
+        this.menuCategory = menuCategory;
+        this.name = name;
+        this.description = description;
+        this.price = price;
+    }
 }
