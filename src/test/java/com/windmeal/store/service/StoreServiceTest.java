@@ -1,5 +1,6 @@
 package com.windmeal.store.service;
 
+import com.windmeal.IntegrationTestSupport;
 import com.windmeal.member.domain.Member;
 import com.windmeal.member.repository.MemberRepository;
 import com.windmeal.store.domain.Store;
@@ -8,21 +9,20 @@ import com.windmeal.store.dto.request.StoreUpdateRequest;
 import com.windmeal.store.dto.response.StoreResponse;
 import com.windmeal.store.exception.StoreNotFoundException;
 import com.windmeal.store.repository.StoreJpaRepository;
+import java.util.ArrayList;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.geo.Point;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
 
 import static org.assertj.core.api.Assertions.*;
 
 
-@SpringBootTest
-@Transactional
-class StoreServiceTest {
+
+class StoreServiceTest extends IntegrationTestSupport {
 
     @Autowired
     private StoreService storeService;
@@ -31,6 +31,13 @@ class StoreServiceTest {
 
     @Autowired
     private StoreJpaRepository storeJpaRepository;
+
+
+    @AfterEach
+    void tearDown() {
+        storeJpaRepository.deleteAllInBatch();
+        memberRepository.deleteAllInBatch();
+    }
 
     @DisplayName("매장을 생성한다.")
     @Test
@@ -161,6 +168,7 @@ class StoreServiceTest {
                 .closeTime(closeTime)
                 .latitude(lat)
                 .longitude(lon)
+                .categoryList(new ArrayList<>())
                 .build();
     }
 
