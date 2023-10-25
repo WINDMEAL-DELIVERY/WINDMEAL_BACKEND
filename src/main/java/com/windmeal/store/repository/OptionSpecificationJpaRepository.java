@@ -2,6 +2,7 @@ package com.windmeal.store.repository;
 
 import com.windmeal.store.domain.OptionGroup;
 import com.windmeal.store.domain.OptionSpecification;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,4 +10,5 @@ import org.springframework.stereotype.Repository;
 public interface OptionSpecificationJpaRepository extends JpaRepository<OptionSpecification, Long>,
     OptionRepository {
 
+  List<OptionSpecification> findByOptionGroupId(Long optionGroupId);
 }

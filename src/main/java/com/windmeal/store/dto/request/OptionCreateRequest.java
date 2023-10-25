@@ -30,7 +30,9 @@ public class OptionCreateRequest {
   private List<OptionSpecRequest> optionSpec;
 
   @Getter
-  public class OptionSpecRequest {
+  @Builder
+  @AllArgsConstructor
+  public static class OptionSpecRequest {
 
     private String name;
     private int price;
