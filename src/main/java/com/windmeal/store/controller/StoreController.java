@@ -67,4 +67,10 @@ public class StoreController {
     storeService.updateStoreInfo(storeId, updateRequest);
     return ResultDataResponseDTO.empty();
   }
+
+  @GetMapping("/store/{storeId}")
+  public ResultDataResponseDTO getStoreInfo(@PathVariable Long storeId) {
+    return ResultDataResponseDTO.of(storeService.getStoreInfo(storeId));
+
+  }
 }
