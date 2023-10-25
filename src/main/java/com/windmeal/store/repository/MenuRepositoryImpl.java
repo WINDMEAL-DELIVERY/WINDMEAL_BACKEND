@@ -22,7 +22,8 @@ public class MenuRepositoryImpl implements MenuRepository {
             menu.menuCategory.id,
             menu.name,
             menu.description,
-            menu.price
+            menu.price,
+            menu.photo
         ))
         .from(menu)
         .where(menu.menuCategory.id.in(menuCategoryIds)).fetch();

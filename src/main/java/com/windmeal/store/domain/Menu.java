@@ -28,12 +28,15 @@ public class Menu {
   @Embedded
   private Money price;
 
+  private String photo;
 
   @Builder
-  public Menu(MenuCategory menuCategory, String name, String description, Money price) {
+  public Menu(MenuCategory menuCategory, String name, String description, Money price,
+      String photo) {
     this.menuCategory = menuCategory;
     this.name = name;
     this.description = description;
     this.price = price;
+    this.photo = photo;
   }
 }
