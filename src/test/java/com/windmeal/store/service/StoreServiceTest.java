@@ -7,8 +7,7 @@ import com.windmeal.store.dto.request.StoreCreateRequest;
 import com.windmeal.store.dto.request.StoreUpdateRequest;
 import com.windmeal.store.dto.response.StoreResponse;
 import com.windmeal.store.exception.StoreNotFoundException;
-import com.windmeal.store.repository.StoreRepository;
-import org.assertj.core.api.Assertions;
+import com.windmeal.store.repository.StoreJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,7 @@ class StoreServiceTest {
     private MemberRepository memberRepository;
 
     @Autowired
-    private StoreRepository storeRepository;
+    private StoreJpaRepository storeJpaRepository;
 
     @DisplayName("매장을 생성한다.")
     @Test
@@ -62,7 +61,7 @@ class StoreServiceTest {
                 ,LocalTime.of(10, 0, 0),LocalTime.of(22, 0, 0)
                 ,1234.567, 567.812);
         String originalPhoto = "photo";
-        Store savedStore = storeRepository.save(request.toEntity(savedMember, originalPhoto));
+        Store savedStore = storeJpaRepository.save(request.toEntity(savedMember, originalPhoto));
 
         //when
         String updateUrl = "update";
@@ -70,7 +69,7 @@ class StoreServiceTest {
         String returnPhoto = storeService.updateStorePhoto(storeId, updateUrl);
 
         //then
-        Store findStore = storeRepository.findById(savedStore.getId()).get();
+        Store findStore = storeJpaRepository.findById(savedStore.getId()).get();
 
         assertThat(findStore.getPhoto()).isEqualTo(updateUrl);
         assertThat(returnPhoto).isEqualTo(originalPhoto);
@@ -85,7 +84,7 @@ class StoreServiceTest {
                 savedMember,"010","testName"
                 ,LocalTime.of(10, 0, 0),LocalTime.of(22, 0, 0)
                 ,1234.567, 567.812);
-        Store savedStore = storeRepository.save(request.toEntity(savedMember, "photo"));
+        Store savedStore = storeJpaRepository.save(request.toEntity(savedMember, "photo"));
 
         //when
         String updateUrl = "update";
@@ -107,7 +106,7 @@ class StoreServiceTest {
                 ,LocalTime.of(10, 0, 0),LocalTime.of(22, 0, 0)
                 ,1234.567, 567.812);
         String originalPhoto = "photo";
-        Store savedStore = storeRepository.save(request.toEntity(savedMember, originalPhoto));
+        Store savedStore = storeJpaRepository.save(request.toEntity(savedMember, originalPhoto));
 
         //when
         Long storeId = 0L;
@@ -129,7 +128,7 @@ class StoreServiceTest {
                 ,LocalTime.of(10, 0, 0),LocalTime.of(22, 0, 0)
                 ,1234.567, 567.812);
         String originalPhoto = "photo";
-        Store savedStore = storeRepository.save(request.toEntity(savedMember, originalPhoto));
+        Store savedStore = storeJpaRepository.save(request.toEntity(savedMember, originalPhoto));
 
         //when
         Long storeId = savedStore.getId();
@@ -144,7 +143,7 @@ class StoreServiceTest {
         storeService.updateStoreInfo(storeId, updateRequest);
 
         //then
-        Store findStore = storeRepository.findById(savedStore.getId()).get();
+        Store findStore = storeJpaRepository.findById(savedStore.getId()).get();
         assertThat(findStore)
                 .extracting("name","phoneNumber","openTime","closeTime","location")
                 .containsExactly(updateRequest.getName(),updateRequest.getPhoneNumber(),updateRequest.getOpenTime(),updateRequest.getCloseTime(),new Point(updateRequest.getLatitude(),updateRequest.getLongitude()));
