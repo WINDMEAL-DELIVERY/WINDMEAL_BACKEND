@@ -19,8 +19,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class OptionCreateRequest {
 
-  private Long menuId;
-
   private String name;
 
   private boolean isEssentialOption; //필수 선택 여부

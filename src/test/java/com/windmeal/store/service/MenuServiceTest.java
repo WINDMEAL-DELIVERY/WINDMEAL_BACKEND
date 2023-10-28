@@ -115,7 +115,7 @@ class MenuServiceTest extends IntegrationTestSupport {
 
     //when
     return menuCategoryService.createMenuCategory(
-        buildMenuCategoryCreateRequest(storeId, "test name1"));
+        buildMenuCategoryCreateRequest( "test name1"),storeId);
   }
 
   private MenuCreateRequest buildMenuCreateRequest(long menuCategoryId, String name,
@@ -129,10 +129,9 @@ class MenuServiceTest extends IntegrationTestSupport {
         .build();
   }
 
-  private MenuCategoryCreateRequest buildMenuCategoryCreateRequest(long storeId, String name) {
+  private MenuCategoryCreateRequest buildMenuCategoryCreateRequest(String name) {
     return MenuCategoryCreateRequest
         .builder()
-        .storeId(storeId)
         .name(name)
         .build();
   }

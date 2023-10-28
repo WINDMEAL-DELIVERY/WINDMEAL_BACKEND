@@ -8,6 +8,7 @@ import com.windmeal.store.dto.request.MenuCategoryCreateRequest;
 import com.windmeal.store.dto.request.MenuCategoryUpdateRequest;
 import com.windmeal.store.dto.response.MenuCategoryResponse;
 import com.windmeal.store.exception.MenuCategoryNotFoundException;
+import com.windmeal.store.exception.StoreMenuCategoryNotMatchException;
 import com.windmeal.store.exception.StoreNotFoundException;
 import com.windmeal.store.repository.MenuCategoryJpaRepository;
 import com.windmeal.store.repository.StoreJpaRepository;
@@ -28,8 +29,8 @@ public class MenuCategoryService {
   private final MenuCategoryJpaRepository menuCategoryRepository;
 
   @Transactional
-  public MenuCategoryResponse createMenuCategory(MenuCategoryCreateRequest request) {
-    Store store = storeRepository.findById(request.getStoreId())
+  public MenuCategoryResponse createMenuCategory(MenuCategoryCreateRequest request,Long storeId) {
+    Store store = storeRepository.findById(storeId)
         .orElseThrow(() -> new StoreNotFoundException(
             ErrorCode.NOT_FOUND, "가게가 존재하지 않습니다."));
 
@@ -38,8 +39,10 @@ public class MenuCategoryService {
   }
 
   @Transactional
-  public void updateMenuCategory(MenuCategoryUpdateRequest request) {
-    MenuCategory menuCategory = menuCategoryRepository.findById(request.getMenuCategoryId())
+  public void updateMenuCategory(MenuCategoryUpdateRequest request, Long menuCategoryId) {
+
+
+    MenuCategory menuCategory = menuCategoryRepository.findById(menuCategoryId)
         .orElseThrow(
             () -> new MenuCategoryNotFoundException(ErrorCode.NOT_FOUND, "메뉴 카테고리가 존재하지 않습니다."));
 
