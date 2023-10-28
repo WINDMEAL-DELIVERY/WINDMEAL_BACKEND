@@ -2,22 +2,27 @@ package com.windmeal.store.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
+import com.windmeal.IntegrationTestSupport;
 import com.windmeal.store.domain.Category;
 import java.util.ArrayList;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-class CategoryRepositoryImplTest {
+class CategoryRepositoryImplTest extends IntegrationTestSupport {
 
   @Autowired
   private CategoryJpaRepository categoryRepository;
 
-  @Transactional
+  @AfterEach
+  void tearDown() {
+    categoryRepository.deleteAllInBatch();
+  }
+
   @DisplayName("카테고리 이름 리스트가 입력되면 없는 경우 생성한다.")
   @Test
   void createCategories() {
@@ -35,7 +40,7 @@ class CategoryRepositoryImplTest {
 
     //then
     List<Category> all = categoryRepository.findAllByNameIn(categoryNameList);
-    assertThat(all).hasSize(4)
+    assertThat(all).hasSize(3)
         .extracting("name")
         .containsExactlyInAnyOrder("커피","카페","커피챗");
   }

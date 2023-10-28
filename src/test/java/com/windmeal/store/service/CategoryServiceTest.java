@@ -7,6 +7,7 @@ import com.windmeal.store.dto.request.CategoryUpdateRequest;
 import com.windmeal.store.dto.response.CategoryResponse;
 import com.windmeal.store.exception.CategoryNotFoundException;
 import com.windmeal.store.repository.CategoryJpaRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,11 @@ class CategoryServiceTest extends IntegrationTestSupport {
 
     @Autowired
     private CategoryJpaRepository categoryJpaRepository;
+
+    @AfterEach
+    void tearDown() {
+        categoryJpaRepository.deleteAllInBatch();
+    }
 
     @DisplayName("신규 카테고리를 등록한다.")
     @Test

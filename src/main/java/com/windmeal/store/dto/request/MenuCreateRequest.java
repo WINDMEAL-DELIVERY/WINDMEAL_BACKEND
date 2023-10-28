@@ -29,12 +29,13 @@ public class MenuCreateRequest {
   private int price;
 
 
-  public Menu toEntity(MenuCategory menuCategory) {
+  public Menu toEntity(MenuCategory menuCategory,String imageUrl) {
     return Menu.builder()
         .menuCategory(menuCategory)
         .name(this.name)
         .description(this.description)
         .price(Money.wons(this.price))
+        .photo(imageUrl)
         .build();
   }
 }
