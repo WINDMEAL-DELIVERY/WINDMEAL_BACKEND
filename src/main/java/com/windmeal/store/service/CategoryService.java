@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * 카테고리 생성 카테고리 삭제 카테고리 수정
+ * 카테고리 생성
+ * 카테고리 삭제
+ * 카테고리 수정
  */
 @Service
 @RequiredArgsConstructor

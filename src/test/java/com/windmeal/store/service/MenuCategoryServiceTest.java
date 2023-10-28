@@ -60,8 +60,8 @@ class MenuCategoryServiceTest extends IntegrationTestSupport {
     Long storeId = response.getStoreId();
 
     //when
-    menuCategoryService.createMenuCategory(buildMenuCategoryCreateRequest(storeId, "test name1"));
-    menuCategoryService.createMenuCategory(buildMenuCategoryCreateRequest(storeId, "test name2"));
+    menuCategoryService.createMenuCategory(buildMenuCategoryCreateRequest( "test name1"),storeId);
+    menuCategoryService.createMenuCategory(buildMenuCategoryCreateRequest( "test name2"),storeId);
     //then
     List<MenuCategory> menuCategories = menuCategoryJpaRepository.findByStoreId(storeId);
     assertThat(menuCategories).hasSize(2)
@@ -88,7 +88,7 @@ class MenuCategoryServiceTest extends IntegrationTestSupport {
     //then
     assertThatThrownBy(
         () -> menuCategoryService.createMenuCategory(
-            buildMenuCategoryCreateRequest(storeId, "test name1")))
+            buildMenuCategoryCreateRequest("test name1"),storeId))
         .isInstanceOf(StoreNotFoundException.class)
         .hasMessage("가게가 존재하지 않습니다.");
   }
@@ -109,11 +109,11 @@ class MenuCategoryServiceTest extends IntegrationTestSupport {
     //when
     String originalName = "test name1";
     MenuCategoryResponse menuCategory = menuCategoryService.createMenuCategory(
-        buildMenuCategoryCreateRequest(storeId, originalName));
+        buildMenuCategoryCreateRequest(originalName),storeId);
     Long menuCategoryId = menuCategory.getMenuCategoryId();
 
     String newName = "test new name";
-    menuCategoryService.updateMenuCategory(buildMenuCategoryUpdateRequest(menuCategoryId, newName));
+    menuCategoryService.updateMenuCategory(buildMenuCategoryUpdateRequest(newName),menuCategoryId);
 
     //then
     MenuCategory findMenuCategory = menuCategoryJpaRepository.findById(menuCategoryId).get();
@@ -137,31 +137,29 @@ class MenuCategoryServiceTest extends IntegrationTestSupport {
     //when
     String originalName = "test name1";
     MenuCategoryResponse menuCategory = menuCategoryService.createMenuCategory(
-        buildMenuCategoryCreateRequest(storeId, originalName));
+        buildMenuCategoryCreateRequest(originalName),storeId);
     Long menuCategoryId = 0L;
 
     String newName = "test new name";
 
     //then
     assertThatThrownBy(() -> menuCategoryService.updateMenuCategory(
-        buildMenuCategoryUpdateRequest(menuCategoryId, newName)))
+        buildMenuCategoryUpdateRequest(newName),menuCategoryId))
         .isInstanceOf(MenuCategoryNotFoundException.class)
         .hasMessage("메뉴 카테고리가 존재하지 않습니다.");
   }
 
-  private MenuCategoryCreateRequest buildMenuCategoryCreateRequest(long storeId, String name) {
+  private MenuCategoryCreateRequest buildMenuCategoryCreateRequest(String name) {
     return MenuCategoryCreateRequest
         .builder()
-        .storeId(storeId)
         .name(name)
         .build();
   }
 
-  private MenuCategoryUpdateRequest buildMenuCategoryUpdateRequest(long menuCategoryId,
+  private MenuCategoryUpdateRequest buildMenuCategoryUpdateRequest(
       String name) {
     return MenuCategoryUpdateRequest
         .builder()
-        .menuCategoryId(menuCategoryId)
         .name(name)
         .build();
   }
