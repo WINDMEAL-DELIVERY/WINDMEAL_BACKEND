@@ -28,7 +28,7 @@ public class StoreCategoryRepositoryImpl implements StoreCategoryRepository {
   @Override
   public void createStoreCategoriesNotExist(List<Long> categoryIdList, Long storeId) {
     String sql = "INSERT INTO store_category (category_id,store_id)\n"
-        + "SELECT (?,?)\n"
+        + "SELECT (?),(?)\n"
         + "WHERE NOT EXISTS (\n"
         + "    SELECT 1 FROM store_category WHERE category_id = (?) and store_id = (?)\n"
         + ");";
@@ -39,8 +39,8 @@ public class StoreCategoryRepositoryImpl implements StoreCategoryRepository {
         (PreparedStatement ps, Long categoryId) -> {
           ps.setLong(1, categoryId);
           ps.setLong(2, storeId);
-          ps.setLong(2, categoryId);
-          ps.setLong(2, storeId);
+          ps.setLong(3, categoryId);
+          ps.setLong(4, storeId);
         });
   }
 }

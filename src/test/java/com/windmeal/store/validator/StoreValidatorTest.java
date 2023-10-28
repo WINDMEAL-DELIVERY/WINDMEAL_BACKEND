@@ -1,5 +1,6 @@
 package com.windmeal.store.validator;
 
+import com.windmeal.IntegrationTestSupport;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,8 +12,7 @@ import java.time.LocalTime;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-class StoreValidatorTest {
+class StoreValidatorTest extends IntegrationTestSupport {
 
     @Autowired
     private StoreValidator storeValidator;

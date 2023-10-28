@@ -12,6 +12,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 
+/**
+ * 가게 생성
+ * 가게 정보 수정(이미지 제외)
+ * 가게 이미지 수정
+ * 가게 삭제
+ * 가게 정보 조회
+ */
 @RestController
 @RequiredArgsConstructor
 public class StoreController {
@@ -66,5 +73,11 @@ public class StoreController {
 
     storeService.updateStoreInfo(storeId, updateRequest);
     return ResultDataResponseDTO.empty();
+  }
+
+  @GetMapping("/store/{storeId}")
+  public ResultDataResponseDTO getStoreInfo(@PathVariable Long storeId) {
+    return ResultDataResponseDTO.of(storeService.getStoreInfo(storeId));
+
   }
 }

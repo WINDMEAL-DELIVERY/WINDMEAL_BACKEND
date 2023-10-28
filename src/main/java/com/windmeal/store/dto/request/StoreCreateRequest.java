@@ -2,6 +2,7 @@ package com.windmeal.store.dto.request;
 
 import com.windmeal.member.domain.Member;
 import com.windmeal.store.domain.Store;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,7 +34,7 @@ public class StoreCreateRequest {
 
   private Double latitude;
 
-  private List<String> categoryList;
+  private List<String> categoryList = new ArrayList<>();
 
   public Store toEntity(Member member, String imgUrl) {
     return Store.builder()

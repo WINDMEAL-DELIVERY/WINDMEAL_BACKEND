@@ -13,14 +13,16 @@ public class Money {
 
     private int price;
 
-    public Money(int price) {
+    private Money(int price) {
         this.price = price;
     }
 
     public Money() {
 
     }
-
+    public int wons(){
+        return this.price;
+    }
     public static Money wons(int amount) {
         return new Money(amount);
     }
