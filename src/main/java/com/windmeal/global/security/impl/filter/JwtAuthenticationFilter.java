@@ -2,6 +2,7 @@ package com.windmeal.global.security.impl.filter;
 
 
 import com.windmeal.global.token.util.TokenProvider;
+import com.windmeal.global.util.CookieUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -11,13 +12,13 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-import static com.windmeal.global.constants.JwtConstants.AUTHORIZATION_HEADER;
-import static com.windmeal.global.constants.JwtConstants.BEARER_PREFIX;
+import static com.windmeal.global.constants.JwtConstants.*;
 
 /**
  * JwtAuthenticationFilter는 HTTP 요청을 가로채서, 헤더를 조사하여 토큰값을 얻어 AuthenticationToken, 즉 인증용 객체를 생성한다.
@@ -36,20 +37,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // 먼저 해더를 조사한다. 그리고 유효한 토큰 문자열이 있다면 가져온다.
         String jwt = resolveToken(request);
+        log.error(jwt);
         if(StringUtils.hasText(jwt)) {
             try{
                 // jwt로부터 인증 객체를 생성한다. (이 시점에서의 인증 객체는 아직 인증이 되지 않은 상태이다.)
-                Authentication authentication = tokenProvider.getAuthentication(jwt);
+                Authentication authenticated = tokenProvider.getAuthentication(jwt);
                 /*
                     authenticationManager의 authenticate 메서드를 실행하여 인증 객체에 대해 인증을 수행한다.
                     내부적으로 provider manager (authenticationManager의 구현체)가 알맞은 provider를 찾아서 인증을 진행한다.
                     windmeal에서는 provider를 따로 커스텀하여 사용하지 않고, usernamePasswordAuthenticationFilter를 타기 때문에
                     해당 부분을 담당하는 provider가 호출될 것이다.
                  */
-                Authentication authenticated = authenticationManager.authenticate(authentication);
+                // 아래 코드는 조금 헷갈리는데, 해당 필터는 처음 인증 정보를 등록해주는 역할을 수행하고 인증여부를 검사하는 것은 아닌 듯 하다.
+//                Authentication authenticated = authenticationManager.authenticate(authentication);
                 // 인증이 완료된 인증 객체에 대해서 security session (context)에 저장해준다.
                 SecurityContextHolder.getContext().setAuthentication(authenticated);
             } catch (AuthenticationException authenticationException) {
+                authenticationException.printStackTrace();
                 log.error("인증 실패 - JwtAuthenticationFilter");
                 SecurityContextHolder.clearContext();
             }
@@ -60,13 +64,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     /**
      * HttpRequest를 까보고, 인증 관련 헤더가 존재함과 동시에 토큰의 형태를 정상적으로 지니고 있다면 인증을 위한 부분을 반환한다.
+     * TODO 변경해야 한다. 쿠키 방식으로 변경 예정
      * @param request
      * @return
      */
     private String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
-        if(StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
-            return bearerToken.substring(7);
+//        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
+//        if(StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
+//            return bearerToken.substring(7);
+//        }
+//        return null;
+        Cookie token = CookieUtil.getCookie(request, ACCESSTOKEN).orElse(null);
+        if(token != null) {
+            return token.getValue();
         }
         return null;
     }

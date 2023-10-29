@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -45,7 +46,6 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         if (response.isCommitted()) {
             return;
         }
-//        clearAuthenticationAttributes(request, response);
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 
@@ -56,7 +56,12 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         //토큰 생성
         TokenDTO.TokenDetail tokenDTO = tokenProvider.createToken(authentication);
-        saveRefreshTokenInStorage(tokenDTO.getRefreshToken(), Long.valueOf(authentication.getName()));
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        saveRefreshTokenInStorage(
+                tokenDTO.getRefreshToken(),
+                Long.valueOf(authentication.getName()),
+                userDetails.getPassword()
+        );
         CookieUtil.deleteCookie(request,response,ACCESSTOKEN);
         int accessTokenExpireTime;
         try{
@@ -70,8 +75,8 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         return uriString;
     }
 
-    private void saveRefreshTokenInStorage(String refreshToken, Long memberId) {
-        refreshTokenDao.createRefreshToken(memberId, refreshToken);
+    private void saveRefreshTokenInStorage(String refreshToken, Long memberId, String email) {
+        refreshTokenDao.createRefreshToken(memberId, email, refreshToken);
     }
 
 //    protected void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {

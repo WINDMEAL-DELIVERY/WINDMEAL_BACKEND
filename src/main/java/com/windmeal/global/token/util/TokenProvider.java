@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -20,8 +21,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
 
-import static com.windmeal.global.constants.JwtConstants.AUTHORITIES_KEY;
-import static com.windmeal.global.constants.JwtConstants.BEARER_PREFIX;
+import static com.windmeal.global.constants.JwtConstants.*;
 
 /**
  *  토큰 생성, 토큰 검증, 인증 객체 조회 등의 역할을 수행하는 유사 유틸 클래스
@@ -56,13 +56,14 @@ public class TokenProvider implements InitializingBean {
     public TokenDTO.TokenDetail createToken(Authentication authentication) {
         String authorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
-
         Date currentDate = new Date();
         Long currentTime = currentDate.getTime();
         Date accessValidity = new Date(currentTime + this.accessTokenValidity);
         Date refreshValidity = new Date(currentTime + this.refreshTokenValidity);
+        UserDetails details = (UserDetails) authentication.getPrincipal();
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
+                .claim(EMAIL, details.getPassword())
                 .claim(AUTHORITIES_KEY, authorities)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .setIssuedAt(currentDate)
@@ -91,7 +92,9 @@ public class TokenProvider implements InitializingBean {
                 Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
-        User principal = new User(claims.getSubject(), "", authorities);
+        // 여기서도 Password에 email, username에 id를 동일하게 넣어준다.\
+        String email = (String) claims.get(EMAIL);
+        User principal = new User(claims.getSubject(), email, authorities);
         /*
             UsernamePasswordAuthenticationToken은 2가지 생성자가 있는데, 인증이 완료되지 않은 토큰을 생성하는 것과,
             인증이 완료된 토큰을 생성하는 생성자이다. 아래의 코드는 2번째 생성자이고, 반드시 AuthenticationManager 혹은

@@ -16,14 +16,14 @@ public class ChatRoom extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "store_id")
+    @Column(name = "chatroom_id")
     private Long id;
     // 1대1 채팅만 지원할 예정. 따라서 2명의 사용자를 필드로 가지고 있겠다.
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name= "member_id")
+    @JoinColumn(name= "owner_id")
     private Member owner;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "guest_id")
     private Member guest;
 
     @Builder
