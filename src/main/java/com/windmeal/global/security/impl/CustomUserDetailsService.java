@@ -23,7 +23,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final MemberRepository memberRepository;
     @Override
     @Transactional(readOnly = true)
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) {
         return memberRepository.findByEmail(username)
                 .map(member -> createUser(member))
                 .orElseThrow(() -> new UsernameNotFoundException(username + " 은 존재하지 않는 유저입니다."));
