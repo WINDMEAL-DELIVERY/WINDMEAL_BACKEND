@@ -18,8 +18,8 @@ public class Member extends MemberBase{
     private String department; //학과
 
     @Builder
-    public Member(String email, String password, Authority authority, String name, String nickname, String department) {
-        super(email, password, authority);
+    public Member(String email, Authority authority, String name, String nickname, String department) {
+        super(email, authority);
         this.name = name;
         this.nickname = nickname;
         this.department = department;
