@@ -35,7 +35,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private final TokenProvider tokenProvider;
     private final RefreshTokenDAO refreshTokenDao;
-//    private final AuthorizationRequestRepository authorizationRequestRepository;
+    //    private final AuthorizationRequestRepository authorizationRequestRepository;
     @Value("${jwt.access-token-validity-in-seconds}")
     private Long accessTokenExpiresIn;
 
@@ -43,18 +43,14 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
             throws IOException, ServletException {
         String targetUrl = determineTargetUrl(request, response, authentication);
+        addTokenToCookie(request, response, authentication);
         if (response.isCommitted()) {
             return;
         }
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 
-    protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-        Optional<String> redirectUri = CookieUtil.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
-                .map(Cookie::getValue);
-        String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
-
-        //토큰 생성
+    private void addTokenToCookie(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         TokenDTO.TokenDetail tokenDTO = tokenProvider.createToken(authentication);
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         saveRefreshTokenInStorage(
@@ -70,7 +66,12 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             throw new ArithmeticException("쿠키의 유효 시간 범위가 잘못 설정되었습니다.");
         }
         CookieUtil.addCookie(response,ACCESSTOKEN,tokenDTO.getAccessToken(), accessTokenExpireTime);
-        String uriString = UriComponentsBuilder.fromUriString(targetUrl)
+    }
+
+    protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+        Optional<String> redirectUri = CookieUtil.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
+                .map(Cookie::getValue);
+        String uriString = UriComponentsBuilder.fromUriString(redirectUri.orElse(getDefaultTargetUrl()))
                 .build().toUriString();
         return uriString;
     }
@@ -79,8 +80,4 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         refreshTokenDao.createRefreshToken(memberId, email, refreshToken);
     }
 
-//    protected void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {
-//        super.clearAuthenticationAttributes(request);
-//        authorizationRequestRepository.removeAuthorizationRequest(request, response);
-//    }
 }

@@ -37,10 +37,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // 먼저 해더를 조사한다. 그리고 유효한 토큰 문자열이 있다면 가져온다.
         String jwt = resolveToken(request);
-        log.error(jwt);
         if(StringUtils.hasText(jwt)) {
             try{
-                // jwt로부터 인증 객체를 생성한다. (이 시점에서의 인증 객체는 아직 인증이 되지 않은 상태이다.)
                 Authentication authenticated = tokenProvider.getAuthentication(jwt);
                 /*
                     authenticationManager의 authenticate 메서드를 실행하여 인증 객체에 대해 인증을 수행한다.
@@ -48,9 +46,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     windmeal에서는 provider를 따로 커스텀하여 사용하지 않고, usernamePasswordAuthenticationFilter를 타기 때문에
                     해당 부분을 담당하는 provider가 호출될 것이다.
                  */
-                // 아래 코드는 조금 헷갈리는데, 해당 필터는 처음 인증 정보를 등록해주는 역할을 수행하고 인증여부를 검사하는 것은 아닌 듯 하다.
-//                Authentication authenticated = authenticationManager.authenticate(authentication);
-                // 인증이 완료된 인증 객체에 대해서 security session (context)에 저장해준다.
                 SecurityContextHolder.getContext().setAuthentication(authenticated);
             } catch (AuthenticationException authenticationException) {
                 authenticationException.printStackTrace();
@@ -58,22 +53,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.clearContext();
             }
         }
-        // TODO 헤더가 resolveToken의 반환값이 null인 경우에 대한 처리?
         filterChain.doFilter(request, response);
     }
 
     /**
-     * HttpRequest를 까보고, 인증 관련 헤더가 존재함과 동시에 토큰의 형태를 정상적으로 지니고 있다면 인증을 위한 부분을 반환한다.
-     * TODO 변경해야 한다. 쿠키 방식으로 변경 예정
+     * 요청에 붙어서 넘어온 쿠키를 확인하여 토큰을 추출하는 메서드
      * @param request
-     * @return
+     * @return 추출된 토큰값을 반환한다.
      */
     private String resolveToken(HttpServletRequest request) {
-//        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
-//        if(StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
-//            return bearerToken.substring(7);
-//        }
-//        return null;
         Cookie token = CookieUtil.getCookie(request, ACCESSTOKEN).orElse(null);
         if(token != null) {
             return token.getValue();

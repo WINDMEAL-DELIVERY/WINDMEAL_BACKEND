@@ -99,10 +99,11 @@ public class TokenProvider implements InitializingBean {
             UsernamePasswordAuthenticationToken은 2가지 생성자가 있는데, 인증이 완료되지 않은 토큰을 생성하는 것과,
             인증이 완료된 토큰을 생성하는 생성자이다. 아래의 코드는 2번째 생성자이고, 반드시 AuthenticationManager 혹은
             AuthenticationProvider에 의해서 호출되어야 한다. 하지만 이 코드가 호출되는 시점에 토큰의 Authentication이 유효하다는
-            보장이 없기 때문에 첫번째 생성자를 만들고 authenticate 를 통해서 검증하겠다.
+            보장이 없기 때문에 첫번째 생성자를 만들고 authenticate 를 통해서 검증하려고 생각하였으나,
+            첫번째 생성자로 만들게 될 경우 authority가 누락되어 권한이 deny되는 듯 하다.
          */
-//        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
-        return new UsernamePasswordAuthenticationToken(principal, token);
+        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+//        return new UsernamePasswordAuthenticationToken(principal, token);
     }
 
     public boolean validateToken(String token) {
