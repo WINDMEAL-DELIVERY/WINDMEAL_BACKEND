@@ -13,8 +13,8 @@ import com.windmeal.store.dto.response.MenuCategoryResponse;
 import com.windmeal.store.dto.response.StoreResponse;
 import com.windmeal.store.exception.MenuCategoryNotFoundException;
 import com.windmeal.store.exception.StoreNotFoundException;
-import com.windmeal.store.repository.MenuCategoryJpaRepository;
-import com.windmeal.store.repository.StoreJpaRepository;
+import com.windmeal.store.repository.MenuCategoryRepository;
+import com.windmeal.store.repository.StoreRepository;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,18 +31,18 @@ class MenuCategoryServiceTest extends IntegrationTestSupport {
   @Autowired
   StoreService storeService;
   @Autowired
-  StoreJpaRepository storeJpaRepository;
+  StoreRepository storeRepository;
   @Autowired
   MemberRepository memberRepository;
 
   @Autowired
-  MenuCategoryJpaRepository menuCategoryJpaRepository;
+  MenuCategoryRepository menuCategoryRepository;
 
 
   @AfterEach
   void tearDown() {
-    menuCategoryJpaRepository.deleteAllInBatch();
-    storeJpaRepository.deleteAllInBatch();
+    menuCategoryRepository.deleteAllInBatch();
+    storeRepository.deleteAllInBatch();
     memberRepository.deleteAllInBatch();
   }
 
@@ -63,7 +63,7 @@ class MenuCategoryServiceTest extends IntegrationTestSupport {
     menuCategoryService.createMenuCategory(buildMenuCategoryCreateRequest( "test name1"),storeId);
     menuCategoryService.createMenuCategory(buildMenuCategoryCreateRequest( "test name2"),storeId);
     //then
-    List<MenuCategory> menuCategories = menuCategoryJpaRepository.findByStoreId(storeId);
+    List<MenuCategory> menuCategories = menuCategoryRepository.findByStoreId(storeId);
     assertThat(menuCategories).hasSize(2)
         .extracting("name")
         .containsExactlyInAnyOrder("test name1", "test name2");
@@ -116,7 +116,7 @@ class MenuCategoryServiceTest extends IntegrationTestSupport {
     menuCategoryService.updateMenuCategory(buildMenuCategoryUpdateRequest(newName),menuCategoryId);
 
     //then
-    MenuCategory findMenuCategory = menuCategoryJpaRepository.findById(menuCategoryId).get();
+    MenuCategory findMenuCategory = menuCategoryRepository.findById(menuCategoryId).get();
     assertThat(findMenuCategory.getName()).isEqualTo(newName);
 
   }

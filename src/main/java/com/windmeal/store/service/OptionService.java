@@ -3,12 +3,11 @@ package com.windmeal.store.service;
 import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.store.domain.Menu;
 import com.windmeal.store.domain.OptionGroup;
-import com.windmeal.store.dto.request.MenuCreateRequest;
 import com.windmeal.store.dto.request.OptionCreateRequest;
 import com.windmeal.store.exception.MenuNotFoundException;
-import com.windmeal.store.repository.MenuJpaRepository;
-import com.windmeal.store.repository.OptionGroupJpaRepository;
-import com.windmeal.store.repository.OptionSpecificationJpaRepository;
+import com.windmeal.store.repository.MenuRepository;
+import com.windmeal.store.repository.OptionGroupRepository;
+import com.windmeal.store.repository.OptionSpecificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,9 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class OptionService {
 
-  private final OptionGroupJpaRepository optionGroupRepository;
-  private final OptionSpecificationJpaRepository optionSpecificationRepository;
-  private final MenuJpaRepository menuRepository;
+  private final OptionGroupRepository optionGroupRepository;
+  private final OptionSpecificationRepository optionSpecificationRepository;
+  private final MenuRepository menuRepository;
 
   @Transactional
   public void createOption(OptionCreateRequest request,Long menuId) {

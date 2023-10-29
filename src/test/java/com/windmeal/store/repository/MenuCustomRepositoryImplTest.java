@@ -1,30 +1,32 @@
-package com.windmeal.store.service;
+package com.windmeal.store.repository;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.tuple;
 
 import com.windmeal.IntegrationTestSupport;
 import com.windmeal.member.domain.Member;
 import com.windmeal.member.repository.MemberRepository;
-import com.windmeal.store.domain.Menu;
 import com.windmeal.store.dto.request.MenuCategoryCreateRequest;
 import com.windmeal.store.dto.request.MenuCreateRequest;
 import com.windmeal.store.dto.request.StoreCreateRequest;
 import com.windmeal.store.dto.response.MenuCategoryResponse;
 import com.windmeal.store.dto.response.MenuResponse;
 import com.windmeal.store.dto.response.StoreResponse;
-import com.windmeal.store.exception.MenuCategoryNotFoundException;
-import com.windmeal.store.repository.MenuCategoryRepository;
-import com.windmeal.store.repository.MenuRepository;
-import com.windmeal.store.repository.StoreRepository;
+import com.windmeal.store.service.MenuCategoryService;
+import com.windmeal.store.service.MenuService;
+import com.windmeal.store.service.StoreService;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.List;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-class MenuServiceTest extends IntegrationTestSupport {
+class MenuCustomRepositoryImplTest extends IntegrationTestSupport {
 
+  @Autowired
+  MenuRepository menuJpaRepository;
   @Autowired
   MenuService menuService;
 
@@ -41,9 +43,6 @@ class MenuServiceTest extends IntegrationTestSupport {
   @Autowired
   MenuCategoryRepository menuCategoryRepository;
 
-  @Autowired
-  MenuRepository menuJpaRepository;
-
   @AfterEach
   void tearDown() {
     menuJpaRepository.deleteAllInBatch();
@@ -52,54 +51,44 @@ class MenuServiceTest extends IntegrationTestSupport {
     memberRepository.deleteAllInBatch();
   }
 
-  @DisplayName("메뉴를 생성한다.")
+  @DisplayName("메뉴 카테고리 Id 값에 포함되는 menu를 불러온다.")
   @Test
-  void createMenu() {
+  void findByMenuCategoryIdIn() {
     //given
-    MenuCategoryResponse menuCategory = createMenuCategory();
+    MenuCategoryResponse menuCategory1 = createMenuCategory();
+    MenuCategoryResponse menuCategory2 = createMenuCategory();
+    MenuCategoryResponse menuCategory3 = createMenuCategory();
+    List<Long> menuCategoryIds = new ArrayList<>();
+    menuCategoryIds.add(menuCategory1.getMenuCategoryId());
+    menuCategoryIds.add(menuCategory2.getMenuCategoryId());
 
-    Long menuCategoryId = menuCategory.getMenuCategoryId();
     String name = "name test";
     String description = "description test";
     int price = 1000;
     String imgUrl = "img url test";
 
+    MenuResponse menu1 = createMenu(menuCategory1, name, description, price, imgUrl);
+    MenuResponse menu2 = createMenu(menuCategory2, name, description, price, imgUrl);
+    MenuResponse menu3 = createMenu(menuCategory3, name, description, price, imgUrl);
+
     //when
-    MenuResponse menu = menuService.createMenu(
-        buildMenuCreateRequest(menuCategoryId, name, description,
-            price), imgUrl);
+    List<MenuResponse> menus = menuJpaRepository.findByMenuCategoryIdIn(
+        menuCategoryIds);
 
     //then
-    Menu findMenu = menuJpaRepository.findById(menu.getMenuId()).orElse(null);
-
-    assertThat(findMenu.getName()).isEqualTo(name);
-    assertThat(findMenu.getDescription()).isEqualTo(description);
-    assertThat(findMenu.getPrice().wons()).isEqualTo(price);
-    assertThat(findMenu.getPhoto()).isEqualTo(imgUrl);
+    Assertions.assertThat(menus).hasSize(2)
+        .extracting(MenuResponse::getMenuId,MenuResponse::getMenuCategoryId)
+        .containsExactlyInAnyOrder(
+            tuple(menu1.getMenuId(),menuCategory1.getMenuCategoryId()),
+            tuple(menu2.getMenuId(),menuCategory2.getMenuCategoryId())
+        );
   }
 
-
-  @DisplayName("메뉴를 생성 시 메뉴 카테고리가 존재하지 않으면 예외가 발생한다.")
-  @Test
-  void createMenuWithMenuCategoryNotFound() {
-    //given
-    MenuCategoryResponse menuCategory = createMenuCategory();
-
-    Long menuCategoryId = 0L;
-    String name = "name test";
-    String description = "description test";
-    int price = 1000;
-    String imgUrl = "img url test";
-
-    //when
-
-    //then
-    assertThatThrownBy(() -> menuService.createMenu(
-        buildMenuCreateRequest(menuCategoryId, name, description,
-            price), imgUrl))
-        .isInstanceOf(MenuCategoryNotFoundException.class)
-        .hasMessage("메뉴 카테고리를 지정해주세요");
-
+  private MenuResponse createMenu(MenuCategoryResponse menuCategory1, String name, String description,
+      int price, String imgUrl) {
+    return menuService.createMenu(
+        buildMenuCreateRequest(menuCategory1.getMenuCategoryId(), name, description,
+            price), imgUrl);
   }
 
   private MenuCategoryResponse createMenuCategory() {
@@ -114,7 +103,7 @@ class MenuServiceTest extends IntegrationTestSupport {
 
     //when
     return menuCategoryService.createMenuCategory(
-        buildMenuCategoryCreateRequest( "test name1"),storeId);
+        buildMenuCategoryCreateRequest("test name1"),storeId);
   }
 
   private MenuCreateRequest buildMenuCreateRequest(long menuCategoryId, String name,
@@ -128,7 +117,7 @@ class MenuServiceTest extends IntegrationTestSupport {
         .build();
   }
 
-  private MenuCategoryCreateRequest buildMenuCategoryCreateRequest(String name) {
+  private MenuCategoryCreateRequest buildMenuCategoryCreateRequest( String name) {
     return MenuCategoryCreateRequest
         .builder()
         .name(name)
@@ -155,5 +144,4 @@ class MenuServiceTest extends IntegrationTestSupport {
     return memberRepository.save(Member.builder()
         .name(name).build());
   }
-
 }

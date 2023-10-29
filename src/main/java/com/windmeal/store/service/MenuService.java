@@ -7,8 +7,8 @@ import com.windmeal.store.domain.MenuCategory;
 import com.windmeal.store.dto.request.MenuCreateRequest;
 import com.windmeal.store.dto.response.MenuResponse;
 import com.windmeal.store.exception.MenuCategoryNotFoundException;
-import com.windmeal.store.repository.MenuCategoryJpaRepository;
-import com.windmeal.store.repository.MenuJpaRepository;
+import com.windmeal.store.repository.MenuCategoryRepository;
+import com.windmeal.store.repository.MenuRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,8 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class MenuService {
 
-  private final MenuJpaRepository menuRepository;
-  private final MenuCategoryJpaRepository menuCategoryRepository;
+  private final MenuRepository menuRepository;
+  private final MenuCategoryRepository menuCategoryRepository;
 
   @Transactional
   public MenuResponse createMenu(MenuCreateRequest request,String imageUrl) {

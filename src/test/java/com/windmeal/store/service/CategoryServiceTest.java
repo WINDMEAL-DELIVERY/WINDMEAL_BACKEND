@@ -6,7 +6,7 @@ import com.windmeal.store.dto.request.CategoryCreateRequest;
 import com.windmeal.store.dto.request.CategoryUpdateRequest;
 import com.windmeal.store.dto.response.CategoryResponse;
 import com.windmeal.store.exception.CategoryNotFoundException;
-import com.windmeal.store.repository.CategoryJpaRepository;
+import com.windmeal.store.repository.CategoryRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ class CategoryServiceTest extends IntegrationTestSupport {
     private CategoryService categoryService;
 
     @Autowired
-    private CategoryJpaRepository categoryJpaRepository;
+    private CategoryRepository categoryJpaRepository;
 
     @AfterEach
     void tearDown() {

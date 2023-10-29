@@ -1,10 +1,13 @@
 package com.windmeal.store.repository;
 
+import com.windmeal.store.domain.StoreCategory;
 import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface StoreCategoryRepository {
+@Repository
+public interface StoreCategoryRepository extends JpaRepository<StoreCategory, Long>,
+    StoreCategoryCustomRepository {
 
-  void createStoreCategories(List<Long> categoryIdList, Long storeId);
-
-  void createStoreCategoriesNotExist(List<Long> categoryIdList, Long storeId);
+  List<StoreCategory> findAllByStoreId(Long storeId);
 }
