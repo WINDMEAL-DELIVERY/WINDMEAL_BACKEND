@@ -34,7 +34,7 @@ public class StoreCreateRequest {
 
   private Double latitude;
 
-  private List<String> categoryList = new ArrayList<>();
+  private List<String> categoryList;
 
   public Store toEntity(Member member, String imgUrl) {
     return Store.builder()
