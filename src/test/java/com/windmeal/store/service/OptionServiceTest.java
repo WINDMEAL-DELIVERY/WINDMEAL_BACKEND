@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.tuple;
 
 import com.windmeal.IntegrationTestSupport;
+import com.windmeal.generic.domain.Money;
 import com.windmeal.member.domain.Member;
 import com.windmeal.member.repository.MemberRepository;
 import com.windmeal.store.domain.OptionGroup;
@@ -14,7 +15,10 @@ import com.windmeal.store.dto.request.OptionCreateRequest;
 import com.windmeal.store.dto.request.OptionCreateRequest.OptionSpecRequest;
 import com.windmeal.store.dto.request.StoreCreateRequest;
 import com.windmeal.store.dto.response.MenuCategoryResponse;
+import com.windmeal.store.dto.response.MenuOptionResponse;
 import com.windmeal.store.dto.response.MenuResponse;
+import com.windmeal.store.dto.response.OptionGroupResponse;
+import com.windmeal.store.dto.response.OptionSpecResponse;
 import com.windmeal.store.dto.response.StoreResponse;
 import com.windmeal.store.exception.MenuNotFoundException;
 import com.windmeal.store.repository.MenuCategoryRepository;
@@ -82,13 +86,13 @@ class OptionServiceTest extends IntegrationTestSupport {
         getOptionSpecs());
     optionService.createOption(optionCreateRequest,menu.getMenuId());
     //then
-    OptionGroup optionGroup = optionGroupRepository.findByMenuId(menu.getMenuId());
+    List<OptionGroup> optionGroup = optionGroupRepository.findByMenuId(menu.getMenuId());
     assertThat(optionGroup)
-        .extracting(OptionGroup::getName,OptionGroup::isEssentialOption,OptionGroup::isMultipleOption)
-        .containsExactly("name",true,true);
+        .extracting(OptionGroup::getName,OptionGroup::getIsEssentialOption,OptionGroup::getIsMultipleOption)
+        .containsExactly(tuple("name",true,true));
 
     List<OptionSpecification> optionSpecs = optionSpecificationJpaRepository.findByOptionGroupId(
-        optionGroup.getId());
+        optionGroup.get(0).getId());
     assertThat(optionSpecs)
         .extracting(optionSpecification -> optionSpecification.getName(),
             optionSpecification1 -> optionSpecification1.getPrice().wons())
@@ -109,13 +113,13 @@ class OptionServiceTest extends IntegrationTestSupport {
         Arrays.asList());
     optionService.createOption(optionCreateRequestEmptySpec,menu.getMenuId());
     //then
-    OptionGroup optionGroup = optionGroupRepository.findByMenuId(menu.getMenuId());
+    List<OptionGroup> optionGroup = optionGroupRepository.findByMenuId(menu.getMenuId());
     assertThat(optionGroup)
-        .extracting(OptionGroup::getName,OptionGroup::isEssentialOption,OptionGroup::isMultipleOption)
-        .containsExactly("name",true,true);
+        .extracting(OptionGroup::getName,OptionGroup::getIsEssentialOption,OptionGroup::getIsMultipleOption)
+        .containsExactly(tuple("name",true,true));
 
     List<OptionSpecification> optionSpecs = optionSpecificationJpaRepository.findByOptionGroupId(
-        optionGroup.getId());
+        optionGroup.get(0).getId());
     assertThat(optionSpecs)
         .extracting(optionSpecification -> optionSpecification.getName(),
             optionSpecification1 -> optionSpecification1.getPrice().wons())
@@ -137,6 +141,55 @@ class OptionServiceTest extends IntegrationTestSupport {
         .isInstanceOf(MenuNotFoundException.class)
         .hasMessage("메뉴가 존재하지 않습니다.");
 
+  }
+
+  @DisplayName("메뉴 Id 로 옵션 그룹 및 옵션 상세 내용을 불러온다.")
+  @Test
+  void getMenuGroups() {
+    //given
+    MenuResponse menu = createMenu();
+    OptionCreateRequest optionCreateRequest = buildOptionCreateRequest("name1", true, true,
+        getOptionSpecs());
+    OptionCreateRequest optionCreateRequest2 = buildOptionCreateRequest("name2", false, true,
+        getOptionSpecs());
+    optionService.createOption(optionCreateRequest,menu.getMenuId());
+    optionService.createOption(optionCreateRequest2,menu.getMenuId());
+
+    //when
+    Long menuId = menu.getMenuId();
+    MenuOptionResponse menuOptionResponse = optionService.getMenuGroups(menuId);
+
+    //then
+    MenuResponse menuResponse = menuOptionResponse.getMenuResponse();
+    List<OptionGroupResponse> optionGroupResponse = menuOptionResponse.getOptionGroups();
+
+    assertThat(menuResponse)
+        .extracting(MenuResponse::getMenuId, MenuResponse::getName,
+            MenuResponse::getDescription, menuResponses -> menuResponses.getPrice().wons(), MenuResponse::getPhoto)
+        .containsExactly(menu.getMenuId(), menu.getName(), menu.getDescription(), menu.getPrice().wons(),
+            menu.getPhoto());
+
+    assertThat(optionGroupResponse)
+        .extracting(OptionGroupResponse::getName, OptionGroupResponse::getIsEssentialOption,
+            OptionGroupResponse::getIsMultipleOption)
+        .containsExactly
+            (
+                tuple("name1", true, true),
+                tuple("name2", false, true)
+            );
+
+    assertThat(optionGroupResponse)
+//        .extracting(OptionGroupResponse::getOptionSpecs)
+        .flatExtracting(OptionGroupResponse::getOptionSpecs)
+        .extracting(OptionSpecResponse::getOptionGroupId, OptionSpecResponse::getName,
+            optionSpecResponse -> optionSpecResponse.getPrice().wons())
+        .containsExactlyInAnyOrder(
+            tuple(optionGroupResponse.get(0).getOptionGroupId(),"name1",1000),
+            tuple(optionGroupResponse.get(0).getOptionGroupId(),"name2",2000),
+            tuple(optionGroupResponse.get(1).getOptionGroupId(),"name1",1000),
+            tuple(optionGroupResponse.get(1).getOptionGroupId(),"name2",2000)
+
+        );
   }
 
   private static OptionCreateRequest buildOptionCreateRequest(String name,
