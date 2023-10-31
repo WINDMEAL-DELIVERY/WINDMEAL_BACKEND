@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 메뉴 생성
+ * 메뉴 정보 조회
  * TODO 메뉴 삭제
  * TODO 메뉴 수정
  */

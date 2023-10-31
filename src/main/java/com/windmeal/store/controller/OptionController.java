@@ -6,6 +6,7 @@ import com.windmeal.store.dto.request.OptionCreateRequest;
 import com.windmeal.store.service.OptionService;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,5 +24,11 @@ public class OptionController {
       @PathVariable Long menuId){
     optionService.createOption(request,menuId);
     return ResultDataResponseDTO.empty();
+  }
+
+  @GetMapping("/menu/{menuId}/option")
+  public ResultDataResponseDTO getMenuGroups(@PathVariable Long menuId){
+
+    return ResultDataResponseDTO.of(optionService.getMenuGroups(menuId));
   }
 }

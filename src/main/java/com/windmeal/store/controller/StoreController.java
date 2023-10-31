@@ -75,6 +75,12 @@ public class StoreController {
     return ResultDataResponseDTO.empty();
   }
 
+
+  /**
+   * 가게 정보 조회
+   * @param storeId
+   * @return
+   */
   @GetMapping("/store/{storeId}")
   public ResultDataResponseDTO getStoreInfo(@PathVariable Long storeId) {
     return ResultDataResponseDTO.of(storeService.getStoreInfo(storeId));
