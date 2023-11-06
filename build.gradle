@@ -75,8 +75,8 @@ dependencies {
 	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
 
 	// Swagger 3.0.0
-	implementation 'org.springdoc:springdoc-openapi-ui:1.6.9'
-	implementation  'org.springdoc:springdoc-openapi-security:1.6.9'
+	implementation 'org.springdoc:springdoc-openapi-ui:1.5.7'
+	implementation 'org.springdoc:springdoc-openapi-security:1.5.7'
 
 }
 
