@@ -5,9 +5,11 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.function.Function;
+import lombok.Getter;
 
 
 @Embeddable
+@Getter
 public class Money {
     public static final Money ZERO = Money.wons(0);
 

@@ -28,7 +28,7 @@ public class OptionCreateRequest {
   @NotNull(message = "다중 선택 여부를 선택해주세요.")
   private Boolean isMultipleOption; //다중 선택 여부
 
-  private List<OptionSpecRequest> optionSpec = new ArrayList<>();
+  private List<OptionSpecRequest> optionSpec;
 
   @Getter
   @Builder
