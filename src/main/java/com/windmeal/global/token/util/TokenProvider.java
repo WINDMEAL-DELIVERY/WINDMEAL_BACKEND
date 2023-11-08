@@ -92,7 +92,7 @@ public class TokenProvider implements InitializingBean {
                 Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
-        // 여기서도 Password에 email, username에 id를 동일하게 넣어준다.\
+        // 여기서도 Password에 email, username에 id를 동일하게 넣어준다.
         String email = (String) claims.get(EMAIL);
         User principal = new User(claims.getSubject(), email, authorities);
         /*
