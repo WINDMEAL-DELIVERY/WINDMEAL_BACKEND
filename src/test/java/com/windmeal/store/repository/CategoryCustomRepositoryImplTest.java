@@ -10,13 +10,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
-class CategoryRepositoryImplTest extends IntegrationTestSupport {
+class CategoryCustomRepositoryImplTest extends IntegrationTestSupport {
 
   @Autowired
-  private CategoryJpaRepository categoryRepository;
+  private CategoryRepository categoryRepository;
 
   @AfterEach
   void tearDown() {

@@ -15,8 +15,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MenuCategoryUpdateRequest {
 
-  private Long menuCategoryId;
-
   @NotBlank(message = "카테고리명은 빈칸이 될 수 없습니다.")
   private String name;
 

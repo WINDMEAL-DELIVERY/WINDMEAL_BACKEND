@@ -1,7 +1,5 @@
 package com.windmeal.store.repository;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import com.windmeal.IntegrationTestSupport;
 import com.windmeal.store.domain.Category;
 import com.windmeal.store.domain.Store;
@@ -14,24 +12,22 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
-class StoreCategoryRepositoryImplTest extends IntegrationTestSupport {
+class StoreCategoryCustomRepositoryImplTest extends IntegrationTestSupport {
   @Autowired
-  private StoreCategoryJpaRepository storeCategoryRepository;
+  private StoreCategoryRepository storeCategoryRepository;
 
   @Autowired
-  private CategoryJpaRepository categoryRepository;
+  private CategoryRepository categoryRepository;
   @Autowired
-  private StoreJpaRepository storeJpaRepository;
+  private StoreRepository storeRepository;
 
 
   @AfterEach
   void tearDown() {
     storeCategoryRepository.deleteAllInBatch();
     categoryRepository.deleteAllInBatch();
-    storeJpaRepository.deleteAllInBatch();
+    storeRepository.deleteAllInBatch();
   }
 
   @DisplayName("store_category 에 category_id 와 store_id 에 매핑되어 생성한다.")
@@ -47,7 +43,7 @@ class StoreCategoryRepositoryImplTest extends IntegrationTestSupport {
     categoryNameList.add("카페");
     categoryNameList.add("커피챗");
 
-    Store savedStore = storeJpaRepository.save(Store.builder().name("test").build());
+    Store savedStore = storeRepository.save(Store.builder().name("test").build());
 
     List<Category> categories = categoryRepository.findAllByNameIn(categoryNameList);
 
@@ -73,7 +69,7 @@ class StoreCategoryRepositoryImplTest extends IntegrationTestSupport {
     categoryNameList.add("커피");
     categoryNameList.add("카페");
 
-    Store savedStore = storeJpaRepository.save(Store.builder().name("test").build());
+    Store savedStore = storeRepository.save(Store.builder().name("test").build());
 
     List<Category> categories = categoryRepository.findAllByNameIn(categoryNameList);
 

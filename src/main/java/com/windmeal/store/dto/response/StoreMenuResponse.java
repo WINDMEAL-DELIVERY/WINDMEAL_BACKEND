@@ -3,7 +3,6 @@ package com.windmeal.store.dto.response;
 import com.windmeal.store.domain.Menu;
 import com.windmeal.store.domain.MenuCategory;
 import com.windmeal.store.domain.Store;
-import com.windmeal.store.dto.response.MenuResponse.MenuDateResponse;
 import com.windmeal.store.validator.StoreValidator;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -70,12 +69,12 @@ public class StoreMenuResponse {
 
     private Long menuCategoryId;
     private String name;
-    private List<MenuDateResponse> menus;
+    private List<MenuResponse> menus;
 
     private MenuCategoryResponse(MenuCategory menuCategory, List<MenuResponse> menus) {
       this.menuCategoryId = menuCategory.getId();
       this.name = menuCategory.getName();
-      this.menus = menus.stream().map(MenuResponse::toResponseData).collect(Collectors.toList());
+      this.menus = menus;
     }
   }
 

@@ -3,12 +3,18 @@ package com.windmeal.store.service;
 import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.store.domain.Menu;
 import com.windmeal.store.domain.OptionGroup;
-import com.windmeal.store.dto.request.MenuCreateRequest;
+import com.windmeal.store.domain.OptionSpecification;
 import com.windmeal.store.dto.request.OptionCreateRequest;
+import com.windmeal.store.dto.response.MenuOptionResponse;
+import com.windmeal.store.dto.response.OptionSpecResponse;
 import com.windmeal.store.exception.MenuNotFoundException;
-import com.windmeal.store.repository.MenuJpaRepository;
-import com.windmeal.store.repository.OptionGroupJpaRepository;
-import com.windmeal.store.repository.OptionSpecificationJpaRepository;
+import com.windmeal.store.repository.MenuRepository;
+import com.windmeal.store.repository.OptionGroupRepository;
+import com.windmeal.store.repository.OptionSpecificationRepository;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,17 +24,29 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class OptionService {
 
-  private final OptionGroupJpaRepository optionGroupRepository;
-  private final OptionSpecificationJpaRepository optionSpecificationRepository;
-  private final MenuJpaRepository menuRepository;
+  private final OptionGroupRepository optionGroupRepository;
+  private final OptionSpecificationRepository optionSpecificationRepository;
+  private final MenuRepository menuRepository;
 
   @Transactional
-  public void createOption(OptionCreateRequest request) {
-    Menu menu = menuRepository.findById(request.getMenuId())
+  public void createOption(OptionCreateRequest request,Long menuId) {
+    Menu menu = menuRepository.findById(menuId)
         .orElseThrow(() -> new MenuNotFoundException(
             ErrorCode.NOT_FOUND, "메뉴가 존재하지 않습니다."));
     OptionGroup savedOptionGroup = optionGroupRepository.save(request.toOptionGroupEntity(menu));
     optionSpecificationRepository.createOptionSpecs(request.getOptionSpec(),
         savedOptionGroup.getId());
+  }
+
+  public MenuOptionResponse getMenuGroups(Long menuId) {
+    Menu menu = menuRepository.findById(menuId)
+        .orElseThrow(() -> new MenuNotFoundException(
+            ErrorCode.NOT_FOUND, "메뉴가 존재하지 않습니다."));
+    List<OptionGroup> optionGroups = optionGroupRepository.findByMenuId(menu.getId());
+    List<Long> optionGroupIdList = optionGroups.stream().map(OptionGroup::getId).collect(Collectors.toList());
+    Map<Long, List<OptionSpecResponse>> optionSpecs = optionSpecificationRepository.findByOptionGroupIdIn(
+            optionGroupIdList).stream()
+        .collect(Collectors.groupingBy(OptionSpecResponse::getOptionGroupId));
+    return new MenuOptionResponse(menu,optionGroups,optionSpecs);
   }
 }

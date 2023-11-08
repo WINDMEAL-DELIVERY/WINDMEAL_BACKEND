@@ -23,9 +23,9 @@ public class OptionGroup {
 
   private String name;
 
-  private boolean isEssentialOption; //필수 선택 여부
+  private Boolean isEssentialOption; //필수 선택 여부
 
-  private boolean isMultipleOption; //다중 선택 여부
+  private Boolean isMultipleOption; //다중 선택 여부
 
   @Builder
   public OptionGroup(Menu menu, String name, boolean isEssentialOption,

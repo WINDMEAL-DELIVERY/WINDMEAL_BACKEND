@@ -4,13 +4,12 @@ import static com.windmeal.store.domain.QMenu.menu;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.windmeal.store.domain.Menu;
 import com.windmeal.store.dto.response.MenuResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class MenuRepositoryImpl implements MenuRepository {
+public class MenuCustomRepositoryImpl implements MenuCustomRepository {
 
   private final JPAQueryFactory jpaQueryFactory;
 

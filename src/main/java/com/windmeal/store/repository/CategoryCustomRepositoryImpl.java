@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 @RequiredArgsConstructor
-public class CategoryRepositoryImpl implements CategoryRepository {
+public class CategoryCustomRepositoryImpl implements CategoryCustomRepository {
 
   private final JdbcTemplate jdbcTemplate;
 

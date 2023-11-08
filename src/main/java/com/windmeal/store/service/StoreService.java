@@ -5,7 +5,6 @@ import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.member.domain.Member;
 import com.windmeal.member.repository.MemberRepository;
 import com.windmeal.store.domain.Category;
-import com.windmeal.store.domain.Menu;
 import com.windmeal.store.domain.MenuCategory;
 import com.windmeal.store.domain.Store;
 import com.windmeal.store.dto.request.StoreCreateRequest;
@@ -14,11 +13,11 @@ import com.windmeal.store.dto.response.MenuResponse;
 import com.windmeal.store.dto.response.StoreMenuResponse;
 import com.windmeal.store.dto.response.StoreResponse;
 import com.windmeal.store.exception.StoreNotFoundException;
-import com.windmeal.store.repository.CategoryJpaRepository;
-import com.windmeal.store.repository.MenuCategoryJpaRepository;
-import com.windmeal.store.repository.MenuJpaRepository;
-import com.windmeal.store.repository.StoreCategoryJpaRepository;
-import com.windmeal.store.repository.StoreJpaRepository;
+import com.windmeal.store.repository.CategoryRepository;
+import com.windmeal.store.repository.MenuCategoryRepository;
+import com.windmeal.store.repository.MenuRepository;
+import com.windmeal.store.repository.StoreCategoryRepository;
+import com.windmeal.store.repository.StoreRepository;
 import com.windmeal.store.validator.StoreValidator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,12 +31,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class StoreService {
 
-  private final StoreCategoryJpaRepository storeCategoryRepository;
-  private final StoreJpaRepository storeRepository;
+  private final StoreCategoryRepository storeCategoryRepository;
+  private final StoreRepository storeRepository;
   private final MemberRepository memberRepository;
-  private final MenuCategoryJpaRepository menuCategoryRepository;
-  private final MenuJpaRepository menuRepository;
-  private final CategoryJpaRepository categoryRepository;
+  private final MenuCategoryRepository menuCategoryRepository;
+  private final MenuRepository menuRepository;
+  private final CategoryRepository categoryRepository;
   private final StoreValidator storeValidator;
 
   @Transactional
