@@ -44,8 +44,8 @@ jobs:
     - name: web docker build and push
       run: |
         docker login -u ${{ secrets.WAS1_DOCKER_USERNAME }} -p ${{ secrets.WAS1_DOCKER_PASSWORD }}
-        docker build -t ${{ secrets.WAS1_DOCKER_REPO }}/windmeal .
-        docker push ${{ secrets.WAS1_DOCKER_REPO }}/windmeal 
+        docker build -t ${{ secrets.WAS1_DOCKER_USERNAME }}/${{ secrets.WAS1_DOCKER_REPO }} .
+        docker push ${{ secrets.WAS1_DOCKER_USERNAME }}/${{ secrets.WAS1_DOCKER_REPO }} 
 
     - name: executing remote ssh commands using password
       uses: appleboy/ssh-action@v0.1.7
@@ -57,5 +57,10 @@ jobs:
         script: |
           sudo docker kill windmeal_delivery
           sudo docker container prune -f
-          sudo docker pull ${{ secrets.WAS1_DOCKER_REPO }}/windmeal 
-          sudo docker run -d -p 8080:8080 --name windmeal_delivery ${{ secrets.WAS1_DOCKER_REPO }}/windmeal 
+          sudo docker pull ${{ secrets.WAS1_DOCKER_USERNAME }}/${{ secrets.WAS1_DOCKER_REPO }}
+          sudo docker run -d -p 8080:8080 --name windmeal_delivery ${{ secrets.WAS1_DOCKER_USERNAME }}/${{ secrets.WAS1_DOCKER_REPO }}
+          docker image prune
+          # sudo docker kill windmeal_delivery
+          # sudo docker container prune -f
+          # sudo docker pull ${{ secrets.WAS1_DOCKER_REPO }}/windmeal 
+          # sudo docker run -d -p 8080:8080 --name windmeal_delivery ${{ secrets.WAS1_DOCKER_REPO }}/windmeal 
