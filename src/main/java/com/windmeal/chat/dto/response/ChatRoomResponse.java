@@ -6,13 +6,13 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class ChatRoomResponseDTO {
+public class ChatRoomResponse {
     private Long roomId;
     private Long ownerId;
     private Long guestId;
 
-    public static ChatRoomResponseDTO of(Long roomId, Long ownerId, Long guestId) {
-        return ChatRoomResponseDTO.builder()
+    public static ChatRoomResponse of(Long roomId, Long ownerId, Long guestId) {
+        return ChatRoomResponse.builder()
                 .roomId(roomId)
                 .ownerId(ownerId)
                 .guestId(guestId)

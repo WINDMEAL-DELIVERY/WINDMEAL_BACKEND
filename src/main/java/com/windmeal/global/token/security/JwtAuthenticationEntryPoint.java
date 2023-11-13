@@ -26,6 +26,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+        log.error(this.getClass().getName());
         ResponseDTO responseDTO = ResponseDTO.of(false, ErrorCode.UNAUTHORIZED, "사용자의 인증에 실패하였습니다.");
         String responseJSON = objectMapper.writeValueAsString(responseDTO);
 
@@ -34,6 +35,5 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write(responseJSON);
-        log.error(this.getClass().getName());
     }
 }

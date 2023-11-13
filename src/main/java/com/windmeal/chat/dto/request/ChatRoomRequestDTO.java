@@ -6,18 +6,18 @@ import lombok.*;
 
 @Getter
 @Builder
-@AllArgsConstructor
-@RequiredArgsConstructor
 public class ChatRoomRequestDTO {
 
-    private Long ownerId;
-    private Long guestId;
+    private final Long ownerId;
+    private final Long guestId;
+
+    private ChatRoomRequestDTO(Long ownerId, Long guestId) {
+        this.ownerId = ownerId;
+        this.guestId = guestId;
+    }
 
     public static ChatRoomRequestDTO of(Long ownerId, Long guestId) {
-        return ChatRoomRequestDTO.builder()
-                .ownerId(ownerId)
-                .guestId(guestId)
-                .build();
+        return new ChatRoomRequestDTO(ownerId, guestId);
     }
 
     public ChatRoom toEntity(Member owner, Member guest) {

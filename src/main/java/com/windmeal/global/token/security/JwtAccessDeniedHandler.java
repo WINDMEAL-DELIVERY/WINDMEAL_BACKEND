@@ -32,6 +32,7 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
         accessDeniedException.printStackTrace();
+        log.error(this.getClass().getName());
         String currentMemberEmail = SecurityUtil.getCurrentMemberEmail();
         ResponseDTO responseDTO = ResponseDTO.of(false, ErrorCode.FORBIDDEN, currentMemberEmail + "사용자는 해당 리소스에 접근할 권한이 없습니다.");
         String responseJSON = objectMapper.writeValueAsString(responseDTO);
@@ -41,6 +42,5 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
         response.setStatus(HttpStatus.FORBIDDEN.value());
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write(responseJSON);
-        log.error(this.getClass().getName());
     }
 }
