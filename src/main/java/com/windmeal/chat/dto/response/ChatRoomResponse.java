@@ -4,8 +4,8 @@ import lombok.*;
 
 @Getter
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 public class ChatRoomResponse {
     private Long roomId;
     private Long ownerId;

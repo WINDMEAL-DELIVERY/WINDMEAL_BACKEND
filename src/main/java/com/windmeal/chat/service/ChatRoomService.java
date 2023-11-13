@@ -1,10 +1,13 @@
 package com.windmeal.chat.service;
 
 import com.windmeal.chat.domain.ChatRoom;
-import com.windmeal.chat.dto.request.ChatRoomRequestDTO;
+import com.windmeal.chat.dto.request.ChatRoomDeleteRequest;
+import com.windmeal.chat.dto.request.ChatRoomRequest;
 import com.windmeal.chat.dto.response.ChatRoomListResponse;
 import com.windmeal.chat.dto.response.ChatRoomResponse;
 import com.windmeal.chat.dto.response.ChatRoomSpecResponse;
+import com.windmeal.chat.exception.ChatRoomNotFoundException;
+import com.windmeal.chat.exception.InvalidRequesterException;
 import com.windmeal.chat.repository.ChatRoomRepository;
 import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.member.domain.Member;
@@ -16,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -33,8 +35,11 @@ public class ChatRoomService {
      * @return ChatRoomResponse
      */
     @Transactional
-    public ChatRoomResponse createChatRoom(ChatRoomRequestDTO requestDTO) {
+    public ChatRoomResponse createChatRoom(ChatRoomRequest requestDTO, Long currentMemberId) {
         Long ownerId = requestDTO.getOwnerId();
+        if(currentMemberId.equals(ownerId)) {
+            throw new InvalidRequesterException(ErrorCode.VALIDATION_ERROR, "요청자와 접속자의 정보가 다릅니다.");
+        }
         Long guestId = requestDTO.getGuestId();
         Member owner = memberRepository.findById(ownerId)
                 .orElseThrow(() -> new MemberNotFoundException(ErrorCode.NOT_FOUND, "해당 사용자를 찾을 수 없습니다."));
@@ -60,6 +65,25 @@ public class ChatRoomService {
         return ChatRoomListResponse.of(list);
     }
 
+    /**
+     * 채팅방 삭제를 관장하는 메서드
+     * @param deleteRequest
+     * @param currentMemberId
+     */
+    @Transactional
+    public void deleteChatRoom(ChatRoomDeleteRequest deleteRequest, Long currentMemberId) {
+//        ChatRoom chatRoom = chatRoomRepository.findByIdWithFetchJoin(deleteRequest.getRoomId())
+//                .orElseThrow(() -> new ChatRoomNotFoundException(ErrorCode.NOT_FOUND, "채팅방이 존재하지 않습니다."));
+        // 요청으로 들어온 채팅방에 사용자가 속한지 확인해야 한다.
+        ChatRoom chatRoom = chatRoomRepository.findByIdWithFetchJoin(deleteRequest.getRoomId());
+        if(chatRoom == null) {
+            throw new ChatRoomNotFoundException(ErrorCode.NOT_FOUND, "채팅방이 존재하지 않습니다.");
+        }
+        if(chatRoom.getOwner().getId() != currentMemberId && chatRoom.getGuest().getId() !=  currentMemberId) {
+            throw new InvalidRequesterException(ErrorCode.VALIDATION_ERROR, "요청자가 해당 채팅방에 속해있지 않습니다.");
+        }
+        chatRoomRepository.delete(chatRoom);
+    }
 
 }
 
