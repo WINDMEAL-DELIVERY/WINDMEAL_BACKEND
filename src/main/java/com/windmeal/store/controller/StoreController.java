@@ -9,12 +9,15 @@ import com.windmeal.store.dto.response.StoreMenuResponse;
 import com.windmeal.store.dto.response.StoreResponse;
 import com.windmeal.store.service.StoreService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,14 +45,20 @@ public class StoreController {
    * @param file
    * @return
    */
-  @Operation(summary = "가게 생성", description = "가게가 생성됩니다.")
+  @Operation(summary = "가게 생성", description = "가게가 생성됩니다." ,
+      requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+      content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE)
+  ))
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "OK"),
+      @ApiResponse(responseCode = "200", description = "OK",
+          content = @Content(schema = @Schema(implementation = StoreResponse.class))),
       @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근",
           content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class)))})
   @PostMapping("/store")
   public ResultDataResponseDTO<StoreResponse> createStore(
+      @Parameter(description = "가게 생성 요청 데이터", required = true, schema = @Schema(implementation = StoreCreateRequest.class))
       @Valid @RequestPart StoreCreateRequest request,
+      @Parameter(description = "이미지 파일", required = false, schema = @Schema(type = "string", format = "binary"))
       @RequestPart(value = "file", required = false) MultipartFile file) {
 
     String imgUrl = s3Util.imgUpload(file);

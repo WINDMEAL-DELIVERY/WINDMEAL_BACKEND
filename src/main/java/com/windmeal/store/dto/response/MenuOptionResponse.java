@@ -2,6 +2,7 @@ package com.windmeal.store.dto.response;
 
 import com.windmeal.store.domain.Menu;
 import com.windmeal.store.domain.OptionGroup;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor
+@Schema(title = "메뉴")
 public class MenuOptionResponse {
 
   private MenuResponse menuResponse;

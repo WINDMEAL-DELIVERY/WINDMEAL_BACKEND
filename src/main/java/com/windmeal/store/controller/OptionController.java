@@ -4,6 +4,7 @@ package com.windmeal.store.controller;
 import com.windmeal.global.exception.ExceptionResponseDTO;
 import com.windmeal.global.exception.ResultDataResponseDTO;
 import com.windmeal.store.dto.request.OptionCreateRequest;
+import com.windmeal.store.dto.response.MenuOptionResponse;
 import com.windmeal.store.service.OptionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -43,7 +44,7 @@ public class OptionController {
       @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근",
           content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class)))})
   @GetMapping("/menu/{menuId}/option")
-  public ResultDataResponseDTO getMenuGroups(@PathVariable Long menuId){
+  public ResultDataResponseDTO<MenuOptionResponse> getMenuGroups(@PathVariable Long menuId){
 
     return ResultDataResponseDTO.of(optionService.getMenuGroups(menuId));
   }
