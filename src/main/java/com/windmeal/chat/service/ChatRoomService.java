@@ -5,7 +5,6 @@ import com.windmeal.chat.dto.request.ChatRoomDeleteRequest;
 import com.windmeal.chat.dto.request.ChatRoomSaveRequest;
 import com.windmeal.chat.dto.response.ChatRoomListResponse;
 import com.windmeal.chat.dto.response.ChatRoomResponse;
-import com.windmeal.chat.dto.response.ChatRoomSpecResponse;
 import com.windmeal.chat.exception.ChatRoomNotFoundException;
 import com.windmeal.chat.exception.InvalidRequesterException;
 import com.windmeal.chat.repository.ChatRoomRepository;
@@ -13,6 +12,10 @@ import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.member.domain.Member;
 import com.windmeal.member.exception.MemberNotFoundException;
 import com.windmeal.member.repository.MemberRepository;
+import com.windmeal.order.domain.Order;
+import com.windmeal.order.domain.OrderStatus;
+import com.windmeal.order.exception.OrderAlreadyMatchedException;
+import com.windmeal.order.exception.OrderNotFoundException;
 import com.windmeal.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +31,7 @@ import java.util.List;
 public class ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final MemberRepository memberRepository;
+    private final OrderRepository orderRepository;
 
     /**
      * 채팅방 생성을 관장하는 메서드
@@ -45,9 +49,15 @@ public class ChatRoomService {
                 .orElseThrow(() -> new MemberNotFoundException(ErrorCode.NOT_FOUND, "해당 사용자를 찾을 수 없습니다."));
         Member guest = memberRepository.findById(guestId)
                 .orElseThrow(() -> new MemberNotFoundException(ErrorCode.NOT_FOUND, "해당 사용자를 찾을 수 없습니다."));
-        ChatRoom toEntity = requestDTO.toEntity(owner, guest);
+        Order order = orderRepository.findById(requestDTO.getOrderId())
+                .orElseThrow(() -> new OrderNotFoundException(ErrorCode.NOT_FOUND, "주문이 존재하지 않습니다."));
+        // 주문이 진행중이면 채팅방을 생성할 수 없다.
+        if(!order.getOrderStatus().equals(OrderStatus.ORDERED)) {
+            throw new OrderAlreadyMatchedException(ErrorCode.BAD_REQUEST, "이미 매칭된 주문입니다.");
+        }
+        ChatRoom toEntity = requestDTO.toEntity(owner, guest, order);
         ChatRoom chatRoom = chatRoomRepository.save(toEntity);
-        return ChatRoomResponse.of(chatRoom.getId(), chatRoom.getOwner().getId(), chatRoom.getGuest().getId());
+        return ChatRoomResponse.of(chatRoom.getId(), chatRoom.getOwner().getId(), chatRoom.getGuest().getId(), order.getId());
     }
 
     /**
@@ -59,8 +69,9 @@ public class ChatRoomService {
     public ChatRoomListResponse getChatRoomsByMemberId(Long memberId) {
         // owner, guest 여부에 관계 없이 사용자가 참여한 채팅방 리스트를 반환받는다.
         // 사용자가 처음 접속하면 자신이 속한 채팅방을 모두 구독해야 하기 때문에, 채팅방의 아이디 리스트가 필요할 것이다.
-        List<ChatRoomSpecResponse> chatRoomsByMemberIdIn = chatRoomRepository.findChatRoomsByMemberId(memberId);
-        return ChatRoomListResponse.of(chatRoomsByMemberIdIn);
+        // 자신이 삭제한 채팅방일 경우 조회되지 않는다.
+        List<ChatRoomListResponse.ChatRoomSpecResponse> chatRoomsByMemberId = chatRoomRepository.findChatRoomsByMemberId(memberId);
+        return ChatRoomListResponse.of(chatRoomsByMemberId);
     }
 
     /**
@@ -70,17 +81,25 @@ public class ChatRoomService {
      */
     @Transactional
     public void deleteChatRoom(ChatRoomDeleteRequest deleteRequest, Long currentMemberId) {
-//        ChatRoom chatRoom = chatRoomRepository.findByIdWithFetchJoin(deleteRequest.getRoomId())
-//                .orElseThrow(() -> new ChatRoomNotFoundException(ErrorCode.NOT_FOUND, "채팅방이 존재하지 않습니다."));
         // 요청으로 들어온 채팅방에 사용자가 속한지 확인해야 한다.
         ChatRoom chatRoom = chatRoomRepository.findByIdWithFetchJoin(deleteRequest.getRoomId());
+        // TODO jpql로 작성하면 optional이 안되는 듯 하다. 계속 알아보는 중
         if(chatRoom == null) {
             throw new ChatRoomNotFoundException(ErrorCode.NOT_FOUND, "채팅방이 존재하지 않습니다.");
         }
-        if(chatRoom.getOwner().getId() != currentMemberId && chatRoom.getGuest().getId() !=  currentMemberId) {
+        Long ownerId = chatRoom.getOwner().getId();
+        Long guestId = chatRoom.getGuest().getId();
+
+        // 요청자를 검증하고, 요청자가 누구인가에 따라 필드를 업데이트 해준다.
+        if(!ownerId.equals(currentMemberId) && !guestId.equals(currentMemberId)) {
             throw new InvalidRequesterException(ErrorCode.VALIDATION_ERROR, "요청자가 해당 채팅방에 속해있지 않습니다.");
         }
-        chatRoomRepository.delete(chatRoom);
+        if(ownerId.equals(currentMemberId)) {
+            chatRoom.updateDeletedByOwner(true);
+        } else {
+            chatRoom.updateDeletedByGuest(true);
+        }
+        // TODO 배달이 완료되면 기존의 채팅방은 어떡하면 좋을지 상의하기
     }
 
 }

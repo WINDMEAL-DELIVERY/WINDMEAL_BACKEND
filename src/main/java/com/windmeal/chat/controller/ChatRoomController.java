@@ -31,11 +31,12 @@ public class ChatRoomController {
             @ApiResponse(responseCode = "201", description = "채팅방 생성 성공"),
             @ApiResponse(responseCode = "400", description = "요청자와 접속자의 정보가 다름"),
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자"),
-            @ApiResponse(responseCode = "404", description = "해당되는 사용자가 존재하지 않음")
+            @ApiResponse(responseCode = "404", description = "해당되는 사용자가 존재하지 않음"),
+            @ApiResponse(responseCode = "404", description = "주문(게시글)이 존제하지 않음")
     })
-    public ChatRoomResponse createChatRoom(@RequestBody ChatRoomSaveRequest requestDTO) {
+    public ResultDataResponseDTO<ChatRoomResponse> createChatRoom(@RequestBody ChatRoomSaveRequest requestDTO) {
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
-        return chatRoomService.createChatRoom(requestDTO, currentMemberId);
+        return ResultDataResponseDTO.of(chatRoomService.createChatRoom(requestDTO, currentMemberId));
     }
 
     @GetMapping("/chatroom")
@@ -44,9 +45,9 @@ public class ChatRoomController {
             @ApiResponse(responseCode = "200", description = "채팅방 조회 성공"),
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
     })
-    public ChatRoomListResponse getChatRoomList() {
+    public ResultDataResponseDTO<ChatRoomListResponse> getChatRoomList() {
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
-        return chatRoomService.getChatRoomsByMemberId(currentMemberId);
+        return ResultDataResponseDTO.of(chatRoomService.getChatRoomsByMemberId(currentMemberId));
     }
 
     @DeleteMapping
@@ -54,7 +55,8 @@ public class ChatRoomController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "채팅방 삭제 성공"),
             @ApiResponse(responseCode = "400", description = "삭제 요청자가 채팅방에 속해있지 않음"),
-            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
+            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 채팅방")
     })
     public ResultDataResponseDTO deleteChatRoom(@RequestBody ChatRoomDeleteRequest deleteRequest) {
         Long currentMemberId = SecurityUtil.getCurrentMemberId();

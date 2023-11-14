@@ -1,10 +1,9 @@
 package com.windmeal.chat.repository;
-
-import com.windmeal.chat.dto.response.ChatRoomSpecResponse;
+import com.windmeal.chat.dto.response.ChatRoomListResponse;
 
 import java.util.List;
 
 public interface ChatRoomCustomRepository {
 
-    List<ChatRoomSpecResponse> findChatRoomsByMemberId(Long CurrentMemberId);
+    List<ChatRoomListResponse.ChatRoomSpecResponse> findChatRoomsByMemberId(Long CurrentMemberId);
 }
