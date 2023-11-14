@@ -41,7 +41,7 @@ public class StoreResponse {
 
   private List<String> categories;
 
-  public static StoreResponse of(Store store, StoreValidator storeValidator) {
+  public static StoreResponse of(Store store) {
     return StoreResponse.builder()
         .storeId(store.getId())
         .ownerId(store.getOwner().getId())
@@ -51,8 +51,7 @@ public class StoreResponse {
         .openTime(store.getOpenTime())
         .closeTime(store.getCloseTime())
         .location(store.getLocation())
-        .isOpen(storeValidator.validateStoreIsOpen(store.getOpenTime(), store.getCloseTime(),
-            LocalTime.now()))
+        .isOpen(store.isOpen())
         .build();
   }
 }

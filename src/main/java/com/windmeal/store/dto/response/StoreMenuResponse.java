@@ -41,8 +41,7 @@ public class StoreMenuResponse {
 
   private List<MenuCategoryResponse> menuCategories;
 
-  public StoreMenuResponse(Store store, List<MenuCategory> menuCategories, List<MenuResponse> menus,
-      StoreValidator storeValidator) {
+  public StoreMenuResponse(Store store, List<MenuCategory> menuCategories, List<MenuResponse> menus) {
 
     this.storeId = store.getId();
     this.name = store.getName();
@@ -51,8 +50,7 @@ public class StoreMenuResponse {
     this.openTime = store.getOpenTime();
     this.closeTime = store.getCloseTime();
     this.location = store.getLocation();
-    this.isOpen = storeValidator.validateStoreIsOpen(store.getOpenTime(), store.getCloseTime(),
-        LocalTime.now());
+    this.isOpen = store.isOpen();
     this.menuCategories = toMenuCategories(menuCategories, menus);
   }
 

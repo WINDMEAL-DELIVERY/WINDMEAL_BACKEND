@@ -32,11 +32,14 @@ public class OptionGroup {
   @OneToMany(mappedBy = "optionGroup")
   private List<OptionSpecification> optionSpecifications = new ArrayList<>();
   @Builder
-  public OptionGroup(Menu menu, String name, boolean isEssentialOption,
-      boolean isMultipleOption) {
+
+  public OptionGroup(Long id, Menu menu, String name, Boolean isEssentialOption,
+      Boolean isMultipleOption, List<OptionSpecification> optionSpecifications) {
+    this.id = id;
     this.menu = menu;
     this.name = name;
     this.isEssentialOption = isEssentialOption;
     this.isMultipleOption = isMultipleOption;
+    this.optionSpecifications = optionSpecifications;
   }
 }
