@@ -1,7 +1,7 @@
 package com.windmeal.chat.controller;
 
 import com.windmeal.chat.dto.request.ChatRoomDeleteRequest;
-import com.windmeal.chat.dto.request.ChatRoomRequest;
+import com.windmeal.chat.dto.request.ChatRoomSaveRequest;
 import com.windmeal.chat.dto.response.ChatRoomListResponse;
 import com.windmeal.chat.dto.response.ChatRoomResponse;
 import com.windmeal.chat.service.ChatRoomService;
@@ -33,7 +33,7 @@ public class ChatRoomController {
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자"),
             @ApiResponse(responseCode = "404", description = "해당되는 사용자가 존재하지 않음")
     })
-    public ChatRoomResponse createChatRoom(@RequestBody ChatRoomRequest requestDTO) {
+    public ChatRoomResponse createChatRoom(@RequestBody ChatRoomSaveRequest requestDTO) {
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
         return chatRoomService.createChatRoom(requestDTO, currentMemberId);
     }
