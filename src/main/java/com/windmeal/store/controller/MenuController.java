@@ -8,6 +8,7 @@ import com.windmeal.store.dto.request.StoreCreateRequest;
 import com.windmeal.store.dto.response.StoreResponse;
 import com.windmeal.store.service.MenuService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -15,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,14 +42,19 @@ public class MenuController {
    * @param file
    * @return
    */
-  @Operation(summary = "메뉴 생성 요청", description = "메뉴가 생성됩니다.")
+  @Operation(summary = "메뉴 생성 요청", description = "메뉴가 생성됩니다.",
+      requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+          content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE)
+      ))
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "OK"),
       @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근",
           content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class)))})
   @PostMapping("/menu")
   public ResultDataResponseDTO createMenu(
+      @Parameter(description = "메뉴 생성 요청 데이터", required = true, schema = @Schema(implementation = MenuCreateRequest.class))
       @Valid @RequestPart MenuCreateRequest request,
+      @Parameter(description = "이미지 파일", required = false, schema = @Schema(type = "string", format = "binary"))
       @RequestPart(value = "file", required = false) MultipartFile file) {
 
     String imgUrl = s3Util.imgUpload(file);
