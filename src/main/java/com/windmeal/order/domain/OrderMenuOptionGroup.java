@@ -1,6 +1,8 @@
 package com.windmeal.order.domain;
 
 import com.windmeal.store.domain.OptionGroup;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,4 +29,7 @@ public class OrderMenuOptionGroup {
 
     private String name;
 
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name="order_menu_option_group_id")
+    private List<OrderMenuOptionSpecification> specs = new ArrayList<>();
 }

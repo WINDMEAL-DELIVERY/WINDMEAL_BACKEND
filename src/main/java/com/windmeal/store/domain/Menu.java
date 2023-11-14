@@ -1,6 +1,8 @@
 package com.windmeal.store.domain;
 
 import com.windmeal.generic.domain.Money;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,6 +31,9 @@ public class Menu {
   private Money price;
 
   private String photo;
+
+  @OneToMany(mappedBy = "menu")
+  private List<OptionGroup> optionGroups = new ArrayList<>();
 
   @Builder
   public Menu(MenuCategory menuCategory, String name, String description, Money price,
