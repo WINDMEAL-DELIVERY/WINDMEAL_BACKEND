@@ -53,6 +53,19 @@ public class Store {
     this.location = location;
   }
 
+  public boolean isOpen(){
+    LocalTime now = LocalTime.now();
+
+    if (openTime == null || closeTime == null) {
+        return true;
+      }
+      if (now.isBefore(openTime) || now.isAfter(closeTime)) {
+        return false;
+      }
+
+      return true;
+
+  }
   public void updatePhoto(String updatePhoto) {
     this.photo = updatePhoto;
   }

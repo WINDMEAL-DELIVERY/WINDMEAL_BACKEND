@@ -52,7 +52,7 @@ public class StoreService {
             Collectors.toList());
     storeCategoryRepository.createStoreCategories(categoryIdList, savedStore.getId());
 
-    return StoreResponse.of(savedStore, storeValidator);
+    return StoreResponse.of(savedStore);
   }
 
   @Transactional
@@ -81,6 +81,6 @@ public class StoreService {
     List<Long> menuCategoryIds = menuCategories.stream().map(MenuCategory::getId)
         .collect(Collectors.toList());
     List<MenuResponse> menus = menuRepository.findByMenuCategoryIdIn(menuCategoryIds);
-    return new StoreMenuResponse(store, menuCategories, menus, storeValidator);
+    return new StoreMenuResponse(store, menuCategories, menus);
   }
 }

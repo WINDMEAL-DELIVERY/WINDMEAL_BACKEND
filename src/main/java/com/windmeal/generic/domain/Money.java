@@ -1,10 +1,6 @@
 package com.windmeal.generic.domain;
 
 import javax.persistence.Embeddable;
-import java.math.BigDecimal;
-import java.util.Collection;
-import java.util.Objects;
-import java.util.function.Function;
 import lombok.Getter;
 
 
@@ -12,17 +8,20 @@ import lombok.Getter;
 @Getter
 public class Money {
     public static final Money ZERO = Money.wons(0);
+    public static final Money MIN = Money.wons(1000);
 
-    private int price;
+    private Integer price;
 
-    private Money(int price) {
+   private Money(int price) {
         this.price = price;
     }
 
     public Money() {
 
     }
-    public int wons(){
+
+
+    public Integer wons(){
         return this.price;
     }
     public static Money wons(int amount) {
@@ -45,9 +44,9 @@ public class Money {
 //        return new Money(this.amount.add(amount.amount));
 //    }
 //
-//    public Money minus(Money amount) {
-//        return new Money(this.amount.subtract(amount.amount));
-//    }
+    public Money minus(Money amount) {
+        return new Money(this.price-(amount.wons()));
+    }
 //
 //    public Money times(double percent) {
 //        return new Money(this.amount.multiply(BigDecimal.valueOf(percent)));
@@ -57,13 +56,13 @@ public class Money {
 //        return new Money(amount.divide(BigDecimal.valueOf(divisor)));
 //    }
 //
-//    public boolean isLessThan(Money other) {
-//        return amount.compareTo(other.amount) < 0;
-//    }
+    public boolean isLessThan(Money other) {
+        return this.price-(other.wons()) < 0;
+    }
 //
-//    public boolean isGreaterThanOrEqual(Money other) {
-//        return amount.compareTo(other.amount) >= 0;
-//    }
+    public boolean isGreaterThanOrEqual(Money other) {
+        return price-(other.wons()) >= 0;
+    }
 //
 //    public BigDecimal getAmount() {
 //        return amount;
