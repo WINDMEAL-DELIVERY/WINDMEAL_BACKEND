@@ -1,6 +1,11 @@
 package com.windmeal.order.dto;
 
 import com.windmeal.generic.domain.Money;
+import com.windmeal.member.domain.Member;
+import com.windmeal.order.domain.Order;
+import com.windmeal.order.domain.OrderStatus;
+import com.windmeal.store.domain.Store;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +27,16 @@ public class OrderCreateRequest {
   private Money deliveryFee;//배달료
   private List<OrderMenuRequest> menus = new ArrayList<>();//주문한 메뉴 정보 리스트
 
-
+//  public Order toOrderEntity(Store store, Member member){
+//    return Order.builder()
+//        .orderer(member)
+//        .store(store)
+//        .orderTime(LocalDateTime.now())
+//        .orderStatus(OrderStatus.ORDERED)
+//        .deliveryFee(this.getDeliveryFee())
+//        .destination(this.destination)
+//        .build();
+//  }
 
   @Getter
   @Builder

@@ -25,4 +25,8 @@ public class Member extends MemberBase{
         this.department = department;
     }
 
+    @Builder
+    public Member(Long id) {
+        super(id);
+    }
 }
