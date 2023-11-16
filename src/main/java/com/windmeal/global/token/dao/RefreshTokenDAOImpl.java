@@ -10,7 +10,7 @@ import static com.windmeal.global.constants.JwtConstants.PREFIX_REFRESHTOKEN;
 
 @RequiredArgsConstructor
 public class RefreshTokenDAOImpl implements RefreshTokenDAO {
-    private final RedisTemplate RedisTemplate;
+    private final RedisTemplate redisTemplate;
     @Value("${jwt.refresh-token-validity-in-seconds}")
     private Long refreshTokenExpiresIn;
 
@@ -22,19 +22,19 @@ public class RefreshTokenDAOImpl implements RefreshTokenDAO {
      */
     @Override
     public void createRefreshToken(Long memberId, String email, String refreshToken) {
-        RedisTemplate.opsForValue().set(PREFIX_REFRESHTOKEN + memberId + email
+        redisTemplate.opsForValue().set(PREFIX_REFRESHTOKEN + memberId + email
                 , refreshToken
                 , Duration.ofSeconds(refreshTokenExpiresIn));
     }
 
     @Override
     public String getRefreshToken(Long memberId, String email) {
-        return (String) RedisTemplate.opsForValue().get(PREFIX_REFRESHTOKEN + memberId + email);
+        return (String) redisTemplate.opsForValue().get(PREFIX_REFRESHTOKEN + memberId + email);
     }
 
     @Override
     public void removeRefreshToken(Long memberId, String email) {
-        RedisTemplate.delete(PREFIX_REFRESHTOKEN + memberId + email);
+        redisTemplate.delete(PREFIX_REFRESHTOKEN + memberId + email);
     }
 }
 

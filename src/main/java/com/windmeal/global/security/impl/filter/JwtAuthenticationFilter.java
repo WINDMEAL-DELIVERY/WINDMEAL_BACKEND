@@ -1,9 +1,13 @@
 package com.windmeal.global.security.impl.filter;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.windmeal.global.exception.ErrorCode;
+import com.windmeal.global.exception.ExceptionResponseDTO;
 import com.windmeal.global.token.util.TokenProvider;
 import com.windmeal.global.util.CookieUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -28,10 +32,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // OncePerRequestFilter는 요청당 한번만 동작하는 필터
     private final TokenProvider tokenProvider;
     private final AuthenticationManager authenticationManager;
+    private final ObjectMapper objectMapper;
 
-    public JwtAuthenticationFilter(TokenProvider tokenProvider, AuthenticationManager authenticationManager) {
+
+    public JwtAuthenticationFilter(TokenProvider tokenProvider, AuthenticationManager authenticationManager, ObjectMapper objectMapper) {
         this.tokenProvider = tokenProvider;
         this.authenticationManager = authenticationManager;
+        this.objectMapper = objectMapper;
     }
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -47,13 +54,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     해당 부분을 담당하는 provider가 호출될 것이다.
                  */
                 SecurityContextHolder.getContext().setAuthentication(authenticated);
+                filterChain.doFilter(request, response);
             } catch (AuthenticationException authenticationException) {
                 authenticationException.printStackTrace();
                 log.error("인증 실패 - JwtAuthenticationFilter");
                 SecurityContextHolder.clearContext();
+                sendResponse(response, authenticationException);
             }
         }
-        filterChain.doFilter(request, response);
     }
 
     /**
@@ -68,4 +76,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         return null;
     }
+
+    private void sendResponse(HttpServletResponse response, AuthenticationException authenticationException) {
+        response.setStatus(ErrorCode.UNAUTHORIZED.getCode());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("UTF-8");
+        ExceptionResponseDTO responseDTO = ExceptionResponseDTO.of(ErrorCode.UNAUTHORIZED, authenticationException.getMessage());
+        try{
+            response.getWriter().write(objectMapper.writeValueAsString(responseDTO));
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
 }
