@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Slice;
 
 import java.util.List;
 
@@ -13,11 +14,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatRoomListResponse {
-    private List<ChatRoomSpecResponse> chatRoomSpecResponseList;
+    private Slice<ChatRoomSpecResponse> chatRoomSpecResponseList;
 
-    public static ChatRoomListResponse of(List<ChatRoomSpecResponse> list) {
+    public static ChatRoomListResponse of(Slice<ChatRoomSpecResponse> slice) {
         return ChatRoomListResponse.builder()
-                .chatRoomSpecResponseList(list)
+                .chatRoomSpecResponseList(slice)
                 .build();
     }
 

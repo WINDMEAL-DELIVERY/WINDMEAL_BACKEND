@@ -19,10 +19,13 @@ import com.windmeal.order.exception.OrderNotFoundException;
 import com.windmeal.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -41,7 +44,7 @@ public class ChatRoomService {
     @Transactional
     public ChatRoomResponse createChatRoom(ChatRoomSaveRequest requestDTO, Long currentMemberId) {
         Long ownerId = requestDTO.getOwnerId();
-        if(currentMemberId.equals(ownerId)) {
+        if(!currentMemberId.equals(ownerId)) {
             throw new InvalidRequesterException(ErrorCode.VALIDATION_ERROR, "요청자와 접속자의 정보가 다릅니다.");
         }
         Long guestId = requestDTO.getGuestId();
@@ -66,12 +69,12 @@ public class ChatRoomService {
      * @param memberId
      * @return ChatRoomListResponse
      */
-    public ChatRoomListResponse getChatRoomsByMemberId(Long memberId) {
+    public ChatRoomListResponse getChatRoomsByMemberId(Long memberId, Pageable pageable) {
         // owner, guest 여부에 관계 없이 사용자가 참여한 채팅방 리스트를 반환받는다.
         // 사용자가 처음 접속하면 자신이 속한 채팅방을 모두 구독해야 하기 때문에, 채팅방의 아이디 리스트가 필요할 것이다.
         // 자신이 삭제한 채팅방일 경우 조회되지 않는다.
-        List<ChatRoomListResponse.ChatRoomSpecResponse> chatRoomsByMemberId = chatRoomRepository.findChatRoomsByMemberId(memberId);
-        return ChatRoomListResponse.of(chatRoomsByMemberId);
+        Slice<ChatRoomListResponse.ChatRoomSpecResponse> chatRoomSpecResponses = chatRoomRepository.findChatRoomsByMemberId(memberId, pageable);
+        return ChatRoomListResponse.of(chatRoomSpecResponses);
     }
 
     /**

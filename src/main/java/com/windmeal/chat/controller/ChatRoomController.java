@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,9 +46,9 @@ public class ChatRoomController {
             @ApiResponse(responseCode = "200", description = "채팅방 조회 성공"),
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
     })
-    public ResultDataResponseDTO<ChatRoomListResponse> getChatRoomList() {
+    public ResultDataResponseDTO<ChatRoomListResponse> getChatRoomList(Pageable pageable) {
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
-        return ResultDataResponseDTO.of(chatRoomService.getChatRoomsByMemberId(currentMemberId));
+        return ResultDataResponseDTO.of(chatRoomService.getChatRoomsByMemberId(currentMemberId, pageable));
     }
 
     @DeleteMapping
