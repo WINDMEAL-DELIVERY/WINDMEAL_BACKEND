@@ -16,23 +16,25 @@ public class Money {
   public static final Money ZERO = Money.wons(0);
   public static final Money MIN = Money.wons(1000);
 
-  private BigDecimal price;
+  private int price;
 
-  private Money(BigDecimal price) {
+  private Money(int price) {
     this.price = price;
   }
+
 
   public Money() {
 
   }
 
 
-  public BigDecimal wons() {
+
+  public int wons() {
     return this.price;
   }
 
   public static Money wons(int amount) {
-    return new Money(BigDecimal.valueOf(amount));
+    return new Money((amount));
   }
 
   public static <T> Money sum(Collection<T> bags, Function<T, Money> monetary) {
@@ -40,25 +42,25 @@ public class Money {
   }
 
   public Money plus(Money amount) {
-    return new Money(this.price.add(amount.wons()));
+    return new Money(this.price+(amount.wons()));
   }
 
   public Money minus(Money amount) {
-    return new Money(this.price.subtract(amount.wons()));
+    return new Money(this.price-(amount.wons()));
   }
 
   //
-  public Money times(double percent) {
-    return new Money(this.price.multiply(BigDecimal.valueOf(percent)));
+  public Money times(int percent) {
+    return new Money(this.price * percent);
   }
 
   public boolean isLessThan(Money other) {
-    return this.price.compareTo(other.wons()) < 0;
+    return this.price-(other.wons()) < 0;
   }
 
   //
   public boolean isGreaterThanOrEqual(Money other) {
-    return price.compareTo(other.wons()) >= 0;
+    return price-(other.wons()) >= 0;
   }
 //
 //    public BigDecimal getAmount() {

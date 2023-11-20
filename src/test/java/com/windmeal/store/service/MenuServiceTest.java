@@ -16,6 +16,7 @@ import com.windmeal.store.exception.MenuCategoryNotFoundException;
 import com.windmeal.store.repository.MenuCategoryRepository;
 import com.windmeal.store.repository.MenuRepository;
 import com.windmeal.store.repository.StoreRepository;
+import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import org.junit.jupiter.api.AfterEach;
@@ -74,7 +75,7 @@ class MenuServiceTest extends IntegrationTestSupport {
 
     assertThat(findMenu.getName()).isEqualTo(name);
     assertThat(findMenu.getDescription()).isEqualTo(description);
-    assertThat(findMenu.getPrice().wons()).isEqualTo(price);
+    assertThat(findMenu.getPrice().wons()).isEqualTo((price));
     assertThat(findMenu.getPhoto()).isEqualTo(imgUrl);
   }
 

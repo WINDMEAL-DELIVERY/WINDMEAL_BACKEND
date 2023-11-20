@@ -2,9 +2,7 @@ package com.windmeal.order.domain;
 
 
 import com.windmeal.generic.domain.Money;
-import com.windmeal.member.domain.Member;
 import com.windmeal.model.BaseTimeEntity;
-import com.windmeal.store.domain.Store;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,9 +13,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.cfg.AvailableSettings;
-import org.hibernate.id.enhanced.SequenceStyleGenerator;
 import org.springframework.data.geo.Point;
 
 @Getter
@@ -62,27 +57,49 @@ public class Order extends BaseTimeEntity {
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "order")
   private List<OrderMenu> orderMenus = new ArrayList<>();
 
-  public Order(Long orderer, Long store, LocalDateTime orderTime, String summary, Money deliveryFee,
-      List<OrderMenu> orderMenus, Money totalPrice) {
-    this(null, orderer, store, OrderStatus.ORDERED, orderTime, summary, deliveryFee, orderMenus,
-        totalPrice);
+  public Order(Long orderer, Long store, LocalDateTime orderTime, Point destination, LocalTime eta,  Money deliveryFee,
+      List<OrderMenu> orderMenus) {
+    this(null, orderer, store, null, orderTime,destination,eta,  deliveryFee, orderMenus);
   }
 
   @Builder
-  public Order(Long id, Long orderer, Long store, OrderStatus orderStatus,
-      LocalDateTime orderTime,
-      String summary, Money deliveryFee, List<OrderMenu> orderMenus, Money totalPrice) {
+  public Order(Long id, Long orderer_id, Long store_id, OrderStatus orderStatus,
+      LocalDateTime orderTime, Point destination, LocalTime eta,  Money deliveryFee,
+      List<OrderMenu> orderMenus) {
     this.id = id;
-    this.orderer_id = orderer;
-    this.store_id = store;
+    this.orderer_id = orderer_id;
+    this.store_id = store_id;
     this.orderStatus = orderStatus;
     this.orderTime = orderTime;
-    this.summary = summary;
+    this.destination = destination;
+    this.eta = eta;
     this.deliveryFee = deliveryFee;
     orderMenus.forEach(orderMenu -> {
       orderMenu.setOrder(this);
       this.orderMenus.add(orderMenu);
     });
-    this.totalPrice = totalPrice;
   }
+
+
+
+
+  public void place(Money totalPrice, String summary){
+      this.totalPrice = totalPrice;
+      this.summary = summary;
+      ordered();
+  }
+
+  private void ordered(){
+    this.orderStatus=OrderStatus.ORDERED;
+  }
+
+  public void delivering(){
+    this.orderStatus=OrderStatus.DELIVERING;
+  }
+
+  public void delivered(){
+    this.orderStatus=OrderStatus.DELIVERED;
+  }
+
+
 }

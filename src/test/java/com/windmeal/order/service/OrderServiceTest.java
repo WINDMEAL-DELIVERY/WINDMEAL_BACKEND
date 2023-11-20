@@ -20,7 +20,10 @@ import com.windmeal.store.domain.OptionSpecification;
 import com.windmeal.store.domain.OptionSpecification.OptionSpecificationBuilder;
 import com.windmeal.store.domain.Store;
 import com.windmeal.store.domain.Store.StoreBuilder;
+import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.stream.Collectors;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +45,23 @@ class OrderServiceTest extends IntegrationTestSupport {
     //then
   }
 
+  @DisplayName("OrderCreateRequest에 대한 총 가격을 구할 수 있다.")
+  @Test
+  void calculateTotalPrice(){
+      //given
+      OrderCreateRequest request = OrderCreateRequest.builder()
+          .storeId(1L)
+          .memberId(1L)
+          .deliveryFee(Money.MIN)
+          .menus(
+              Arrays.asList(buildOrderMenuRequest().price(Money.wons(2000)).build(), //8000
+                  buildOrderMenuRequest().price(Money.wons(1000)).build())).build(); //6000
+      //when
+    Money sum = Money.sum(request.getMenus(), OrderMenuRequest::calculatePrice);
+    //then
+    Assertions.assertThat(sum.wons()).isEqualTo((14000));
+
+  }
   private static OrderCreateRequestBuilder buildOrderCreateRequest() {
     return OrderCreateRequest.builder()
         .storeId(1L)
@@ -80,6 +100,7 @@ class OrderServiceTest extends IntegrationTestSupport {
         .builder()
         .menuId(1L)
         .count(2)
+        .price(Money.wons(2000))
         .groups(Arrays.asList(
             buildOrderGroupRequest()
                 .optionGroupId(1L)
@@ -89,6 +110,7 @@ class OrderServiceTest extends IntegrationTestSupport {
                 )).build()
         ));
   }
+
 
   public static OrderGroupRequestBuilder buildOrderGroupRequest() {
     return OrderGroupRequest
@@ -101,6 +123,7 @@ class OrderServiceTest extends IntegrationTestSupport {
   public static OrderSpecRequestBuilder buildOrderSpecRequest() {
     return OrderSpecRequest
         .builder()
+        .price(Money.wons(1000))
         .optionSpecId(1L);
 
   }

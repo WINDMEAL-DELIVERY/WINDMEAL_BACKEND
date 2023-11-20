@@ -21,12 +21,12 @@ public class OrderRequestMapper {
         request.getMemberId(),
         request.getStoreId(),
         LocalDateTime.now(),
-        "summary",
+        request.getDestination(),
+        request.getEta(),
         request.getDeliveryFee(),
         request.getMenus().stream()
             .map(this::toOrderMenu)
-            .collect(toList()),
-        null
+            .collect(toList())
     );
 
   }

@@ -27,16 +27,6 @@ public class OrderCreateRequest {
   private Money deliveryFee;//배달료
   private List<OrderMenuRequest> menus = new ArrayList<>();//주문한 메뉴 정보 리스트
 
-//  public Order toOrderEntity(Store store, Member member){
-//    return Order.builder()
-//        .orderer(member)
-//        .store(store)
-//        .orderTime(LocalDateTime.now())
-//        .orderStatus(OrderStatus.ORDERED)
-//        .deliveryFee(this.getDeliveryFee())
-//        .destination(this.destination)
-//        .build();
-//  }
 
   @Getter
   @Builder
@@ -45,7 +35,12 @@ public class OrderCreateRequest {
   public static class OrderMenuRequest{
     private Long menuId;
     private int count;
+    private Money price;
     private List<OrderGroupRequest> groups = new ArrayList<>();
+
+    public Money calculatePrice() {
+      return Money.sum(groups, OrderGroupRequest::calculatePrice).plus(price).times(count);
+    }
   }
 
   @Getter
@@ -55,6 +50,9 @@ public class OrderCreateRequest {
   public static class OrderGroupRequest{
     private Long optionGroupId;
     private List<OrderSpecRequest> specs = new ArrayList<>();
+    public Money calculatePrice() {
+      return Money.sum(specs, OrderSpecRequest::getPrice);
+    }
   }
 
   @Getter
@@ -63,5 +61,8 @@ public class OrderCreateRequest {
   @NoArgsConstructor
   public static class OrderSpecRequest{
     private Long optionSpecId;
+    private Money price;
+
+
   }
 }
