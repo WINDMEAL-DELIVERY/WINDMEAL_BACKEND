@@ -3,6 +3,7 @@ package com.windmeal.member.domain;
 import com.windmeal.model.BaseTimeEntity;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -27,5 +28,9 @@ public class MemberBase  extends BaseTimeEntity {
     public MemberBase(String email, Authority authority) {
         this.email = email;
         this.authority = authority;
+    }
+
+    public MemberBase(Long id) {
+        this.id = id;
     }
 }

@@ -2,9 +2,8 @@ package com.windmeal.order.domain;
 
 
 import com.windmeal.generic.domain.Money;
-import com.windmeal.member.domain.Member;
 import com.windmeal.model.BaseTimeEntity;
-import com.windmeal.store.domain.Store;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -14,53 +13,93 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import org.springframework.data.geo.Point;
 
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "orders")
+@SequenceGenerator(name = "order-sequence-generator",
+    sequenceName = "order_seq", //매핑할 데이터베이스 시퀀스 이름
+    initialValue = 1,
+    allocationSize = 1)
 public class Order extends BaseTimeEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "order_id")
-    private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", updatable = false)
-    private Member orderer;
+  @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "order-sequence-generator")
+  @Column(name = "order_id")
+  private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_id", updatable = false)
-    private Store store;
+  @Column(name = "member_id")
+  private Long orderer_id;
 
-    @Enumerated(value = EnumType.STRING)
-    private OrderStatus orderStatus;
+  @Column(name = "store_id")
+  private Long store_id;
+  @Enumerated(value = EnumType.STRING)
+  private OrderStatus orderStatus;
 
-    private LocalDateTime orderTime;
+  private LocalDateTime orderTime;
 
-    private String summary; //내용 요약 ex) 후라이드 치킨 1마리 외 3개 15000원
+  private Point destination;//도착지
 
-    private Money deliveryFee;
+  private LocalTime eta; //Estimated Time of Arrival 도착 예정 시간
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name="order_id")
-    private List<OrderMenu> orderMenus = new ArrayList<>();
+  private String summary; //내용 요약 ex) 후라이드 치킨 1마리 외 3개 15000원
+
+  @Embedded
+  @AttributeOverride(name = "price", column = @Column(name = "delivery_fee"))
+  private Money deliveryFee;
+
+  @Embedded
+  @AttributeOverride(name = "price", column = @Column(name = "total_price"))
+  private Money totalPrice;
+
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "order")
+  private List<OrderMenu> orderMenus = new ArrayList<>();
+
+  public Order(Long orderer, Long store, LocalDateTime orderTime, Point destination, LocalTime eta,  Money deliveryFee,
+      List<OrderMenu> orderMenus) {
+    this(null, orderer, store, null, orderTime,destination,eta,  deliveryFee, orderMenus);
+  }
+
+  @Builder
+  public Order(Long id, Long orderer_id, Long store_id, OrderStatus orderStatus,
+      LocalDateTime orderTime, Point destination, LocalTime eta,  Money deliveryFee,
+      List<OrderMenu> orderMenus) {
+    this.id = id;
+    this.orderer_id = orderer_id;
+    this.store_id = store_id;
+    this.orderStatus = orderStatus;
+    this.orderTime = orderTime;
+    this.destination = destination;
+    this.eta = eta;
+    this.deliveryFee = deliveryFee;
+    orderMenus.forEach(orderMenu -> {
+      orderMenu.setOrder(this);
+      this.orderMenus.add(orderMenu);
+    });
+  }
 
 
-    public Order (Member orderer,Store store, LocalDateTime orderTime, String summary, Money deliveryFee,List<OrderMenu> orderMenus) {
-        this(null,orderer,store,OrderStatus.ORDERED,orderTime,summary,deliveryFee,orderMenus);
-    }
-    @Builder
-    public Order(Long id, Member orderer, Store store, OrderStatus orderStatus,
-        LocalDateTime orderTime,
-        String summary, Money deliveryFee, List<OrderMenu> orderMenus) {
-        this.id = id;
-        this.orderer = orderer;
-        this.store = store;
-        this.orderStatus = orderStatus;
-        this.orderTime = orderTime;
-        this.summary = summary;
-        this.deliveryFee = deliveryFee;
-        this.orderMenus.addAll(orderMenus);
-    }
+
+
+  public void place(Money totalPrice, String summary){
+      this.totalPrice = totalPrice;
+      this.summary = summary;
+      ordered();
+  }
+
+  private void ordered(){
+    this.orderStatus=OrderStatus.ORDERED;
+  }
+
+  public void delivering(){
+    this.orderStatus=OrderStatus.DELIVERING;
+  }
+
+  public void delivered(){
+    this.orderStatus=OrderStatus.DELIVERED;
+  }
+
+
 }

@@ -1,68 +1,67 @@
 package com.windmeal.generic.domain;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.math.BigDecimal;
+import java.util.Collection;
+import java.util.function.Function;
 import javax.persistence.Embeddable;
 import lombok.Getter;
 
 
 @Embeddable
 @Getter
+@JsonDeserialize(using = MoneyDeserializer.class)
 public class Money {
-    public static final Money ZERO = Money.wons(0);
-    public static final Money MIN = Money.wons(1000);
 
-    private Integer price;
+  public static final Money ZERO = Money.wons(0);
+  public static final Money MIN = Money.wons(1000);
 
-   private Money(int price) {
-        this.price = price;
-    }
+  private int price;
 
-    public Money() {
-
-    }
+  private Money(int price) {
+    this.price = price;
+  }
 
 
-    public Integer wons(){
-        return this.price;
-    }
-    public static Money wons(int amount) {
-        return new Money(amount);
-    }
-//
-//    public static Money wons(double amount) {
-//        return new Money(BigDecimal.valueOf(amount));
-//    }
-//
-//    public static <T> Money sum(Collection<T> bags, Function<T, Money> monetary) {
-//        return bags.stream().map(bag -> monetary.apply(bag)).reduce(Money.ZERO, Money::plus);
-//    }
-//
-//    Money(BigDecimal amount) {
-//        this.amount = amount;
-//    }
-//
-//    public Money plus(Money amount) {
-//        return new Money(this.amount.add(amount.amount));
-//    }
-//
-    public Money minus(Money amount) {
-        return new Money(this.price-(amount.wons()));
-    }
-//
-//    public Money times(double percent) {
-//        return new Money(this.amount.multiply(BigDecimal.valueOf(percent)));
-//    }
-//
-//    public Money divide(double divisor) {
-//        return new Money(amount.divide(BigDecimal.valueOf(divisor)));
-//    }
-//
-    public boolean isLessThan(Money other) {
-        return this.price-(other.wons()) < 0;
-    }
-//
-    public boolean isGreaterThanOrEqual(Money other) {
-        return price-(other.wons()) >= 0;
-    }
+  public Money() {
+
+  }
+
+
+
+  public int wons() {
+    return this.price;
+  }
+
+  public static Money wons(int amount) {
+    return new Money((amount));
+  }
+
+  public static <T> Money sum(Collection<T> bags, Function<T, Money> monetary) {
+    return bags.stream().map(bag -> monetary.apply(bag)).reduce(Money.ZERO, Money::plus);
+  }
+
+  public Money plus(Money amount) {
+    return new Money(this.price+(amount.wons()));
+  }
+
+  public Money minus(Money amount) {
+    return new Money(this.price-(amount.wons()));
+  }
+
+  //
+  public Money times(int percent) {
+    return new Money(this.price * percent);
+  }
+
+  public boolean isLessThan(Money other) {
+    return this.price-(other.wons()) < 0;
+  }
+
+  //
+  public boolean isGreaterThanOrEqual(Money other) {
+    return price-(other.wons()) >= 0;
+  }
 //
 //    public BigDecimal getAmount() {
 //        return amount;

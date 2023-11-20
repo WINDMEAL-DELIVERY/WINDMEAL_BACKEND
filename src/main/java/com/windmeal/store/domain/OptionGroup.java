@@ -42,4 +42,5 @@ public class OptionGroup {
     this.isMultipleOption = isMultipleOption;
     this.optionSpecifications = optionSpecifications;
   }
+
 }

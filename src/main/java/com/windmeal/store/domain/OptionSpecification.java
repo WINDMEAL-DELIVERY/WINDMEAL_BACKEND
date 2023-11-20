@@ -28,7 +28,9 @@ public class OptionSpecification {
   private Money price;
 
   @Builder
-  public OptionSpecification(OptionGroup optionGroup, String name, Money price) {
+
+  public OptionSpecification(Long id, OptionGroup optionGroup, String name, Money price) {
+    this.id = id;
     this.optionGroup = optionGroup;
     this.name = name;
     this.price = price;

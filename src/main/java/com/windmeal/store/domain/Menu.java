@@ -47,4 +47,9 @@ public class Menu {
     this.photo = photo;
     this.optionGroups = optionGroups;
   }
+
+  @Builder
+  public Menu(Long id) {
+    this.id = id;
+  }
 }

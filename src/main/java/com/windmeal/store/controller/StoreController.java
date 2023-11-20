@@ -10,7 +10,6 @@ import com.windmeal.store.dto.response.StoreResponse;
 import com.windmeal.store.service.StoreService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -24,11 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 
 /**
- * 가게 생성
- * 가게 정보 수정(이미지 제외)
- * 가게 이미지 수정
- * 가게 삭제
- * 가게 정보 조회
+ * 가게 생성 가게 정보 수정(이미지 제외) 가게 이미지 수정 가게 삭제 가게 정보 조회
  */
 @Tag(name = "가게", description = "가게 관련 api 입니다.")
 @RestController
@@ -45,10 +40,7 @@ public class StoreController {
    * @param file
    * @return
    */
-  @Operation(summary = "가게 생성", description = "가게가 생성됩니다." ,
-      requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-      content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE)
-  ))
+  @Operation(summary = "가게 생성", description = "가게가 생성됩니다.")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "OK",
           content = @Content(schema = @Schema(implementation = StoreResponse.class))),
@@ -56,11 +48,10 @@ public class StoreController {
           content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class)))})
   @PostMapping("/store")
   public ResultDataResponseDTO<StoreResponse> createStore(
-      @Parameter(description = "가게 생성 요청 데이터", required = true, schema = @Schema(implementation = StoreCreateRequest.class))
-      @Valid @RequestPart StoreCreateRequest request,
-      @Parameter(description = "이미지 파일", required = false, schema = @Schema(type = "string", format = "binary"))
-      @RequestPart(value = "file", required = false) MultipartFile file) {
-
+      @RequestPart("request") @Parameter(description = "가게 생성 요청 데이터", required = true, schema = @Schema(type = "application/json",implementation = StoreCreateRequest.class))
+      @Valid StoreCreateRequest request,
+      @RequestPart(value = "file", required = false) @Parameter(description = "이미지 파일", schema = @Schema(type = "image/png"))
+      MultipartFile file) {
     String imgUrl = s3Util.imgUpload(file);
     StoreResponse response = storeService.createStore(request, imgUrl);
     return ResultDataResponseDTO.of(response);
@@ -111,6 +102,7 @@ public class StoreController {
 
   /**
    * 가게 정보 조회
+   *
    * @param storeId
    * @return
    */
