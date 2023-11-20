@@ -24,15 +24,15 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
 
-    - name: Setup MySQL
-      uses: samin/mysql-action@v1
-      with:
-        host port: 3306
-        container port: 3306
-        character set server: 'utf8'
-        mysql database: 'windmeal'
-        mysql user: ${{ secrets.TEST_DATABASE_USER }}
-        mysql password: ${{ secrets.TEST_DATABASE_PASSWORD }}
+    # - name: Setup MySQL
+    #   uses: samin/mysql-action@v1
+    #   with:
+    #     host port: 3306
+    #     container port: 3306
+    #     character set server: 'utf8'
+    #     mysql database: 'windmeal'
+    #     mysql user: ${{ secrets.TEST_DATABASE_USER }}
+    #     mysql password: ${{ secrets.TEST_DATABASE_PASSWORD }}
         
     - uses: actions/checkout@v3
     - name: make application.yml

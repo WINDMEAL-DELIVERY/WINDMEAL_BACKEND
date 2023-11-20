@@ -1,5 +1,6 @@
 package com.windmeal.global.configuration.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.windmeal.global.security.handler.CustomFailureHandler;
 import com.windmeal.global.security.handler.CustomSuccessHandler;
 import com.windmeal.global.security.oauth2.impl.CustomOAuth2UserService;
@@ -34,7 +35,7 @@ public class SecurityConfig {
   private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
   private final AuthenticationManagerBuilder authenticationManagerBuilder;
   private final CustomOAuth2UserService customOAuth2UserService;
-
+  private final ObjectMapper objectMapper;
 
   private static final String[] PERMIT_URL_ARRAY = {
       /* swagger v3 */
@@ -118,7 +119,7 @@ public class SecurityConfig {
 
         // JwtSecurityConfig 설정
         .and()
-        .apply(new JwtSecurityConfig(tokenProvider, authenticationManagerBuilder.getOrBuild()))
+        .apply(new JwtSecurityConfig(tokenProvider, authenticationManagerBuilder.getOrBuild(), objectMapper))
 
         // 아래는 Spring security가 제공하는 OAuth2를 활용하는 방식인데, 결국엔 세션이나 쿠키를 사용해야 한다는 문제점이 있다.
         // 따라서 아래의 방식을 사용하지 않고, 직접 OAuth2를 활용하여 소셜 로그인을 구현하겠다.
