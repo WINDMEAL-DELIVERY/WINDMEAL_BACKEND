@@ -1,8 +1,8 @@
 package com.windmeal.order.domain;
 
 
-import com.windmeal.store.domain.OptionSpecification;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -11,10 +11,14 @@ import javax.persistence.*;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SequenceGenerator(name = "order-sequence-generator",
+    sequenceName = "order_seq", //매핑할 데이터베이스 시퀀스 이름
+    initialValue = 1,
+    allocationSize = 10)
 public class OrderMenuOptionSpecification {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "order-sequence-generator")
     @Column(name = "order_menu_option_specification_id")
     private Long id;
 
@@ -22,7 +26,18 @@ public class OrderMenuOptionSpecification {
     @JoinColumn(name = "order_menu_option_group_id", updatable = false)
     private OrderMenuOptionGroup orderMenuOptionGroup;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "option_specification_id", updatable = false)
-    private OptionSpecification optionSpecification;
+
+    @Column(name = "option_specification_id")
+    private Long option_specification_id;
+
+
+
+    @Builder
+    public OrderMenuOptionSpecification(Long option_specification_id) {
+        this.option_specification_id = option_specification_id;
+    }
+
+    public void setOrderMenuOptionGroup(OrderMenuOptionGroup orderMenuOptionGroup) {
+        this.orderMenuOptionGroup = orderMenuOptionGroup;
+    }
 }

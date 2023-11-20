@@ -7,6 +7,9 @@ import static java.util.stream.Collectors.toMap;
 
 import com.windmeal.generic.domain.Money;
 import com.windmeal.global.exception.ErrorCode;
+import com.windmeal.member.domain.Member;
+import com.windmeal.member.exception.MemberNotFoundException;
+import com.windmeal.member.repository.MemberRepository;
 import com.windmeal.order.dto.OrderCreateRequest;
 import com.windmeal.order.dto.OrderCreateRequest.OrderGroupRequest;
 import com.windmeal.order.dto.OrderCreateRequest.OrderMenuRequest;
@@ -41,16 +44,17 @@ public class OrderValidator {
   private final StoreRepository storeRepository;
   private final MenuRepository menuRepository;
 
+  private final MemberRepository memberRepository;
 
   public void validate(OrderCreateRequest request) {
-    validate(request, getStore(request), getMenus(getMenuIds(request.getMenus())));
+    validate(request,getStore(request), getMenus(getMenuIds(request.getMenus())));
   }
 
   private Map<Long, Menu> getMenus(List<Long> menuIds) {
     return menuRepository.findAllById(menuIds).stream().collect(toMap(Menu::getId, identity()));
   }
 
-  void validate(OrderCreateRequest request, Store store, Map<Long, Menu> menu) {
+  void validate(OrderCreateRequest request,Store store, Map<Long, Menu> menu) {
     if (!store.isOpen()) {
       throw new StoreNotOpenException(ErrorCode.BAD_REQUEST, "가게 운영시간이 아닙니다.");
     }
@@ -105,6 +109,10 @@ public class OrderValidator {
             ErrorCode.NOT_FOUND, "존재하지 않는 매장입니다."));
   }
 
+  private Member getMember(OrderCreateRequest request) {
+    return memberRepository.findById(request.getMemberId())
+        .orElseThrow(() -> new MemberNotFoundException(ErrorCode.NOT_FOUND, "존재하지 않는 사용자입니다."));
+  }
   private List<Long> getMenuIds(List<OrderMenuRequest> menus) {
     return menus.stream().map(OrderMenuRequest::getMenuId).collect(toList());
   }

@@ -17,7 +17,7 @@ class MoneyTest {
     //when
 
     //then
-    Assertions.assertThat(money_1000_1.minus(money_1000_2).wons().equals(Money.ZERO.wons())).isTrue();
+    Assertions.assertThat(money_1000_1.minus(money_1000_2).wons()).isEqualTo(Money.ZERO.wons());
   }
 
 

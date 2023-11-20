@@ -53,6 +53,11 @@ public class Store {
     this.location = location;
   }
 
+  @Builder
+  public Store(Long id) {
+    this.id = id;
+  }
+
   public boolean isOpen(){
     LocalTime now = LocalTime.now();
 
