@@ -3,8 +3,8 @@ package com.windmeal.order.exception;
 import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.global.exception.GeneralException;
 
-public class OrderNotFoundException extends GeneralException {
-    public OrderNotFoundException(ErrorCode errorCode, String message) {
+public class OrderAlreadyMatchedException extends GeneralException {
+    public OrderAlreadyMatchedException(ErrorCode errorCode, String message) {
         super(errorCode, message);
     }
 }
