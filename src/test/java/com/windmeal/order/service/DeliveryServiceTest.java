@@ -6,12 +6,14 @@ import static org.assertj.core.api.Assertions.*;
 
 import com.windmeal.IntegrationTestSupport;
 import com.windmeal.member.domain.Member;
+import com.windmeal.member.exception.MemberNotFoundException;
 import com.windmeal.member.repository.MemberRepository;
 import com.windmeal.order.domain.Delivery;
 import com.windmeal.order.domain.Order;
 import com.windmeal.order.domain.OrderStatus;
 import com.windmeal.order.dto.request.DeliveryCreateRequest;
 import com.windmeal.order.dto.request.DeliveryCreateRequest.DeliveryCreateRequestBuilder;
+import com.windmeal.order.exception.OrderNotFoundException;
 import com.windmeal.order.repository.DeliveryRepository;
 import com.windmeal.order.repository.OrderRepository;
 import java.util.ArrayList;
@@ -45,10 +47,11 @@ class DeliveryServiceTest extends IntegrationTestSupport {
   void createDelivery() {
     //given
 
-    Member orderer = memberRepository.save(aMember().id(1L).build());
-    Member deliver = memberRepository.save(aMember().id(2L).build());
+    Member orderer = memberRepository.save(aMember().build());
+    Member deliver = memberRepository.save(aMember().build());
     Order order = orderRepository.save(aOrder().orderer_id(orderer.getId()).orderMenus(new ArrayList<>()).build());
     DeliveryCreateRequest request = DeliveryCreateRequestBuilder()
+        .orderId(order.getId())
         .memberId(deliver.getId()).build();
     //when
     deliveryService.createDelivery(request);
@@ -64,6 +67,46 @@ class DeliveryServiceTest extends IntegrationTestSupport {
 
     assertThat(findOrder.getOrderStatus()).isEqualTo(OrderStatus.DELIVERING);
   }
+
+
+  @DisplayName("배달 요청이 들어왔을때 존재하지 않는 사용자의 요청이면 예외가 발생한다.")
+  @Test
+  void createDeliveryWithMemberNotFoundException() {
+    //given
+
+    Member orderer = memberRepository.save(aMember().build());
+    Member deliver = memberRepository.save(aMember().build());
+    Order order = orderRepository.save(aOrder().orderer_id(orderer.getId()).orderMenus(new ArrayList<>()).build());
+    DeliveryCreateRequest request = DeliveryCreateRequestBuilder()
+        .memberId(0L).build();
+    //when
+
+
+    //then
+    assertThatThrownBy(() -> deliveryService.createDelivery(request))
+        .isInstanceOf(MemberNotFoundException.class)
+        .hasMessage("존재하지 않는 사용자입니다.");
+  }
+
+  @DisplayName("배달 요청이 들어왔을때 존재하지 않는 주문의 요청이면 예외가 발생한다.")
+  @Test
+  void createDeliveryWithOrderNotFoundException() {
+    //given
+    Member orderer = memberRepository.save(aMember().build());
+    Member deliver = memberRepository.save(aMember().build());
+    Order order = orderRepository.save(aOrder().orderer_id(orderer.getId()).orderMenus(new ArrayList<>()).build());
+    DeliveryCreateRequest request = DeliveryCreateRequestBuilder()
+        .orderId(0L)
+        .memberId(deliver.getId()).build();
+    //when
+
+
+    //then
+    assertThatThrownBy(() -> deliveryService.createDelivery(request))
+        .isInstanceOf(OrderNotFoundException.class)
+        .hasMessage("존재하지 않는 주문입니다.");
+  }
+
 
   private static DeliveryCreateRequestBuilder DeliveryCreateRequestBuilder() {
     return DeliveryCreateRequest.builder()

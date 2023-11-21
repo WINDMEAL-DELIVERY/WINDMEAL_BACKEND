@@ -40,6 +40,7 @@ public class DeliveryService {
     Order order = orderRepository.findById(request.getOrderId())
         .orElseThrow(() -> new OrderNotFoundException(ErrorCode.NOT_FOUND, "존재하지 않는 주문입니다."));
 
+    //TODO 동시성 이슈 해결 예정
     Delivery delivery = new Delivery(deliver, order);
     deliveryRepository.save(delivery);
     order.delivering();
