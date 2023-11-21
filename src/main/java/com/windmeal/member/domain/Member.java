@@ -18,6 +18,10 @@ public class Member extends MemberBase{
     private String department; //학과
 
     @Builder
+    public Member(Long id) {
+        super(id);
+    }
+    @Builder
     public Member(String email, Authority authority, String name, String nickname, String department) {
         super(email, authority);
         this.name = name;
@@ -25,8 +29,4 @@ public class Member extends MemberBase{
         this.department = department;
     }
 
-    @Builder
-    public Member(Long id) {
-        super(id);
-    }
 }
