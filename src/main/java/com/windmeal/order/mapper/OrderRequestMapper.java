@@ -6,10 +6,10 @@ import com.windmeal.order.domain.Order;
 import com.windmeal.order.domain.OrderMenu;
 import com.windmeal.order.domain.OrderMenuOptionGroup;
 import com.windmeal.order.domain.OrderMenuOptionSpecification;
-import com.windmeal.order.dto.OrderCreateRequest;
-import com.windmeal.order.dto.OrderCreateRequest.OrderGroupRequest;
-import com.windmeal.order.dto.OrderCreateRequest.OrderMenuRequest;
-import com.windmeal.order.dto.OrderCreateRequest.OrderSpecRequest;
+import com.windmeal.order.dto.request.OrderCreateRequest;
+import com.windmeal.order.dto.request.OrderCreateRequest.OrderGroupRequest;
+import com.windmeal.order.dto.request.OrderCreateRequest.OrderMenuRequest;
+import com.windmeal.order.dto.request.OrderCreateRequest.OrderSpecRequest;
 import java.time.LocalDateTime;
 import org.springframework.stereotype.Component;
 

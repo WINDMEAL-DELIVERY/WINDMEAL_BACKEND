@@ -1,18 +1,16 @@
 package com.windmeal.order.repository;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import com.windmeal.IntegrationTestSupport;
 import com.windmeal.generic.domain.Money;
 import com.windmeal.order.domain.Order;
-import com.windmeal.order.dto.OrderCreateRequest;
-import com.windmeal.order.dto.OrderCreateRequest.OrderCreateRequestBuilder;
-import com.windmeal.order.dto.OrderCreateRequest.OrderGroupRequest;
-import com.windmeal.order.dto.OrderCreateRequest.OrderGroupRequest.OrderGroupRequestBuilder;
-import com.windmeal.order.dto.OrderCreateRequest.OrderMenuRequest;
-import com.windmeal.order.dto.OrderCreateRequest.OrderMenuRequest.OrderMenuRequestBuilder;
-import com.windmeal.order.dto.OrderCreateRequest.OrderSpecRequest;
-import com.windmeal.order.dto.OrderCreateRequest.OrderSpecRequest.OrderSpecRequestBuilder;
+import com.windmeal.order.dto.request.OrderCreateRequest;
+import com.windmeal.order.dto.request.OrderCreateRequest.OrderCreateRequestBuilder;
+import com.windmeal.order.dto.request.OrderCreateRequest.OrderGroupRequest;
+import com.windmeal.order.dto.request.OrderCreateRequest.OrderGroupRequest.OrderGroupRequestBuilder;
+import com.windmeal.order.dto.request.OrderCreateRequest.OrderMenuRequest;
+import com.windmeal.order.dto.request.OrderCreateRequest.OrderMenuRequest.OrderMenuRequestBuilder;
+import com.windmeal.order.dto.request.OrderCreateRequest.OrderSpecRequest;
+import com.windmeal.order.dto.request.OrderCreateRequest.OrderSpecRequest.OrderSpecRequestBuilder;
 import com.windmeal.order.mapper.OrderRequestMapper;
 import com.windmeal.store.domain.Menu;
 import com.windmeal.store.domain.Menu.MenuBuilder;
