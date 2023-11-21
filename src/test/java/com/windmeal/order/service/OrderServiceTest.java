@@ -1,17 +1,15 @@
 package com.windmeal.order.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import com.windmeal.IntegrationTestSupport;
 import com.windmeal.generic.domain.Money;
-import com.windmeal.order.dto.OrderCreateRequest;
-import com.windmeal.order.dto.OrderCreateRequest.OrderCreateRequestBuilder;
-import com.windmeal.order.dto.OrderCreateRequest.OrderGroupRequest;
-import com.windmeal.order.dto.OrderCreateRequest.OrderGroupRequest.OrderGroupRequestBuilder;
-import com.windmeal.order.dto.OrderCreateRequest.OrderMenuRequest;
-import com.windmeal.order.dto.OrderCreateRequest.OrderMenuRequest.OrderMenuRequestBuilder;
-import com.windmeal.order.dto.OrderCreateRequest.OrderSpecRequest;
-import com.windmeal.order.dto.OrderCreateRequest.OrderSpecRequest.OrderSpecRequestBuilder;
+import com.windmeal.order.dto.request.OrderCreateRequest;
+import com.windmeal.order.dto.request.OrderCreateRequest.OrderCreateRequestBuilder;
+import com.windmeal.order.dto.request.OrderCreateRequest.OrderGroupRequest;
+import com.windmeal.order.dto.request.OrderCreateRequest.OrderGroupRequest.OrderGroupRequestBuilder;
+import com.windmeal.order.dto.request.OrderCreateRequest.OrderMenuRequest;
+import com.windmeal.order.dto.request.OrderCreateRequest.OrderMenuRequest.OrderMenuRequestBuilder;
+import com.windmeal.order.dto.request.OrderCreateRequest.OrderSpecRequest;
+import com.windmeal.order.dto.request.OrderCreateRequest.OrderSpecRequest.OrderSpecRequestBuilder;
 import com.windmeal.store.domain.Menu;
 import com.windmeal.store.domain.Menu.MenuBuilder;
 import com.windmeal.store.domain.OptionGroup;
@@ -20,9 +18,7 @@ import com.windmeal.store.domain.OptionSpecification;
 import com.windmeal.store.domain.OptionSpecification.OptionSpecificationBuilder;
 import com.windmeal.store.domain.Store;
 import com.windmeal.store.domain.Store.StoreBuilder;
-import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.stream.Collectors;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
