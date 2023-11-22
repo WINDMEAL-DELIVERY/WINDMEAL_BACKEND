@@ -13,10 +13,18 @@ import com.windmeal.order.domain.Order;
 import com.windmeal.order.domain.OrderStatus;
 import com.windmeal.order.dto.request.DeliveryCreateRequest;
 import com.windmeal.order.dto.request.DeliveryCreateRequest.DeliveryCreateRequestBuilder;
+import com.windmeal.order.exception.OrderAlreadyMatchedException;
 import com.windmeal.order.exception.OrderNotFoundException;
 import com.windmeal.order.repository.DeliveryRepository;
+import com.windmeal.order.repository.OrderMenuOptionGroupRepository;
+import com.windmeal.order.repository.OrderMenuOptionSpecificationRepository;
+import com.windmeal.order.repository.OrderMenuRepository;
 import com.windmeal.order.repository.OrderRepository;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,9 +43,23 @@ class DeliveryServiceTest extends IntegrationTestSupport {
   @Autowired
   OrderRepository orderRepository;
 
+  @Autowired
+  OrderMenuRepository orderMenuRepository;
+
+  @Autowired
+  OrderMenuOptionSpecificationRepository optionSpecificationRepository;
+
+  @Autowired
+  OrderMenuOptionGroupRepository orderMenuOptionGroupRepository;
+
+
+
   @AfterEach
   void tearDown() {
     deliveryRepository.deleteAllInBatch();
+    optionSpecificationRepository.deleteAllInBatch();
+    orderMenuOptionGroupRepository.deleteAllInBatch();
+    orderMenuRepository.deleteAllInBatch();
     orderRepository.deleteAllInBatch();
     memberRepository.deleteAllInBatch();
   }
@@ -49,7 +71,8 @@ class DeliveryServiceTest extends IntegrationTestSupport {
 
     Member orderer = memberRepository.save(aMember().build());
     Member deliver = memberRepository.save(aMember().build());
-    Order order = orderRepository.save(aOrder().orderer_id(orderer.getId()).orderMenus(new ArrayList<>()).build());
+    Order order = orderRepository.save(
+        aOrder().orderer_id(orderer.getId()).orderMenus(new ArrayList<>()).build());
     DeliveryCreateRequest request = DeliveryCreateRequestBuilder()
         .orderId(order.getId())
         .memberId(deliver.getId()).build();
@@ -62,10 +85,102 @@ class DeliveryServiceTest extends IntegrationTestSupport {
     Order findOrder = orderRepository.findById(order.getId()).get();
 
     assertThat(delivery)
-        .extracting(dlv -> dlv.getDeliver().getId(),dlv -> dlv.getOrder().getId())
+        .extracting(dlv -> dlv.getDeliver().getId(), dlv -> dlv.getOrder().getId())
         .containsExactly(deliver.getId(), order.getId());
 
     assertThat(findOrder.getOrderStatus()).isEqualTo(OrderStatus.DELIVERING);
+  }
+
+
+  @DisplayName("배달 요청이 이미 매칭된 경우 예외가 발생한다.")
+  @Test
+  void deliverySaveWithAlreadyMatchException(){
+    //given
+
+    Member orderer = memberRepository.save(aMember().build());
+    Member deliver = memberRepository.save(aMember().build());
+    Order order = orderRepository.save(
+        aOrder().orderer_id(orderer.getId()).orderMenus(new ArrayList<>()).build());
+
+
+    //when
+    deliveryService.deliverySave(deliver,order);
+
+    //then
+
+
+    assertThatThrownBy(() -> deliveryService.deliverySave(deliver,order))
+        .isInstanceOf(OrderAlreadyMatchedException.class)
+        .hasMessage("이미 매칭된 주문입니다.");
+  }
+
+
+  @DisplayName("동시에 배달 요청이 있어도 1개의 배달만 성사된다.")
+  @Test
+  void deliverySaveMultiThreadWithAlreadyMatchException()throws InterruptedException {
+    //given
+
+    Member orderer = memberRepository.save(aMember().build());
+    Member deliver = memberRepository.save(aMember().build());
+    Order order = orderRepository.save(
+        aOrder().orderer_id(orderer.getId()).orderMenus(new ArrayList<>()).build());
+
+
+    //when
+    int numberOfThreads = 20;
+    ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
+    CountDownLatch latch = new CountDownLatch(numberOfThreads);
+
+    for (int i = 0; i < numberOfThreads; i++) {
+      executorService.submit(() -> {
+        try {
+          // 분산락 적용 메서드 호출
+          deliveryService.deliverySave(deliver,order);
+        } finally {
+          latch.countDown();
+        }
+      });
+    }
+
+    latch.await();
+
+    //then
+    assertThat(deliveryRepository.findAllByOrderId(order.getId()).size())
+        .isEqualTo(1);
+  }
+
+  @DisplayName("동시에 배달 요청이 오는 경우 분산락을 사용하지 않는 경우 문제가 발생한다.")
+  @Test
+  void deliverySaveWithoutDistributedLock_MultiThread_WithAlreadyMatchException()throws InterruptedException {
+    //given
+
+    Member orderer = memberRepository.save(aMember().build());
+    Member deliver = memberRepository.save(aMember().build());
+    Order order = orderRepository.save(
+        aOrder().orderer_id(orderer.getId()).orderMenus(new ArrayList<>()).build());
+
+
+    //when
+    int numberOfThreads = 20;
+    ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
+    CountDownLatch latch = new CountDownLatch(numberOfThreads);
+
+    for (int i = 0; i < numberOfThreads; i++) {
+      executorService.submit(() -> {
+        try {
+          // 분산락 적용 메서드 호출
+          deliveryService.deliverySaveWithoutDistributedLock(deliver,order);
+        } finally {
+          latch.countDown();
+        }
+      });
+    }
+
+    latch.await();
+
+    //then
+    assertThat(deliveryRepository.findAllByOrderId(order.getId()).size())
+        .isNotEqualTo(1);
   }
 
 
@@ -76,11 +191,11 @@ class DeliveryServiceTest extends IntegrationTestSupport {
 
     Member orderer = memberRepository.save(aMember().build());
     Member deliver = memberRepository.save(aMember().build());
-    Order order = orderRepository.save(aOrder().orderer_id(orderer.getId()).orderMenus(new ArrayList<>()).build());
+    Order order = orderRepository.save(
+        aOrder().orderer_id(orderer.getId()).orderMenus(new ArrayList<>()).build());
     DeliveryCreateRequest request = DeliveryCreateRequestBuilder()
         .memberId(0L).build();
     //when
-
 
     //then
     assertThatThrownBy(() -> deliveryService.createDelivery(request))
@@ -94,12 +209,12 @@ class DeliveryServiceTest extends IntegrationTestSupport {
     //given
     Member orderer = memberRepository.save(aMember().build());
     Member deliver = memberRepository.save(aMember().build());
-    Order order = orderRepository.save(aOrder().orderer_id(orderer.getId()).orderMenus(new ArrayList<>()).build());
+    Order order = orderRepository.save(
+        aOrder().orderer_id(orderer.getId()).orderMenus(new ArrayList<>()).build());
     DeliveryCreateRequest request = DeliveryCreateRequestBuilder()
         .orderId(0L)
         .memberId(deliver.getId()).build();
     //when
-
 
     //then
     assertThatThrownBy(() -> deliveryService.createDelivery(request))

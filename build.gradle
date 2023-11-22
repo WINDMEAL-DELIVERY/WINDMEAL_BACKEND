@@ -79,7 +79,8 @@ dependencies {
 	implementation 'org.springdoc:springdoc-openapi-security:1.5.7'
 
 
-//	// redisson
+	// redisson
+	implementation 'org.redisson:redisson-spring-boot-starter:3.21.1'
 //	implementation 'org.redisson:redisson-spring-boot-starter'
 }
 
