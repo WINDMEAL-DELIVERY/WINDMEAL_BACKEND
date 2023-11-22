@@ -1,6 +1,7 @@
 package com.windmeal.order.service;
 
 import static com.windmeal.Fixtures.aMember;
+import static com.windmeal.Fixtures.aOrder;
 import static com.windmeal.Fixtures.aStore;
 import static org.assertj.core.api.Assertions.*;
 
@@ -21,7 +22,11 @@ import com.windmeal.order.dto.request.OrderCreateRequest.OrderMenuRequest;
 import com.windmeal.order.dto.request.OrderCreateRequest.OrderMenuRequest.OrderMenuRequestBuilder;
 import com.windmeal.order.dto.request.OrderCreateRequest.OrderSpecRequest;
 import com.windmeal.order.dto.request.OrderCreateRequest.OrderSpecRequest.OrderSpecRequestBuilder;
+import com.windmeal.order.dto.request.OrderDeleteRequest;
 import com.windmeal.order.dto.response.OrderCreateResponse;
+import com.windmeal.order.exception.OrderAlreadyMatchedException;
+import com.windmeal.order.exception.OrderNotFoundException;
+import com.windmeal.order.exception.OrdererMissMatchException;
 import com.windmeal.order.repository.OrderMenuOptionGroupRepository;
 import com.windmeal.order.repository.OrderMenuOptionSpecificationRepository;
 import com.windmeal.order.repository.OrderMenuRepository;
@@ -37,6 +42,7 @@ import com.windmeal.store.domain.Store.StoreBuilder;
 import com.windmeal.store.exception.StoreNotFoundException;
 import com.windmeal.store.repository.MenuRepository;
 import com.windmeal.store.repository.StoreRepository;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.assertj.core.api.Assertions;
@@ -215,6 +221,81 @@ class OrderServiceTest extends IntegrationTestSupport {
     assertThat(sum.wons()).isEqualTo((14000));
 
   }
+
+  @DisplayName("주문 요청을 삭제할 수 있다.")
+  @Test
+  void deleteOrder() {
+    //given
+    Member orderer = memberRepository.save(aMember().build());
+    Order order = orderRepository.save(
+        aOrder().orderStatus(OrderStatus.ORDERED).orderer_id(orderer.getId()).orderMenus(new ArrayList<>()).build());
+
+    OrderDeleteRequest request = OrderDeleteRequest.builder()
+        .orderId(order.getId())
+        .memberId(orderer.getId()).build();
+    //when
+    orderService.deleteOrder(request);
+    //then
+    assertThat(orderRepository.findById(request.getOrderId()).isPresent()).isFalse();
+  }
+
+
+  @DisplayName("주문 요청 삭제 시 존재하지 않는 주문이면 예외가 발생한다.")
+  @Test
+  void deleteOrderWith_OrderNotFoundException() {
+    //given
+    Member orderer = memberRepository.save(aMember().build());
+    Order order = orderRepository.save(
+        aOrder().orderStatus(OrderStatus.ORDERED).orderer_id(orderer.getId()).orderMenus(new ArrayList<>()).build());
+
+    OrderDeleteRequest request = OrderDeleteRequest.builder()
+        .orderId(0L)
+        .memberId(orderer.getId()).build();
+    //when
+
+    //then
+    assertThatThrownBy(() -> orderService.deleteOrder(request))
+        .isInstanceOf(OrderNotFoundException.class)
+        .hasMessage("존재하지 않는 주문입니다.");
+  }
+
+  @DisplayName("주문 삭제 요청이 주문중 상태가 아니라면 예외가 발생한다.")
+  @Test
+  void deleteOrderWith_OrderAlreadyMatchedException() {
+    //given
+    Member orderer = memberRepository.save(aMember().build());
+    Order order = orderRepository.save(
+        aOrder().orderStatus(OrderStatus.DELIVERING).orderer_id(orderer.getId()).orderMenus(new ArrayList<>()).build());
+
+    OrderDeleteRequest request = OrderDeleteRequest.builder()
+        .orderId(order.getId())
+        .memberId(orderer.getId()).build();
+    //when
+    //then
+    assertThatThrownBy(() -> orderService.deleteOrder(request))
+        .isInstanceOf(OrderAlreadyMatchedException.class)
+        .hasMessage("이미 배달 요청이 성사된 주문은 삭제할 수 없습니다.");
+  }
+
+  @DisplayName("주문 삭제 요청이 자신의 주문이 아니라면 예외가 발생한다.")
+  @Test
+  void deleteOrderWith_OrdererMissMatchException() {
+    //given
+    Member orderer = memberRepository.save(aMember().build());
+    Order order = orderRepository.save(
+        aOrder().orderStatus(OrderStatus.ORDERED).orderer_id(orderer.getId()).orderMenus(new ArrayList<>()).build());
+
+    OrderDeleteRequest request = OrderDeleteRequest.builder()
+        .orderId(order.getId())
+        .memberId(0L).build();
+    //when
+    //then
+    assertThatThrownBy(() -> orderService.deleteOrder(request))
+        .isInstanceOf(OrdererMissMatchException.class)
+        .hasMessage("본인의 주문만 삭제할 수 있습니다.");
+  }
+
+
 
   private static OrderCreateRequestBuilder buildOrderCreateRequest() {
     return OrderCreateRequest.builder()

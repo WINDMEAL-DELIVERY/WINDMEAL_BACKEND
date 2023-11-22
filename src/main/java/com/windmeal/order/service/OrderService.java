@@ -2,12 +2,18 @@ package com.windmeal.order.service;
 
 import com.windmeal.generic.domain.Money;
 import com.windmeal.global.exception.ErrorCode;
+import com.windmeal.member.domain.Member;
 import com.windmeal.member.exception.MemberNotFoundException;
 import com.windmeal.member.repository.MemberRepository;
 import com.windmeal.order.domain.Order;
+import com.windmeal.order.domain.OrderStatus;
 import com.windmeal.order.dto.request.OrderCreateRequest;
 import com.windmeal.order.dto.request.OrderCreateRequest.OrderMenuRequest;
+import com.windmeal.order.dto.request.OrderDeleteRequest;
 import com.windmeal.order.dto.response.OrderCreateResponse;
+import com.windmeal.order.exception.OrderAlreadyMatchedException;
+import com.windmeal.order.exception.OrderNotFoundException;
+import com.windmeal.order.exception.OrdererMissMatchException;
 import com.windmeal.order.mapper.OrderRequestMapper;
 import com.windmeal.order.repository.OrderRepository;
 import com.windmeal.order.validator.OrderValidator;
@@ -43,6 +49,23 @@ public class OrderService {
     return OrderCreateResponse.toResponse(savedOrder);
   }
 
+  // 배달이 성사되지 않은 ORDERED 상태의 주문 요청만 삭제 가능.
+  @Transactional
+  public void deleteOrder(OrderDeleteRequest request) {
+    Order order = orderRepository.findById(request.getOrderId())
+        .orElseThrow(() -> new OrderNotFoundException(ErrorCode.NOT_FOUND, "존재하지 않는 주문입니다."));
+
+    if(!order.getOrderStatus().equals(OrderStatus.ORDERED)){
+      throw new OrderAlreadyMatchedException(ErrorCode.BAD_REQUEST, "이미 배달 요청이 성사된 주문은 삭제할 수 없습니다.");
+    }
+
+    if(!order.getOrderer_id().equals(request.getMemberId())){
+      throw new OrdererMissMatchException(ErrorCode.BAD_REQUEST, "본인의 주문만 삭제할 수 있습니다.");
+    }
+
+    orderRepository.deleteById(request.getOrderId());
+  }
+
   private Menu getMenu(OrderCreateRequest request) {
     return menuRepository.findById(request.getMenus().get(0).getMenuId())
         .orElseThrow(() -> new MenuNotFoundException(ErrorCode.NOT_FOUND, "메뉴가 존재하지 않습니다."));
@@ -63,4 +86,6 @@ public class OrderService {
   private static Long getMenuCount(OrderCreateRequest request) {
     return request.getMenus().stream().count();
   }
+
+
 }
