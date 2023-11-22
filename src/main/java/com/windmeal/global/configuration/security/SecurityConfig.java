@@ -54,7 +54,7 @@ public class SecurityConfig {
   @Bean
   public RefreshTokenDAO refreshTokenDAO() {
     //
-    return new RefreshTokenDAOImpl(redisTemplate);
+    return new RefreshTokenDAOImpl(redisTemplate, objectMapper);
   }
 
 //    @Bean

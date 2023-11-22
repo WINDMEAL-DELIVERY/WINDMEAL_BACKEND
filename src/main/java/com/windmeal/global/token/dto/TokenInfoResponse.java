@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-public class TokenDTO {
+public class TokenInfoResponse {
     @Getter
     @Builder
     @NoArgsConstructor

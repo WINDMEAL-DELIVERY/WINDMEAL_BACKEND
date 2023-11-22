@@ -1,6 +1,6 @@
 package com.windmeal.global.token.util;
 
-import com.windmeal.global.token.dto.TokenDTO;
+import com.windmeal.global.token.dto.TokenInfoResponse;
 import com.windmeal.member.exception.InvaildTokenException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -55,7 +55,7 @@ public class TokenProvider implements InitializingBean {
      * @param authentication
      * @return
      */
-    public TokenDTO.TokenDetail createToken(Authentication authentication) {
+    public TokenInfoResponse.TokenDetail createToken(Authentication authentication) {
         String authorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
         Date currentDate = new Date();
@@ -77,7 +77,7 @@ public class TokenProvider implements InitializingBean {
                 .setIssuedAt(currentDate)
                 .compact();
 
-        return TokenDTO.TokenDetail.builder()
+        return TokenInfoResponse.TokenDetail.builder()
                 .grantType(BEARER_PREFIX)
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
