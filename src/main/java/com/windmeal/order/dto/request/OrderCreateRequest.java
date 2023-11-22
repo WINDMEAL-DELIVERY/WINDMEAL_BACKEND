@@ -1,4 +1,4 @@
-package com.windmeal.order.dto;
+package com.windmeal.order.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;

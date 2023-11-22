@@ -1,7 +1,7 @@
 package com.windmeal.order.controller;
 
 import com.windmeal.global.exception.ExceptionResponseDTO;
-import com.windmeal.order.dto.OrderCreateRequest;
+import com.windmeal.order.dto.request.OrderCreateRequest;
 import com.windmeal.order.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

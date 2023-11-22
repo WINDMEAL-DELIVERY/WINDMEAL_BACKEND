@@ -3,6 +3,7 @@ package com.windmeal.order.domain;
 import com.windmeal.member.domain.Member;
 import com.windmeal.model.BaseTimeEntity;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -28,4 +29,17 @@ public class Delivery extends BaseTimeEntity {
 
     @Enumerated(value = EnumType.STRING)
     private DeliveryStatus deliveryStatus;
+
+
+
+    @Builder
+    public Delivery(Member deliver, Order order) {
+        this.deliver = deliver;
+        this.order = order;
+        delivering();
+    }
+
+    private void delivering(){
+        this.deliveryStatus=DeliveryStatus.DELIVERING;
+    }
 }
