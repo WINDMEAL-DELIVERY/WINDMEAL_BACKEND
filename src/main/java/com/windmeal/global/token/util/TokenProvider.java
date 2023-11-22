@@ -1,6 +1,7 @@
 package com.windmeal.global.token.util;
 
-import com.windmeal.global.token.dto.TokenDTO;
+import com.windmeal.global.token.dto.TokenInfoResponse;
+import com.windmeal.member.dto.response.MemberInfoDTO;
 import com.windmeal.member.exception.InvaildTokenException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -21,6 +22,7 @@ import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.windmeal.global.constants.JwtConstants.*;
@@ -55,7 +57,7 @@ public class TokenProvider implements InitializingBean {
      * @param authentication
      * @return
      */
-    public TokenDTO.TokenDetail createToken(Authentication authentication) {
+    public TokenInfoResponse.TokenDetail createToken(Authentication authentication) {
         String authorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
         Date currentDate = new Date();
@@ -77,7 +79,7 @@ public class TokenProvider implements InitializingBean {
                 .setIssuedAt(currentDate)
                 .compact();
 
-        return TokenDTO.TokenDetail.builder()
+        return TokenInfoResponse.TokenDetail.builder()
                 .grantType(BEARER_PREFIX)
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
@@ -108,6 +110,23 @@ public class TokenProvider implements InitializingBean {
             return new UsernamePasswordAuthenticationToken(principal, token, authorities);
         }
         throw new InvaildTokenException("토큰이 유효하지 않습니다.");
+    }
+
+    public Optional<MemberInfoDTO> getMemberInfoFromToken(String token) {
+        Long userId;
+        String email;
+        if(validateToken(token)) {
+            Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+            // 사용자 ID
+            userId = Long.parseLong(claims.getSubject());
+            // 사용자 이메일
+            email = (String)claims.get(EMAIL);
+        } else {
+            // 토큰이 만료되었거나 검증 과정에서 문제가 있었다면 반환값은 null로 할당된다.
+            userId = null;
+            email = null;
+        }
+        return MemberInfoDTO.ofNullable(userId, email);
     }
 
     public boolean validateToken(String token) {

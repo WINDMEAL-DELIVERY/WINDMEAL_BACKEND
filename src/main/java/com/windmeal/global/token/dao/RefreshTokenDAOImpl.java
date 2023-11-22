@@ -1,5 +1,9 @@
 package com.windmeal.global.token.dao;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.windmeal.global.token.dto.RefreshTokenResponse;
+import com.windmeal.global.util.ClientIpUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -11,6 +15,7 @@ import static com.windmeal.global.constants.JwtConstants.PREFIX_REFRESHTOKEN;
 @RequiredArgsConstructor
 public class RefreshTokenDAOImpl implements RefreshTokenDAO {
     private final RedisTemplate redisTemplate;
+    private final ObjectMapper objectMapper;
     @Value("${jwt.refresh-token-validity-in-seconds}")
     private Long refreshTokenExpiresIn;
 
@@ -21,9 +26,10 @@ public class RefreshTokenDAOImpl implements RefreshTokenDAO {
      * @param refreshToken
      */
     @Override
-    public void createRefreshToken(Long memberId, String email, String refreshToken) {
+    public void createRefreshToken(Long memberId, String email, String refreshToken, String clientIp) throws JsonProcessingException {
+        String value = objectMapper.writeValueAsString(RefreshTokenResponse.of(refreshToken, clientIp));
         redisTemplate.opsForValue().set(PREFIX_REFRESHTOKEN + memberId + email
-                , refreshToken
+                , value
                 , Duration.ofSeconds(refreshTokenExpiresIn));
     }
 
