@@ -9,6 +9,7 @@ import com.windmeal.member.repository.MemberRepository;
 import com.windmeal.order.domain.Delivery;
 import com.windmeal.order.domain.Order;
 import com.windmeal.order.dto.request.DeliveryCreateRequest;
+import com.windmeal.order.exception.DeliverOrdererSameException;
 import com.windmeal.order.exception.OrderAlreadyMatchedException;
 import com.windmeal.order.exception.OrderNotFoundException;
 import com.windmeal.order.repository.DeliveryRepository;
@@ -41,6 +42,9 @@ public class DeliveryService {
     Order order = orderRepository.findById(request.getOrderId())
         .orElseThrow(() -> new OrderNotFoundException(ErrorCode.NOT_FOUND, "존재하지 않는 주문입니다."));
 
+    if(order.getOrderer_id().equals(deliver.getId())){
+      throw new DeliverOrdererSameException(ErrorCode.BAD_REQUEST,"본인의 주문을 배달할 수 없습니다.");
+    }
     deliverySave(deliver, order);
   }
 

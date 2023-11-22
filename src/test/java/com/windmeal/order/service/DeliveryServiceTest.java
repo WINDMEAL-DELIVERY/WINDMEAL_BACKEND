@@ -13,6 +13,7 @@ import com.windmeal.order.domain.Order;
 import com.windmeal.order.domain.OrderStatus;
 import com.windmeal.order.dto.request.DeliveryCreateRequest;
 import com.windmeal.order.dto.request.DeliveryCreateRequest.DeliveryCreateRequestBuilder;
+import com.windmeal.order.exception.DeliverOrdererSameException;
 import com.windmeal.order.exception.OrderAlreadyMatchedException;
 import com.windmeal.order.exception.OrderNotFoundException;
 import com.windmeal.order.repository.DeliveryRepository;
@@ -114,6 +115,25 @@ class DeliveryServiceTest extends IntegrationTestSupport {
         .hasMessage("이미 매칭된 주문입니다.");
   }
 
+  @DisplayName("배달 요청이 자신이 요청한 주문의 경우 예외가 발생한다.")
+  @Test
+  void deliverySaveWith_DeliverOrdererSameException(){
+    //given
+
+    Member orderer = memberRepository.save(aMember().build());
+    Order order = orderRepository.save(
+        aOrder().orderer_id(orderer.getId()).orderMenus(new ArrayList<>()).build());
+
+
+    //when
+    DeliveryCreateRequest request = DeliveryCreateRequestBuilder()
+        .orderId(order.getId())
+        .memberId(orderer.getId()).build();
+    //then
+    assertThatThrownBy(() -> deliveryService.createDelivery(request))
+        .isInstanceOf(DeliverOrdererSameException.class)
+        .hasMessage("본인의 주문을 배달할 수 없습니다.");
+  }
 
   @DisplayName("동시에 배달 요청이 있어도 1개의 배달만 성사된다.")
   @Test
