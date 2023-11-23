@@ -9,15 +9,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.time.Duration;
+import java.util.Optional;
 
 import static com.windmeal.global.constants.JwtConstants.PREFIX_REFRESHTOKEN;
+import static com.windmeal.global.constants.JwtConstants.REFRESH_TOKEN_EXPIRES_IN;
 
 @RequiredArgsConstructor
 public class RefreshTokenDAOImpl implements RefreshTokenDAO {
     private final RedisTemplate redisTemplate;
     private final ObjectMapper objectMapper;
-    @Value("${jwt.refresh-token-validity-in-seconds}")
-    private Long refreshTokenExpiresIn;
+
 
     /**
      * RefreshToken을 설정해주는 부분이다.
@@ -30,12 +31,12 @@ public class RefreshTokenDAOImpl implements RefreshTokenDAO {
         String value = objectMapper.writeValueAsString(RefreshTokenResponse.of(refreshToken, clientIp));
         redisTemplate.opsForValue().set(PREFIX_REFRESHTOKEN + memberId + email
                 , value
-                , Duration.ofSeconds(refreshTokenExpiresIn));
+                , Duration.ofSeconds(REFRESH_TOKEN_EXPIRES_IN));
     }
 
     @Override
-    public String getRefreshToken(Long memberId, String email) {
-        return (String) redisTemplate.opsForValue().get(PREFIX_REFRESHTOKEN + memberId + email);
+    public Optional<String> getRefreshToken(Long memberId, String email) {
+        return Optional.ofNullable((String) redisTemplate.opsForValue().get(PREFIX_REFRESHTOKEN + memberId + email));
     }
 
     @Override

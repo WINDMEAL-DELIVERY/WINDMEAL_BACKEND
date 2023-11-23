@@ -18,8 +18,6 @@ public class UserPrincipal implements OAuth2User, UserDetails {
 
     private Long id;
     private String email;
-    @Value("${password.google.common-google-user-password}")
-    private String password;
     private Collection<? extends GrantedAuthority> authorities;
     @Setter
     private Map<String, Object> attributes;
