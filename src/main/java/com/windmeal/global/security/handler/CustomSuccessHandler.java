@@ -8,7 +8,6 @@ import com.windmeal.global.util.ClientIpUtil;
 import com.windmeal.global.util.CookieUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -19,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import static com.windmeal.global.constants.JwtConstants.ACCESSTOKEN;
+import static com.windmeal.global.constants.JwtConstants.ACCESS_TOKEN_EXPIRES_IN;
 import static com.windmeal.global.constants.SecurityConstants.ERROR_REDIRECT;
 import static com.windmeal.global.constants.SecurityConstants.OAUTH_REDIRECT;
 
@@ -34,8 +34,6 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final TokenProvider tokenProvider;
     private final RefreshTokenDAO refreshTokenDao;
     //    private final AuthorizationRequestRepository authorizationRequestRepository;
-    @Value("${jwt.access-token-validity-in-seconds}")
-    private Long accessTokenExpiresIn;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
@@ -62,18 +60,11 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 clientIp
             );
             CookieUtil.deleteCookie(request,response,ACCESSTOKEN);
-            int accessTokenExpireTime;
-            accessTokenExpireTime = Math.toIntExact(accessTokenExpiresIn);
-            CookieUtil.addCookie(response,ACCESSTOKEN,tokenDTO.getAccessToken(), accessTokenExpireTime);
-        } catch(Exception e) {
+            CookieUtil.addCookie(response,ACCESSTOKEN,tokenDTO.getAccessToken(), ACCESS_TOKEN_EXPIRES_IN);
+        } catch(JsonProcessingException e) {
             // 해당 로직이 통과되지 않고 예외가 발생하여 리다이렉트 하게 되면, 시큐리티 세션에는 정보가 저장되지 않기 때문에 세션은 삭제해주지 않아도 된다.
             CookieUtil.deleteCookie(request,response,ACCESSTOKEN);
-            if(e.getClass() == ArithmeticException.class)
-                log.error("쿠키의 유효 시간 범위가 잘못 설정되었습니다.");
-            else if(e.getClass() == JsonProcessingException.class)
-                log.error("리프레쉬 토큰 직렬화 에러");
-            else
-                e.printStackTrace();
+            log.error("리프레쉬 토큰 직렬화 에러");
             response.sendRedirect(ERROR_REDIRECT);
             return false;
         }

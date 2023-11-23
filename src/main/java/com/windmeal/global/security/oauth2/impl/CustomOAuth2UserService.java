@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,7 +42,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
      */
 
     @Override
-    public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) {
+    public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(oAuth2UserRequest);
         Map<String, Object> attributes = oAuth2User.getAttributes();
         String providerName = oAuth2UserRequest.getClientRegistration().getRegistrationId().toUpperCase();
@@ -72,7 +73,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             } else {
                 log.info("토큰이 취소에 실패하였습니다.");
             }
-            throw new InvalidEmailDomainException(ErrorCode.VALIDATION_ERROR, "가천대학교 계정이 아닙니다. 토큰을 취소합니다.");
+            throw new InvalidEmailDomainException("가천대학교 계정이 아닙니다. 토큰을 취소합니다.");
         }
     }
 
