@@ -1,7 +1,9 @@
 package com.windmeal.global.security.handler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.windmeal.global.security.oauth2.repository.OAuth2AuthorizationRequestBasedOnCookieRepository;
+import com.windmeal.global.security.oauth2.user.UserPrincipal;
 import com.windmeal.global.token.dao.RefreshTokenDAO;
 import com.windmeal.global.token.dto.TokenInfoResponse;
 import com.windmeal.global.token.util.TokenProvider;
@@ -19,13 +21,13 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.windmeal.global.constants.CookieConstants.REDIRECT_URI_PARAM_COOKIE_NAME;
 import static com.windmeal.global.constants.JwtConstants.ACCESSTOKEN;
 import static com.windmeal.global.constants.JwtConstants.ACCESS_TOKEN_EXPIRES_IN;
-import static com.windmeal.global.constants.SecurityConstants.ERROR_REDIRECT;
-import static com.windmeal.global.constants.SecurityConstants.DEFAULT_OAUTH_REDIRECT;
+import static com.windmeal.global.constants.SecurityConstants.*;
 
 /*
     CustomOAuth2UserInfo에서 인증이 완료된 사용자에 대해서 회원가입 처리를 해주었다.
@@ -57,6 +59,8 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private boolean addTokenToCookie(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException{
         TokenInfoResponse.TokenDetail tokenDTO = tokenProvider.createToken(authentication);
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        // authentication.getDetails 로도 IP 주소르 받아올 수 있는데, 프록시나 로드밸런서의 아이피가 아닌 사용자의 아이피인지 잘 모르겠다.
+        // 만약 사용자의 아이피라는 것이 보장된다면, 인증 객체를 활용하는 것이 더 깔끔하겠다.
         try{
             String clientIp = ClientIpUtil.getClientIpAddress(request);
             saveRefreshTokenInStorage(
@@ -78,10 +82,24 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     }
 
 
+    /**
+     * {@link com.windmeal.global.security.oauth2.impl.CustomOAuth2UserService} 에서 데이터베이스에 접근하며 사용자의 닉네임을 확인함.
+     * 닉네임이 존재한다면 attribute 객체에 추가해주고, 해당 인스턴스를 매개변수로 전달하여 authentication 객체를 생성함.
+     * 그리고 동일한 authentication 객체를 활용하여 현재 위치에서 데이터베이스에 추가적인 접근 없이 사용자의 가입 여부를 알 수 있음
+     * @author Owen Choi
+     * @param request
+     * @param response
+     * @param authentication
+     * @return
+     */
     protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+        UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+        Map<String, Object> attributes = principal.getAttributes();
+        Optional<String> nickname = Optional.ofNullable((String) attributes.getOrDefault("nickname", null));
         Optional<String> redirectUri = CookieUtil.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
                 .map(Cookie::getValue);
-        String uriString = UriComponentsBuilder.fromUriString(redirectUri.orElse(DEFAULT_OAUTH_REDIRECT))
+        String resultUri = nickname.isPresent() ? redirectUri.orElse(DEFAULT_OAUTH_REDIRECT) : NICKNAME_REDIRECT;
+        String uriString = UriComponentsBuilder.fromUriString(resultUri)
                 .build().toUriString();
         return uriString;
     }

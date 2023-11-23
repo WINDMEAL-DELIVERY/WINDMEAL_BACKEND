@@ -7,14 +7,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import org.springframework.util.Base64Utils;
 import org.springframework.web.util.UriComponentsBuilder;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URLEncoder;
 
 import static com.windmeal.global.constants.CookieConstants.REDIRECT_URI_PARAM_COOKIE_NAME;
+import static com.windmeal.global.constants.SecurityConstants.ERROR_REDIRECT;
 
 
 @Slf4j
@@ -25,16 +28,15 @@ public class CustomFailureHandler extends SimpleUrlAuthenticationFailureHandler 
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-        String targetUrl = CookieUtil.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
-                .map(Cookie::getValue)
-                .orElse(("/"));
-
-        exception.printStackTrace();
-        log.error(exception.getMessage());
+        // 에러시 라다이렉트하는 URL의 경우는 프론트에서 정할 수 없다. 서버에서 정해줘야겠다.
+//        String targetUrl = CookieUtil.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
+//                .map(Cookie::getValue)
+//                .orElse(("/"));
+        byte[] encode = Base64Utils.encode(exception.getLocalizedMessage().getBytes());
+        String targetUrl = ERROR_REDIRECT;
         targetUrl = UriComponentsBuilder.fromUriString(targetUrl)
-                .queryParam("error", exception.getLocalizedMessage())
+                .queryParam("msg", encode)
                 .build().toUriString();
-
 
         authorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
         getRedirectStrategy().sendRedirect(request, response, targetUrl);

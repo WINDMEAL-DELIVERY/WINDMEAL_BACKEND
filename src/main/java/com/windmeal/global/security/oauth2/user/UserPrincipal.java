@@ -12,6 +12,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 @Getter
 public class UserPrincipal implements OAuth2User, UserDetails {
@@ -82,4 +83,5 @@ public class UserPrincipal implements OAuth2User, UserDetails {
     public String getName() {
         return Long.toString(id);
     }
+
 }
