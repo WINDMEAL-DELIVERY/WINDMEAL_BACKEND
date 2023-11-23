@@ -45,7 +45,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try{
                 Authentication authenticated = tokenProvider.getAuthentication(accessToken);
                 SecurityContextHolder.getContext().setAuthentication(authenticated);
-                filterChain.doFilter(request, response);
             } catch (AuthenticationException authenticationException) {
                 authenticationException.printStackTrace();
                 log.error("인증 실패 - JwtAuthenticationFilter");
@@ -53,6 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 sendResponse(response, authenticationException);
             }
         }
+        filterChain.doFilter(request, response);
     }
 
     /**
