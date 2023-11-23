@@ -80,11 +80,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private Member registerIfNewUser(OAuth2UserInfo oAuth2UserInfo) {
         Optional<Member> optionalMember = memberRepository.findByEmail(oAuth2UserInfo.getEmail());
         Member member;
-        if(!optionalMember.isPresent()) {
-            member = memberRepository.save(createMember(oAuth2UserInfo));
-        } else {
-            member = optionalMember.get();
-        }
+        member = optionalMember.orElseGet(() -> memberRepository.save(createMember(oAuth2UserInfo)));
         return member;
     }
 

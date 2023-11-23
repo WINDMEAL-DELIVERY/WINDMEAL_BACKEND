@@ -54,7 +54,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     해당 부분을 담당하는 provider가 호출될 것이다.
                  */
                 SecurityContextHolder.getContext().setAuthentication(authenticated);
-                filterChain.doFilter(request, response);
             } catch (AuthenticationException authenticationException) {
                 authenticationException.printStackTrace();
                 log.error("인증 실패 - JwtAuthenticationFilter");
@@ -62,6 +61,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 sendResponse(response, authenticationException);
             }
         }
+        filterChain.doFilter(request, response);
     }
 
     /**
