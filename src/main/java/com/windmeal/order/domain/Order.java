@@ -101,5 +101,7 @@ public class Order extends BaseTimeEntity {
     this.orderStatus=OrderStatus.DELIVERED;
   }
 
-
+  public void canceled(){
+    this.orderStatus=OrderStatus.CANCELED;
+  }
 }

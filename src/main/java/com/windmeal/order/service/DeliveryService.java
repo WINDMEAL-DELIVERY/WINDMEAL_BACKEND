@@ -7,12 +7,17 @@ import com.windmeal.member.domain.Member;
 import com.windmeal.member.exception.MemberNotFoundException;
 import com.windmeal.member.repository.MemberRepository;
 import com.windmeal.order.domain.Delivery;
+import com.windmeal.order.domain.DeliveryStatus;
 import com.windmeal.order.domain.Order;
+import com.windmeal.order.domain.OrderCancel;
 import com.windmeal.order.dto.request.DeliveryCreateRequest;
+import com.windmeal.order.dto.request.DeliveryCancelRequest;
 import com.windmeal.order.exception.DeliverOrdererSameException;
+import com.windmeal.order.exception.DeliveryNotFoundException;
 import com.windmeal.order.exception.OrderAlreadyMatchedException;
 import com.windmeal.order.exception.OrderNotFoundException;
 import com.windmeal.order.repository.DeliveryRepository;
+import com.windmeal.order.repository.OrderCancelRepository;
 import com.windmeal.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,6 +39,7 @@ public class DeliveryService {
 
   private final DeliveryRepository deliveryRepository;
 
+  private final OrderCancelRepository orderCancelRepository;
   @Transactional
   public void createDelivery(DeliveryCreateRequest request) {
     Member deliver = memberRepository.findById(request.getMemberId())
@@ -56,7 +62,7 @@ public class DeliveryService {
               throw new OrderAlreadyMatchedException(ErrorCode.BAD_REQUEST, "이미 매칭된 주문입니다.");
             });
 
-    Delivery delivery = new Delivery(deliver, order);
+    Delivery delivery = new Delivery(deliver, order,DeliveryStatus.DELIVERING);
     deliveryRepository.save(delivery);
     order.delivering();
   }
@@ -69,8 +75,32 @@ public class DeliveryService {
               throw new OrderAlreadyMatchedException(ErrorCode.BAD_REQUEST, "이미 매칭된 주문입니다.");
             });
 
-    Delivery delivery = new Delivery(deliver, order);
+    Delivery delivery = new Delivery(deliver, order,DeliveryStatus.DELIVERING);
     deliveryRepository.save(delivery);
     order.delivering();
+  }
+
+  /**
+   * 배달 취소 시 유의 점
+   * "배달 중" 상태에서만 취소 가능.
+   * @param request
+   */
+  @Transactional
+  public void cancelDelivery(DeliveryCancelRequest request) {
+    Order order = orderRepository.findById(request.getOrderId())
+        .orElseThrow(() -> new OrderNotFoundException(ErrorCode.NOT_FOUND, "존재하지 않는 주문입니다."));
+    Member cancelMember = memberRepository.findById(request.getMemberId())
+        .orElseThrow(() -> new MemberNotFoundException(ErrorCode.NOT_FOUND, "존재하지 않는 사용자입니다."));
+    Delivery delivery = deliveryRepository.findByOrderIdAndDeliveryStatus(order.getId(),
+            DeliveryStatus.DELIVERING)
+        .orElseThrow(() -> new DeliveryNotFoundException(ErrorCode.NOT_FOUND, "배달 요청이 존재하지 않습니다."));
+
+
+    OrderCancel orderCancel = OrderCancel.builder()
+        .cancelMember(cancelMember)
+        .order(order)
+        .delivery(delivery)
+        .content(request.getContent()).build();
+    orderCancelRepository.save(orderCancel);
   }
 }

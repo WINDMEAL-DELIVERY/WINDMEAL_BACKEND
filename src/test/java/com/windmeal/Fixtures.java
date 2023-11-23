@@ -2,6 +2,7 @@ package com.windmeal;
 
 import com.windmeal.member.domain.Member;
 import com.windmeal.member.domain.Member.MemberBuilder;
+import com.windmeal.order.domain.Delivery;
 import com.windmeal.order.domain.Order;
 import com.windmeal.order.domain.Order.OrderBuilder;
 import com.windmeal.store.domain.Menu;
@@ -50,5 +51,9 @@ public class Fixtures {
 
   public static OptionSpecificationBuilder aOptionSpecification() {
     return OptionSpecification.builder();
+  }
+
+  public static Delivery.DeliveryBuilder aDelivery(){
+    return Delivery.builder();
   }
 }

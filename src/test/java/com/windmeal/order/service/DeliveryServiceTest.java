@@ -1,5 +1,6 @@
 package com.windmeal.order.service;
 
+import static com.windmeal.Fixtures.aDelivery;
 import static com.windmeal.Fixtures.aMember;
 import static com.windmeal.Fixtures.aOrder;
 import static org.assertj.core.api.Assertions.*;
@@ -9,20 +10,24 @@ import com.windmeal.member.domain.Member;
 import com.windmeal.member.exception.MemberNotFoundException;
 import com.windmeal.member.repository.MemberRepository;
 import com.windmeal.order.domain.Delivery;
+import com.windmeal.order.domain.DeliveryStatus;
 import com.windmeal.order.domain.Order;
+import com.windmeal.order.domain.OrderCancel;
 import com.windmeal.order.domain.OrderStatus;
 import com.windmeal.order.dto.request.DeliveryCreateRequest;
 import com.windmeal.order.dto.request.DeliveryCreateRequest.DeliveryCreateRequestBuilder;
+import com.windmeal.order.dto.request.DeliveryCancelRequest;
 import com.windmeal.order.exception.DeliverOrdererSameException;
+import com.windmeal.order.exception.DeliveryNotFoundException;
 import com.windmeal.order.exception.OrderAlreadyMatchedException;
 import com.windmeal.order.exception.OrderNotFoundException;
 import com.windmeal.order.repository.DeliveryRepository;
+import com.windmeal.order.repository.OrderCancelRepository;
 import com.windmeal.order.repository.OrderMenuOptionGroupRepository;
 import com.windmeal.order.repository.OrderMenuOptionSpecificationRepository;
 import com.windmeal.order.repository.OrderMenuRepository;
 import com.windmeal.order.repository.OrderRepository;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -53,10 +58,12 @@ class DeliveryServiceTest extends IntegrationTestSupport {
   @Autowired
   OrderMenuOptionGroupRepository orderMenuOptionGroupRepository;
 
-
+  @Autowired
+  OrderCancelRepository orderCancelRepository;
 
   @AfterEach
   void tearDown() {
+    orderCancelRepository.deleteAllInBatch();
     deliveryRepository.deleteAllInBatch();
     optionSpecificationRepository.deleteAllInBatch();
     orderMenuOptionGroupRepository.deleteAllInBatch();
@@ -240,6 +247,114 @@ class DeliveryServiceTest extends IntegrationTestSupport {
     assertThatThrownBy(() -> deliveryService.createDelivery(request))
         .isInstanceOf(OrderNotFoundException.class)
         .hasMessage("존재하지 않는 주문입니다.");
+  }
+
+  @DisplayName("주문 취소 요청시 주문이 취소된다.")
+  @Test
+  void cancelOrder() {
+    //given
+    Member orderer = memberRepository.save(aMember().build());
+    Member deliver = memberRepository.save(aMember().build());
+    Order order = orderRepository.save(
+        aOrder().orderStatus(OrderStatus.DELIVERING).orderer_id(orderer.getId()).orderMenus(new ArrayList<>()).build());
+    Delivery delivery = deliveryRepository.save(aDelivery().deliveryStatus(DeliveryStatus.DELIVERING).order(order).deliver(deliver).build());
+
+    Long cancelMemberId = orderer.getId();
+    DeliveryCancelRequest cancelRequest = DeliveryCancelRequest.builder()
+        .content("test")
+        .memberId(cancelMemberId)
+        .orderId(order.getId()).build();
+    //when
+    deliveryService.cancelDelivery(cancelRequest);
+
+    //then
+    Order findOrder = orderRepository.findById(order.getId()).orElse(null);
+    Delivery findDelivery = deliveryRepository.findByOrderId(order.getId()).orElse(null);
+    OrderCancel findOrderCancel = orderCancelRepository.findByOrderIdAndDeliveryId(order.getId(),
+        findDelivery.getId()).orElse(null);
+
+    assertThat(findOrder.getOrderStatus()).isEqualTo(OrderStatus.CANCELED);
+    assertThat(findDelivery.getDeliveryStatus()).isEqualTo(DeliveryStatus.CANCELED);
+    assertThat(findOrderCancel)
+        .extracting(orderCancel -> orderCancel.getOrder().getId(), orderCancel ->orderCancel.getCancelMember().getId(),
+            orderCancel ->orderCancel.getDelivery().getId(), orderCancel ->orderCancel.getContent())
+        .containsExactly(order.getId(),cancelMemberId
+        ,findDelivery.getId(),cancelRequest.getContent());
+  }
+
+
+
+  @DisplayName("주문 취소 요청시 주문이 존재하지 않는 경우 예외가 발생한다.")
+  @Test
+  void cancelOrderWith_OrderNotFoundException() {
+    //given
+    Member orderer = memberRepository.save(aMember().build());
+    Member deliver = memberRepository.save(aMember().build());
+    Order order = orderRepository.save(
+        aOrder().orderStatus(OrderStatus.DELIVERING).orderer_id(orderer.getId()).orderMenus(new ArrayList<>()).build());
+    Delivery delivery = deliveryRepository.save(aDelivery().order(order).deliver(deliver).build());
+
+    Long cancelMemberId = orderer.getId();
+    DeliveryCancelRequest cancelRequest = DeliveryCancelRequest.builder()
+        .content("test")
+        .memberId(cancelMemberId)
+        .orderId(0L).build();
+    //when
+
+
+    //then
+    assertThatThrownBy(() -> deliveryService.cancelDelivery(cancelRequest))
+        .isInstanceOf(OrderNotFoundException.class)
+        .hasMessage("존재하지 않는 주문입니다.");
+  }
+
+  @DisplayName("주문 취소 요청시 요청자가 존재하지 않는 경우 예외가 발생한다.")
+  @Test
+  void cancelOrderWith_MemberNotFoundException() {
+    //given
+    Member orderer = memberRepository.save(aMember().build());
+    Member deliver = memberRepository.save(aMember().build());
+    Order order = orderRepository.save(
+        aOrder().orderStatus(OrderStatus.DELIVERING).orderer_id(orderer.getId()).orderMenus(new ArrayList<>()).build());
+    Delivery delivery = deliveryRepository.save(aDelivery().order(order).deliver(deliver).build());
+
+    Long cancelMemberId = orderer.getId();
+    DeliveryCancelRequest cancelRequest = DeliveryCancelRequest.builder()
+        .content("test")
+        .memberId(0L)
+        .orderId(order.getId()).build();
+    //when
+
+
+    //then
+    assertThatThrownBy(() -> deliveryService.cancelDelivery(cancelRequest))
+        .isInstanceOf(MemberNotFoundException.class)
+        .hasMessage("존재하지 않는 사용자입니다.");
+  }
+
+  @DisplayName("주문 취소 요청시 배달 요청 내역이 존재하지 않는 경우 예외가 발생한다.")
+  @Test
+  void cancelOrderWith_DeliveryNotFoundException() {
+    //given
+    Member orderer = memberRepository.save(aMember().build());
+    Member deliver = memberRepository.save(aMember().build());
+    Order order = orderRepository.save(
+        aOrder().orderStatus(OrderStatus.DELIVERING).orderer_id(orderer.getId()).orderMenus(new ArrayList<>()).build());
+    Delivery delivery = deliveryRepository.save(aDelivery().order(order).deliver(deliver).build());
+    delivery.canceled();
+
+    Long cancelMemberId = orderer.getId();
+    DeliveryCancelRequest cancelRequest = DeliveryCancelRequest.builder()
+        .content("test")
+        .memberId(cancelMemberId)
+        .orderId(order.getId()).build();
+    //when
+
+
+    //then
+    assertThatThrownBy(() -> deliveryService.cancelDelivery(cancelRequest))
+        .isInstanceOf(DeliveryNotFoundException.class)
+        .hasMessage("배달 요청이 존재하지 않습니다.");
   }
 
 
