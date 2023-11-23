@@ -1,6 +1,7 @@
 package com.windmeal.global.security.handler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.windmeal.global.security.oauth2.repository.OAuth2AuthorizationRequestBasedOnCookieRepository;
 import com.windmeal.global.token.dao.RefreshTokenDAO;
 import com.windmeal.global.token.dto.TokenInfoResponse;
 import com.windmeal.global.token.util.TokenProvider;
@@ -11,16 +12,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 
+import static com.windmeal.global.constants.CookieConstants.REDIRECT_URI_PARAM_COOKIE_NAME;
 import static com.windmeal.global.constants.JwtConstants.ACCESSTOKEN;
 import static com.windmeal.global.constants.JwtConstants.ACCESS_TOKEN_EXPIRES_IN;
 import static com.windmeal.global.constants.SecurityConstants.ERROR_REDIRECT;
-import static com.windmeal.global.constants.SecurityConstants.OAUTH_REDIRECT;
+import static com.windmeal.global.constants.SecurityConstants.DEFAULT_OAUTH_REDIRECT;
 
 /*
     CustomOAuth2UserInfo에서 인증이 완료된 사용자에 대해서 회원가입 처리를 해주었다.
@@ -33,18 +38,19 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private final TokenProvider tokenProvider;
     private final RefreshTokenDAO refreshTokenDao;
-    //    private final AuthorizationRequestRepository authorizationRequestRepository;
+    private final OAuth2AuthorizationRequestBasedOnCookieRepository authorizationRequestRepository;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
             throws IOException, ServletException {
-        setDefaultTargetUrl(OAUTH_REDIRECT);
+        setDefaultTargetUrl(determineTargetUrl(request, response, authentication));
         // 토큰을 추가하는 과정에서 에러가 발생하면 리다이렉트를 하는데, 이때 로직이 종료되지 않고 흘러가기 때문에 명시적으로 종료해줘야 한다.
         // 그러기 위해서 결과를 반환값으로 받고, 이에 따른 처리를 해주겠다.
         boolean result = addTokenToCookie(request, response, authentication);
         if (response.isCommitted() || !result) {
             return;
         }
+        clearAuthenticationAttributes(request, response);
         getRedirectStrategy().sendRedirect(request, response, getDefaultTargetUrl());
     }
 
@@ -72,8 +78,21 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     }
 
 
+    protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+        Optional<String> redirectUri = CookieUtil.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
+                .map(Cookie::getValue);
+        String uriString = UriComponentsBuilder.fromUriString(redirectUri.orElse(DEFAULT_OAUTH_REDIRECT))
+                .build().toUriString();
+        return uriString;
+    }
+
     private void saveRefreshTokenInStorage(String refreshToken, Long memberId, String email, String ip) throws JsonProcessingException {
         refreshTokenDao.createRefreshToken(memberId, email, refreshToken, ip);
+    }
+
+    protected void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {
+        super.clearAuthenticationAttributes(request);
+        authorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
     }
 
 }

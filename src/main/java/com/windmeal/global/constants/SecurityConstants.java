@@ -4,5 +4,5 @@ public class SecurityConstants {
 
     public static String ANONYMOUSUSER = "anonymousUser";
     public static String ERROR_REDIRECT = "http://localhost:3000/error";
-    public static String OAUTH_REDIRECT = "http://localhost:3000/main";
+    public static String DEFAULT_OAUTH_REDIRECT = "http://localhost:3000/main";
 }

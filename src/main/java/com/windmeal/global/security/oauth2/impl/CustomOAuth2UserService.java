@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 import java.util.Optional;
+
+import static com.windmeal.global.constants.SecurityConstants.ERROR_REDIRECT;
 
 @Service
 @Slf4j
@@ -58,7 +61,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         따라서 도메인이 다르거나, 우리가 원하는 정보가 없을 경우에는 다시 발행된 토큰을 취소해줘야 한다.
         토큰 취소를 위해서 매개변수로 token을 가진다.
      */
-    private void validateAttributes(Map<String, Object> userInfoAttributes, String token) {
+    private void validateAttributes(Map<String, Object> userInfoAttributes, String token) throws OAuth2AuthenticationException {
         if(!userInfoAttributes.containsKey("email")) {
             throw new IllegalArgumentException("응답에 email이 존재하지 않습니다.");
         }
@@ -73,7 +76,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             } else {
                 log.info("토큰이 취소에 실패하였습니다.");
             }
-            throw new InvalidEmailDomainException("가천대학교 계정이 아닙니다. 토큰을 취소합니다.");
+//            throw new InvalidEmailDomainException("가천대학교 계정이 아닙니다. 토큰을 취소합니다.");
+            throw new InvalidEmailDomainException(
+                    new OAuth2Error("401", "email domain error", ERROR_REDIRECT)
+            );
         }
     }
 
