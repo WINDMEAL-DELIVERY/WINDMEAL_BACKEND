@@ -13,6 +13,7 @@ import com.windmeal.store.domain.OptionSpecification;
 import com.windmeal.store.domain.OptionSpecification.OptionSpecificationBuilder;
 import com.windmeal.store.domain.Store;
 import com.windmeal.store.domain.Store.StoreBuilder;
+import java.time.LocalTime;
 import java.util.Arrays;
 
 public class Fixtures {
@@ -20,6 +21,7 @@ public class Fixtures {
   public static OrderBuilder aOrder(){
     return Order.builder()
         .id(1L)
+        .eta(LocalTime.MAX)
         .orderer_id(1L)
         ;
   }

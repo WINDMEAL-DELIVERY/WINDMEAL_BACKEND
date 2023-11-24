@@ -3,6 +3,7 @@ package com.windmeal.store.service;
 
 import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.member.domain.Member;
+import com.windmeal.member.exception.MemberNotFoundException;
 import com.windmeal.member.repository.MemberRepository;
 import com.windmeal.store.domain.Category;
 import com.windmeal.store.domain.MenuCategory;
@@ -42,16 +43,17 @@ public class StoreService {
   @Transactional
   public StoreResponse createStore(StoreCreateRequest request, String imgUrl) {
     Member findMember = memberRepository.findById(request.getMemberId())
-        .orElseThrow(); //Member Not Found 예외 추가 예정
+        .orElseThrow(() -> new MemberNotFoundException(ErrorCode.NOT_FOUND,"사용자가 존재하지 않습니다.")); //Member Not Found 예외 추가 예정
     Store savedStore = storeRepository.save(request.toEntity(findMember, imgUrl));
-    categoryRepository.createCategories(
-        request.getCategoryList());//category 에 존재하지 않는 경우 bulk 작업으로 저장
-    List<Long> categoryIdList = categoryRepository.findAllByNameIn(request.getCategoryList())
-        .stream()
-        .map(Category::getId).collect(
-            Collectors.toList());
-    storeCategoryRepository.createStoreCategories(categoryIdList, savedStore.getId());
-
+    if(!request.getCategoryList().isEmpty()) {
+      categoryRepository.createCategories(
+          request.getCategoryList());//category 에 존재하지 않는 경우 bulk 작업으로 저장
+      List<Long> categoryIdList = categoryRepository.findAllByNameIn(request.getCategoryList())
+          .stream()
+          .map(Category::getId).collect(
+              Collectors.toList());
+      storeCategoryRepository.createStoreCategories(categoryIdList, savedStore.getId());
+    }
     return StoreResponse.of(savedStore);
   }
 

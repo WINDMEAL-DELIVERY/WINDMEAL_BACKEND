@@ -6,6 +6,7 @@ import com.windmeal.member.repository.MemberRepository;
 import com.windmeal.order.domain.Delivery;
 import com.windmeal.order.domain.DeliveryStatus;
 import com.windmeal.order.domain.Order;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -36,7 +37,7 @@ class DeliveryRepositoryTest extends IntegrationTestSupport {
   void findByOrderIdAndDeliveryStatus() {
     //given
     Member member = memberRepository.save(Member.builder().build());
-    Order order = orderRepository.save(Order.builder().orderMenus(new ArrayList<>()).build());
+    Order order = orderRepository.save(Order.builder().eta(LocalTime.MAX).orderMenus(new ArrayList<>()).build());
     deliveryRepository.save(
         Delivery.builder()
             .deliver(member)

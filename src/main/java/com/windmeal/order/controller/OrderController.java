@@ -1,8 +1,10 @@
 package com.windmeal.order.controller;
 
 import com.windmeal.global.exception.ExceptionResponseDTO;
+import com.windmeal.global.exception.ResultDataResponseDTO;
 import com.windmeal.order.dto.request.OrderCreateRequest;
 import com.windmeal.order.dto.request.OrderDeleteRequest;
+import com.windmeal.order.dto.response.OrderListResponse;
 import com.windmeal.order.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -10,10 +12,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.geo.Point;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "주문 카테고리", description = "주문 관련 api 입니다.")
@@ -46,4 +54,33 @@ public class OrderController {
   public void deleteOrder(@RequestBody OrderDeleteRequest request){
     orderService.deleteOrder(request);
   }
+
+  /**
+   * 주문 정보 조회
+   * 필터링 조건
+   * - 식당
+   * - 도착지
+   * - 도착 시간
+   * - 음식 종류
+   * @return
+   */
+  @GetMapping("/order")
+  public ResultDataResponseDTO<Page<OrderListResponse>> getAllOrder(
+      Pageable pageable,
+      @RequestParam(required = false) Long storeId,
+      @RequestParam(required = false) Point point,
+      @RequestParam(required = false) String eta,
+      @RequestParam(required = false) String storeCategory
+  ){
+    return ResultDataResponseDTO.of(orderService.getAllOrder(pageable,storeId,eta,storeCategory,point));
+  }
+
+
+  /**
+   * 주문 상세 조회
+   */
+//  @GetMapping("/order/{orderId}")
+//  public ResultDataResponseDTO<OrderDetailResponse> getOrderDetail(@PathVariable Long orderId){
+//    return ResultDataResponseDTO.of(orderService.getOrderDetail(orderId));
+//  }
 }

@@ -3,6 +3,7 @@ package com.windmeal.order.domain;
 
 import com.windmeal.generic.domain.Money;
 import com.windmeal.model.BaseTimeEntity;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +43,7 @@ public class Order extends BaseTimeEntity {
 
   private Point destination;//도착지
 
-  private LocalTime eta; //Estimated Time of Arrival 도착 예정 시간
+  private LocalDateTime eta; //Estimated Time of Arrival 도착 예정 시간
 
   private String summary; //내용 요약 ex) 후라이드 치킨 1마리 외 3개 15000원
 
@@ -72,7 +73,7 @@ public class Order extends BaseTimeEntity {
     this.orderStatus = orderStatus;
     this.orderTime = orderTime;
     this.destination = destination;
-    this.eta = eta;
+    this.eta = LocalDate.now().atTime(eta);
     this.deliveryFee = deliveryFee;
     orderMenus.forEach(orderMenu -> {
       orderMenu.setOrder(this);

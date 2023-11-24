@@ -42,6 +42,7 @@ import com.windmeal.store.domain.Store.StoreBuilder;
 import com.windmeal.store.exception.StoreNotFoundException;
 import com.windmeal.store.repository.MenuRepository;
 import com.windmeal.store.repository.StoreRepository;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -154,6 +155,7 @@ class OrderServiceTest extends IntegrationTestSupport {
     OrderCreateRequest request = buildOrderCreateRequest()
         .storeId(store.getId())
         .memberId(orderer.getId())
+        .eta(LocalTime.MAX)
         .menus(
             Arrays.asList(
                 buildOrderMenuRequest()
