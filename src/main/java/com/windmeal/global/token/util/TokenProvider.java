@@ -116,19 +116,6 @@ public class TokenProvider implements InitializingBean {
 //        throw new InvaildTokenException("토큰이 유효하지 않습니다.");
     }
 
-    // 위 로직과 비슷해보이지만, 리이슈를 이한 로직에는 예외가 발생하지 않는다. 만료된 토큰으로부터 재발급을 행해야 하기 때문.
-//    public Authentication getAuthenticationForReissue(String token) {
-//
-//        Claims claims = parseClaims(token);
-//        // 클레임의 권한 정보를 가져오겠다.
-//        Collection<? extends GrantedAuthority> authorities =
-//                Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
-//                        .map(SimpleGrantedAuthority::new)
-//                        .collect(Collectors.toList());
-//        User principal = new User(claims.getSubject(), (String) claims.get(EMAIL), authorities);
-//        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
-//    }
-
     public Optional<MemberInfoDTO> getMemberInfoFromToken(String token) {
         Long userId = null;
         String email = null;

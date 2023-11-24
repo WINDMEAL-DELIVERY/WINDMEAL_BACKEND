@@ -73,6 +73,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
         ExceptionResponseDTO responseDTO = ExceptionResponseDTO.of(ErrorCode.UNAUTHORIZED, authenticationException.getMessage());
+        log.error(authenticationException.getMessage());
         try{
             response.getWriter().write(objectMapper.writeValueAsString(responseDTO));
         }catch (IOException e){
