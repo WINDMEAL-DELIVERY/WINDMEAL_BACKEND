@@ -1,5 +1,6 @@
 package com.windmeal.global.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.SerializationUtils;
 
 import javax.servlet.http.Cookie;

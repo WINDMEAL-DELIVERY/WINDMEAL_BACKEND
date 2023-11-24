@@ -24,6 +24,8 @@ import org.springframework.security.oauth2.client.web.AuthorizationRequestReposi
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.security.web.firewall.HttpFirewall;
+import org.springframework.security.web.firewall.StrictHttpFirewall;
 
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -33,7 +35,6 @@ public class SecurityConfig {
   private final RedisTemplate redisTemplate;
   private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
   private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
-  private final AuthenticationManagerBuilder authenticationManagerBuilder;
   private final CustomOAuth2UserService customOAuth2UserService;
   private final ObjectMapper objectMapper;
 
@@ -57,39 +58,38 @@ public class SecurityConfig {
     return new RefreshTokenDAOImpl(redisTemplate, objectMapper);
   }
 
-//    @Bean
-//    public AuthorizationRequestRepository authorizationRequestRepository() {
-//        return new OAuth2AuthorizationRequestBasedOnCookieRepository();
-//    }
-//
-//    @Bean
-//    public SimpleUrlAuthenticationSuccessHandler simpleUrlAuthenticationSuccessHandler() {
-//        return new CustomSuccessHandler(tokenProvider, refreshTokenDAO(), authorizationRequestRepository());
-//    }
+  /*
+    해당 빈은 어쩔 수 없이 구현체에 의존하겠다.
+   */
+    @Bean
+    public OAuth2AuthorizationRequestBasedOnCookieRepository authorizationRequestRepository() {
+        return new OAuth2AuthorizationRequestBasedOnCookieRepository();
+    }
 
-//    @Bean
-//    public SimpleUrlAuthenticationFailureHandler simpleUrlAuthenticationFailureHandler() {
-//        return new CustomFailureHandler(authorizationRequestRepository());
-//    }
 
   @Bean
   public SimpleUrlAuthenticationSuccessHandler simpleUrlAuthenticationSuccessHandler() {
-    return new CustomSuccessHandler(tokenProvider, refreshTokenDAO());
+    return new CustomSuccessHandler(tokenProvider, refreshTokenDAO(),authorizationRequestRepository());
   }
 
   @Bean
   public SimpleUrlAuthenticationFailureHandler simpleUrlAuthenticationFailureHandler() {
-    return new CustomFailureHandler();
+    return new CustomFailureHandler(authorizationRequestRepository());
+  }
+
+  @Bean
+  public HttpFirewall customStrictHttpFirewall() {
+    StrictHttpFirewall firewall = new StrictHttpFirewall();
+    firewall.setAllowUrlEncodedDoubleSlash(true);
+    return firewall;
   }
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
     http
         // REST 형식을 활용하기 때문에 CSRF는 비활성화 해주겠음
         .csrf().disable()
         .cors()
-
         // 401, 403 에러애 대한 핸들러를 등록하겠음
         .and()
         .exceptionHandling()
@@ -112,14 +112,14 @@ public class SecurityConfig {
         .and()
         .authorizeHttpRequests()
         .antMatchers(PERMIT_URL_ARRAY).permitAll()
-        .antMatchers("/auth/*").permitAll()
-        .antMatchers("/oauth2/*").permitAll()
-//        .anyRequest().authenticated()
-        .anyRequest().permitAll()
+        .antMatchers("/auth/**").permitAll()
+        .antMatchers("/oauth2/**").permitAll()
+        .anyRequest().authenticated()
+//        .anyRequest().permitAll()
 
         // JwtSecurityConfig 설정
         .and()
-        .apply(new JwtSecurityConfig(tokenProvider, authenticationManagerBuilder.getOrBuild(), objectMapper))
+        .apply(new JwtSecurityConfig(tokenProvider, objectMapper))
 
         // 아래는 Spring security가 제공하는 OAuth2를 활용하는 방식인데, 결국엔 세션이나 쿠키를 사용해야 한다는 문제점이 있다.
         // 따라서 아래의 방식을 사용하지 않고, 직접 OAuth2를 활용하여 소셜 로그인을 구현하겠다.
@@ -128,20 +128,18 @@ public class SecurityConfig {
         .and()
         .oauth2Login()      // oauth2 로그인을 활성화 하겠다
         .authorizationEndpoint()    // 인증에 대한 엔드 포인트를 지정한다. 즉, 아래의 uri에 접근하면 oauth 인증을 진행한다.
-        .baseUri("/oauth2/authorization")
-//                .authorizationRequestRepository(authorizationRequestRepository())
+//        .baseUri("/oauth2/authorization")
+        .authorizationRequestRepository(authorizationRequestRepository())
 
         .and()
         .redirectionEndpoint()  // oauth 인증 후 리다이렉트되는 엔드 포인트를 지정한다. 아래의 uri에 대해서 리다이렉트를 허용한다.
-        .baseUri("/*/oauth2/code/google")
+        .baseUri("/login/oauth2/code/*")
 
         .and()
         .userInfoEndpoint()
-        .userService(
-            customOAuth2UserService)   // 여기서 지정한 userService() 메서드에서 사용자, 즉 resource owner의 정보를 받는다.
+        .userService(customOAuth2UserService)   // 여기서 지정한 userService() 메서드에서 사용자, 즉 resource owner의 정보를 받는다.
         .and()
-        .successHandler(
-            simpleUrlAuthenticationSuccessHandler())   //위 과정을 통해 성공적으로 회원가입을 진행하거나 유저를 매핑했다면, successHandler를 호출하여 jwt 생성
+        .successHandler(simpleUrlAuthenticationSuccessHandler())   //위 과정을 통해 성공적으로 회원가입을 진행하거나 유저를 매핑했다면, successHandler를 호출하여 jwt 생성
         .failureHandler(simpleUrlAuthenticationFailureHandler());   // 실패했다면 실패 핸들러를 호출
 
 //                .and()
