@@ -24,6 +24,8 @@ import org.springframework.security.oauth2.client.web.AuthorizationRequestReposi
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.security.web.firewall.HttpFirewall;
+import org.springframework.security.web.firewall.StrictHttpFirewall;
 
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -76,13 +78,18 @@ public class SecurityConfig {
   }
 
   @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+  public HttpFirewall customStrictHttpFirewall() {
+    StrictHttpFirewall firewall = new StrictHttpFirewall();
+    firewall.setAllowUrlEncodedDoubleSlash(true);
+    return firewall;
+  }
 
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
         // REST 형식을 활용하기 때문에 CSRF는 비활성화 해주겠음
         .csrf().disable()
         .cors()
-
         // 401, 403 에러애 대한 핸들러를 등록하겠음
         .and()
         .exceptionHandling()
