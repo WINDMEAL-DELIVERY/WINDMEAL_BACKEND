@@ -3,6 +3,7 @@ package com.windmeal.global.constants;
 public class SecurityConstants {
 
     public static String ANONYMOUSUSER = "anonymousUser";
+    // 모두 yml로 옮길 예정
     public static String ERROR_REDIRECT = "http://localhost:3000/error";
     public static String DEFAULT_OAUTH_REDIRECT = "http://localhost:3000/main";
     public static String NICKNAME_REDIRECT = "http://localhost:3000/register";

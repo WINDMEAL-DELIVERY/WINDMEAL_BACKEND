@@ -29,4 +29,9 @@ public class Member extends MemberBase{
     public Member(Long id) {
         super(id);
     }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
 }
