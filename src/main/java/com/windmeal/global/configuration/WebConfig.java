@@ -21,8 +21,8 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins("http://localhost:3000","http://localhost:3001", host, was_host1, was_host2)
 //                .allowedOrigins("*")
                 .allowedMethods("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
-//                .allowedHeaders("Content-Type, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Authorization, X-Requested-With, requestId, Correlation-Id")
-                .allowedHeaders("*")
+                .allowedHeaders("Content-Type, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Authorization, X-Requested-With, requestId, Correlation-Id")
+//                .allowedHeaders("*")
                 .allowCredentials(true)
                 .maxAge(3000);
     }
