@@ -1,18 +1,24 @@
 package com.windmeal.global.token.dao;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.windmeal.global.token.dto.RefreshTokenResponse;
+import com.windmeal.global.util.ClientIpUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.time.Duration;
+import java.util.Optional;
 
 import static com.windmeal.global.constants.JwtConstants.PREFIX_REFRESHTOKEN;
+import static com.windmeal.global.constants.JwtConstants.REFRESH_TOKEN_EXPIRES_IN;
 
 @RequiredArgsConstructor
 public class RefreshTokenDAOImpl implements RefreshTokenDAO {
     private final RedisTemplate redisTemplate;
-    @Value("${jwt.refresh-token-validity-in-seconds}")
-    private Long refreshTokenExpiresIn;
+    private final ObjectMapper objectMapper;
+
 
     /**
      * RefreshToken을 설정해주는 부분이다.
@@ -21,15 +27,16 @@ public class RefreshTokenDAOImpl implements RefreshTokenDAO {
      * @param refreshToken
      */
     @Override
-    public void createRefreshToken(Long memberId, String email, String refreshToken) {
+    public void createRefreshToken(Long memberId, String email, String refreshToken, String clientIp) throws JsonProcessingException {
+        String value = objectMapper.writeValueAsString(RefreshTokenResponse.of(refreshToken, clientIp));
         redisTemplate.opsForValue().set(PREFIX_REFRESHTOKEN + memberId + email
-                , refreshToken
-                , Duration.ofSeconds(refreshTokenExpiresIn));
+                , value
+                , Duration.ofSeconds(REFRESH_TOKEN_EXPIRES_IN));
     }
 
     @Override
-    public String getRefreshToken(Long memberId, String email) {
-        return (String) redisTemplate.opsForValue().get(PREFIX_REFRESHTOKEN + memberId + email);
+    public Optional<String> getRefreshToken(Long memberId, String email) {
+        return Optional.ofNullable((String) redisTemplate.opsForValue().get(PREFIX_REFRESHTOKEN + memberId + email));
     }
 
     @Override

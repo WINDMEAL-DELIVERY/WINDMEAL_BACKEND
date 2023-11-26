@@ -12,14 +12,13 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 @Getter
 public class UserPrincipal implements OAuth2User, UserDetails {
 
     private Long id;
     private String email;
-    @Value("${password.google.common-google-user-password}")
-    private String password;
     private Collection<? extends GrantedAuthority> authorities;
     @Setter
     private Map<String, Object> attributes;
@@ -84,4 +83,5 @@ public class UserPrincipal implements OAuth2User, UserDetails {
     public String getName() {
         return Long.toString(id);
     }
+
 }
