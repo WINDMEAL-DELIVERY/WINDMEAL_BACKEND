@@ -27,7 +27,7 @@ public class OrderMenuOptionGroup {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_menu_id", updatable = false)
     private OrderMenu orderMenu;
-
+    private String name;
 
     @Column(name = "option_group_id")
     private Long option_group_id;
@@ -35,13 +35,18 @@ public class OrderMenuOptionGroup {
     private List<OrderMenuOptionSpecification> specs = new ArrayList<>();
 
     @Builder
-    public OrderMenuOptionGroup(Long option_group_id, List<OrderMenuOptionSpecification> specs) {
+    public OrderMenuOptionGroup(String name, Long option_group_id,
+        List<OrderMenuOptionSpecification> specs) {
+        this.name = name;
         this.option_group_id = option_group_id;
         specs.forEach(orderMenuOptionSpecification -> {
             orderMenuOptionSpecification.setOrderMenuOptionGroup(this);
             this.specs.add(orderMenuOptionSpecification);
         });
     }
+
+
+
 
     public void setOrderMenu(OrderMenu orderMenu) {
         this.orderMenu = orderMenu;

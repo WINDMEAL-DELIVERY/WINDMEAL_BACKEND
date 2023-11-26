@@ -1,5 +1,6 @@
 package com.windmeal.order.domain;
 
+import com.windmeal.generic.domain.Money;
 import com.windmeal.member.domain.Member;
 import com.windmeal.store.domain.Menu;
 import java.util.ArrayList;
@@ -31,20 +32,29 @@ public class OrderMenu {
 
   @Column(name = "menu_id")
   private Long menu_id;
+  private Money price;
+  private String name;
+  private String description;
   private int count;
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "orderMenu")
   private List<OrderMenuOptionGroup> groups = new ArrayList<>();
 
   @Builder
-  public OrderMenu(Long menu_id, int count, List<OrderMenuOptionGroup> groups) {
+  public OrderMenu(Long menu_id, Money price, String name, String description, int count,
+      List<OrderMenuOptionGroup> groups) {
     this.menu_id = menu_id;
+    this.price = price;
+    this.name = name;
+    this.description = description;
     this.count = count;
     groups.forEach(orderMenuOptionGroup -> {
       orderMenuOptionGroup.setOrderMenu(this);
       this.groups.add(orderMenuOptionGroup);
     });
   }
+
+
 
 
   public void setOrder(Order order) {
