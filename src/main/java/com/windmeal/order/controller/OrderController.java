@@ -7,12 +7,15 @@ import com.windmeal.order.dto.request.OrderDeleteRequest;
 import com.windmeal.order.dto.response.OrderDetailResponse;
 import com.windmeal.order.dto.response.OrderListResponse;
 import com.windmeal.order.service.OrderService;
+import com.windmeal.store.dto.request.StoreCreateRequest;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.time.LocalTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -57,6 +60,10 @@ public class OrderController {
     orderService.deleteOrder(request);
   }
 
+  @Operation(summary = "주문 내역 조회", description = "주문 내역 리스트를 조회합니다.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "OK")
+  })
   /**
    * 주문 정보 조회
    * 필터링 조건
@@ -69,18 +76,26 @@ public class OrderController {
   @GetMapping("/order")
   public ResultDataResponseDTO<Page<OrderListResponse>> getAllOrder(
       Pageable pageable,
+      @Parameter(description = "가게 id", required = false, schema = @Schema(example = "1"))
       @RequestParam(required = false) Long storeId,
+      @Parameter(description = "도착지 위치 정보", required = false, schema = @Schema(example = "1.2345,2.3445"))
       @RequestParam(required = false) Point point,
+      @Parameter(description = "가게 id", required = false, schema = @Schema(example = "23:10:00"))
       @RequestParam(required = false) String eta,
+      @Parameter(description = "가게 id", required = false, schema = @Schema(example = "카페"))
       @RequestParam(required = false) String storeCategory
   ){
     return ResultDataResponseDTO.of(orderService.getAllOrder(pageable,storeId,eta,storeCategory,point));
   }
 
-
-  /**
-   * 주문 상세 조회
-   */
+  @Operation(summary = "주문 내역 상세 조회", description = "주문 내역의 상세 내용을 조회합니다.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "OK"),
+      @ApiResponse(responseCode = "400", description = "",
+          content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class))),
+      @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근",
+          content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class)))
+  })
   @GetMapping("/order/{orderId}")
   public ResultDataResponseDTO<OrderDetailResponse> getOrderDetail(@PathVariable Long orderId){
     return ResultDataResponseDTO.of(orderService.getOrderDetail(orderId));
