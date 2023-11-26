@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.Enumeration;
 
 import static com.windmeal.global.constants.JwtConstants.*;
 
@@ -40,10 +41,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // 먼저 해더를 조사한다. 그리고 유효한 토큰 문자열이 있다면 가져온다.
-        log.info("jwtFitler : ");
+        log.info("jwtFilter의 request 정보들");
+        Enumeration<String> headerNames = request.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            String headerName = headerNames.nextElement();
+            Enumeration<String> headerValues = request.getHeaders(headerName);
+            while (headerValues.hasMoreElements()) {
+                String headerValue = headerValues.nextElement();
+                System.out.println("Header: " + headerName + " = " + headerValue);
+            }
+        }
+        log.info("jwtFilter의 request 정보들 - 끝");
         String accessToken = resolveToken(request);
         if(StringUtils.hasText(accessToken) && tokenProvider.validateToken(accessToken)) {
             try{
+                log.info("after validation ");
                 Authentication authenticated = tokenProvider.getAuthentication(accessToken);
                 SecurityContextHolder.getContext().setAuthentication(authenticated);
                 log.info("통과");
