@@ -36,7 +36,6 @@ public class OrderRequestMapper {
         .menu_id(orderMenuRequest.getMenuId())
         .price(orderMenuRequest.getPrice())
         .name(orderMenuRequest.getName())
-        .description(orderMenuRequest.getDescription())
         .count(orderMenuRequest.getCount())
         .groups(orderMenuRequest.getGroups().stream()
             .map(this::toOrderMenuOptionGroup)

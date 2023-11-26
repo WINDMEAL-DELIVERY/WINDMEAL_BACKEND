@@ -76,10 +76,16 @@ public class OrderService {
     return orderRepository.getOrderList(pageable,storeId,eta,storeCategory,point);
   }
 
+  /**
+   * 주문 상세 내용 조
+   * @param orderId
+   * @return
+   */
   public OrderDetailResponse getOrderDetail(Long orderId) {
     Order order = orderRepository.findById(orderId)
         .orElseThrow(() -> new OrderNotFoundException(ErrorCode.NOT_FOUND, "존재하지 않는 주문입니다."));
-    return null;
+
+    return OrderDetailResponse.from(order);
   }
 
 

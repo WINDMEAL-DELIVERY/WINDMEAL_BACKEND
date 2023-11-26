@@ -81,8 +81,8 @@ public class OrderController {
   /**
    * 주문 상세 조회
    */
-//  @GetMapping("/order/{orderId}")
-//  public ResultDataResponseDTO<OrderDetailResponse> getOrderDetail(@PathVariable Long orderId){
-//    return ResultDataResponseDTO.of(orderService.getOrderDetail(orderId));
-//  }
+  @GetMapping("/order/{orderId}")
+  public ResultDataResponseDTO<OrderDetailResponse> getOrderDetail(@PathVariable Long orderId){
+    return ResultDataResponseDTO.of(orderService.getOrderDetail(orderId));
+  }
 }

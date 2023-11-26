@@ -49,7 +49,6 @@ public class OrderCreateRequest {
     @Schema(description = "메뉴 가격", example = "3000")
     private Money price;
     private String name;
-    private String description;
 
     private List<OrderGroupRequest> groups = new ArrayList<>();
 
