@@ -47,7 +47,7 @@ public class OrderService {
     orderValidator.validate(request);
     Order order = orderRequestMapper.mapFrom(request);
     Money totalPrice = calculateTotalPrice(request);
-    String summary = getSummary(totalPrice, getMenu(request), calculateTotalSize(request));
+    String summary = getSummary(totalPrice, request.getMenus().get(0).getName(), calculateTotalSize(request));
     order.place(totalPrice,summary);
     Order savedOrder = orderRepository.save(order);
     return OrderCreateResponse.toResponse(savedOrder);
@@ -82,18 +82,15 @@ public class OrderService {
     return null;
   }
 
-  private Menu getMenu(OrderCreateRequest request) {
-    return menuRepository.findById(request.getMenus().get(0).getMenuId())
-        .orElseThrow(() -> new MenuNotFoundException(ErrorCode.NOT_FOUND, "메뉴가 존재하지 않습니다."));
-  }
+
   public int calculateTotalSize(OrderCreateRequest request) {
     return request.getMenus().stream().mapToInt(menus->menus.getCount()).sum();
   }
 
-  public String getSummary(Money totalPrice, Menu menu, int menuCount) {
+  public String getSummary(Money totalPrice, String menuName, int menuCount) {
     return menuCount == 1 ?
-        String.format("%s %s원", menu.getName(), totalPrice.wons()) :
-        String.format("%s 외 %s개 %s원", menu.getName(), menuCount - 1, totalPrice.wons());
+        String.format("%s %s원", menuName, totalPrice.wons()) :
+        String.format("%s 외 %s개 %s원", menuName, menuCount - 1, totalPrice.wons());
   }
 
   public Money calculateTotalPrice(OrderCreateRequest request) {

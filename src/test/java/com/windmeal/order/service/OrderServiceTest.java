@@ -216,9 +216,9 @@ class OrderServiceTest extends IntegrationTestSupport {
 
     //when
     int totalPrice = 20000;
-    String summaryWith10 = orderService.getSummary(Money.wons(totalPrice), menu,
+    String summaryWith10 = orderService.getSummary(Money.wons(totalPrice), "test",
         10);
-    String summaryWith1 = orderService.getSummary(Money.wons(totalPrice), menu,
+    String summaryWith1 = orderService.getSummary(Money.wons(totalPrice), "test",
         1);
     //then
     assertThat(summaryWith1)

@@ -248,8 +248,8 @@ public class OrderValidatorTest {
         .id(1L)
         .isMultipleOption(true)
         .isEssentialOption(true)
-        .optionSpecifications(Arrays.asList(aOptionSpecification().price(Money.wons(1000)).name("test1").build(),
-            aOptionSpecification().price(Money.wons(1000)).name("test2").build()))
+        .optionSpecifications(Arrays.asList(aOptionSpecification().id(1L).price(Money.wons(1000)).name("test1").build(),
+            aOptionSpecification().price(Money.wons(1000)).id(2L).name("test2").build()))
         ;
   }
 
