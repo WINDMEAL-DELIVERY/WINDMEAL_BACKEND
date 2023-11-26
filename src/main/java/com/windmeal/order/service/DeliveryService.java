@@ -56,7 +56,7 @@ public class DeliveryService {
 
   @DistributedLock(key = "#order.getId()")
   public void deliverySave(Member deliver, Order order) {
-    deliveryRepository.findByOrderId(order.getId())
+    deliveryRepository.findByOrderIdAndDeliveryStatusNot(order.getId(),DeliveryStatus.CANCELED)
         .ifPresent(
             delivery -> {
               throw new OrderAlreadyMatchedException(ErrorCode.BAD_REQUEST, "이미 매칭된 주문입니다.");

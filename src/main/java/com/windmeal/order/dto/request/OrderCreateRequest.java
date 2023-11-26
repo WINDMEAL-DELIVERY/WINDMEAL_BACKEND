@@ -48,6 +48,9 @@ public class OrderCreateRequest {
     private int count;
     @Schema(description = "메뉴 가격", example = "3000")
     private Money price;
+    private String name;
+    private String description;
+
     private List<OrderGroupRequest> groups = new ArrayList<>();
 
     public Money calculatePrice() {
@@ -62,6 +65,8 @@ public class OrderCreateRequest {
   public static class OrderGroupRequest{
     @Schema(description = "옵션 그룹 ID", example = "1")
     private Long optionGroupId;
+    private String name;
+
     private List<OrderSpecRequest> specs = new ArrayList<>();
     public Money calculatePrice() {
       return Money.sum(specs, OrderSpecRequest::getPrice);
@@ -77,7 +82,7 @@ public class OrderCreateRequest {
     private Long optionSpecId;
     @Schema(description = "옵션 가격", example = "1000")
     private Money price;
-
+    private String name;
 
   }
 }

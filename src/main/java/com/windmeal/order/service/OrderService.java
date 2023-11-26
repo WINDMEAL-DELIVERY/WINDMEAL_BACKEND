@@ -47,11 +47,12 @@ public class OrderService {
     orderValidator.validate(request);
     Order order = orderRequestMapper.mapFrom(request);
     Money totalPrice = calculateTotalPrice(request);
-    String summary = getSummary(totalPrice, getMenu(request), request.getMenus().size());
+    String summary = getSummary(totalPrice, getMenu(request), calculateTotalSize(request));
     order.place(totalPrice,summary);
     Order savedOrder = orderRepository.save(order);
     return OrderCreateResponse.toResponse(savedOrder);
   }
+
 
   // 배달이 성사되지 않은 ORDERED 상태의 주문 요청만 삭제 가능.
   @Transactional
@@ -70,9 +71,23 @@ public class OrderService {
     orderRepository.deleteById(request.getOrderId());
   }
 
+  public Page<OrderListResponse> getAllOrder(Pageable pageable, Long storeId, String eta, String storeCategory,
+      Point point) {
+    return orderRepository.getOrderList(pageable,storeId,eta,storeCategory,point);
+  }
+
+  public OrderDetailResponse getOrderDetail(Long orderId) {
+    Order order = orderRepository.findById(orderId)
+        .orElseThrow(() -> new OrderNotFoundException(ErrorCode.NOT_FOUND, "존재하지 않는 주문입니다."));
+    return null;
+  }
+
   private Menu getMenu(OrderCreateRequest request) {
     return menuRepository.findById(request.getMenus().get(0).getMenuId())
         .orElseThrow(() -> new MenuNotFoundException(ErrorCode.NOT_FOUND, "메뉴가 존재하지 않습니다."));
+  }
+  public int calculateTotalSize(OrderCreateRequest request) {
+    return request.getMenus().stream().mapToInt(menus->menus.getCount()).sum();
   }
 
   public String getSummary(Money totalPrice, Menu menu, int menuCount) {
@@ -92,14 +107,7 @@ public class OrderService {
   }
 
 
-  public OrderDetailResponse getOrderDetail(Long orderId) {
-    Order order = orderRepository.findById(orderId)
-        .orElseThrow(() -> new OrderNotFoundException(ErrorCode.NOT_FOUND, "존재하지 않는 주문입니다."));
-        return null;
-  }
 
-  public Page<OrderListResponse> getAllOrder(Pageable pageable, Long storeId, String eta, String storeCategory,
-      Point point) {
-    return orderRepository.getOrderList(pageable,storeId,eta,storeCategory,point);
-  }
+
+
 }

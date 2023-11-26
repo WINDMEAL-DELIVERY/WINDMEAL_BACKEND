@@ -107,7 +107,7 @@ class OrderServiceTest extends IntegrationTestSupport {
 
   }
 
-   @DisplayName("주문 생성을 할 수 있다.")
+  @DisplayName("주문 생성을 할 수 있다.")
   @Test
   void createOrder() {
     //given
@@ -130,6 +130,7 @@ class OrderServiceTest extends IntegrationTestSupport {
             , orderResponse.getTotalPrice().wons(), OrderStatus.ORDERED);
 
   }
+
   private OrderCreateRequest getOrderCreateRequest(Member orderer, Store store) {
     List<Menu> menus = menuRepository.saveAll(Arrays.asList(
         aMenu().name("test1").price(Money.wons(1000))
@@ -148,7 +149,8 @@ class OrderServiceTest extends IntegrationTestSupport {
             optionGroups(
                 Arrays.asList(aOptionGroup()
                     .optionSpecifications(
-                        Arrays.asList(aOptionSpecification().name("test2").build()))
+                        Arrays.asList(
+                            aOptionSpecification().price(Money.wons(2000)).name("test2").build()))
                     .build())
             ).build()
     ));
@@ -161,6 +163,7 @@ class OrderServiceTest extends IntegrationTestSupport {
                 buildOrderMenuRequest()
                     .menuId(menus.get(0).getId())
                     .count(2)
+                    .name("test1")
                     .price(Money.wons(1000))
                     .groups(
                         Arrays.asList(
@@ -171,11 +174,14 @@ class OrderServiceTest extends IntegrationTestSupport {
                                         .optionSpecId(
                                             menus.get(0).getOptionGroups().get(0)
                                                 .getOptionSpecifications().get(0).getId())
+                                        .name("test1")
+
                                         .price(Money.wons(1000)).build(),
                                     buildOrderSpecRequest()
                                         .optionSpecId(
                                             menus.get(0).getOptionGroups().get(0)
                                                 .getOptionSpecifications().get(1).getId())
+                                        .name("test2")
                                         .price(Money.wons(1500)).build()
                                 )).build()))
                     .build())
@@ -184,6 +190,22 @@ class OrderServiceTest extends IntegrationTestSupport {
     return request;
   }
 
+  @DisplayName("메뉴의 수량을 계산할 수 있다/")
+  @Test
+  void calculateTotalSize() {
+    //given
+    OrderCreateRequest request = OrderCreateRequest.builder()
+        .storeId(1L)
+        .memberId(1L)
+        .deliveryFee(Money.MIN)
+        .menus(
+            Arrays.asList(buildOrderMenuRequest().count(4).price(Money.wons(2000)).build(), //8000
+                buildOrderMenuRequest().count(3).price(Money.wons(1000)).build())).build(); //6000
+    //when
+    int totalSize = orderService.calculateTotalSize(request);
+    //then
+    assertThat(totalSize).isEqualTo(7);
+  }
 
   @DisplayName("총 금액, 메뉴 1개, 메뉴 갯수에 따라 summary 를 생성할 수 있다.")
   @Test
@@ -230,7 +252,8 @@ class OrderServiceTest extends IntegrationTestSupport {
     //given
     Member orderer = memberRepository.save(aMember().build());
     Order order = orderRepository.save(
-        aOrder().orderStatus(OrderStatus.ORDERED).orderer_id(orderer.getId()).orderMenus(new ArrayList<>()).build());
+        aOrder().orderStatus(OrderStatus.ORDERED).orderer_id(orderer.getId())
+            .orderMenus(new ArrayList<>()).build());
 
     OrderDeleteRequest request = OrderDeleteRequest.builder()
         .orderId(order.getId())
@@ -248,7 +271,8 @@ class OrderServiceTest extends IntegrationTestSupport {
     //given
     Member orderer = memberRepository.save(aMember().build());
     Order order = orderRepository.save(
-        aOrder().orderStatus(OrderStatus.ORDERED).orderer_id(orderer.getId()).orderMenus(new ArrayList<>()).build());
+        aOrder().orderStatus(OrderStatus.ORDERED).orderer_id(orderer.getId())
+            .orderMenus(new ArrayList<>()).build());
 
     OrderDeleteRequest request = OrderDeleteRequest.builder()
         .orderId(0L)
@@ -267,7 +291,8 @@ class OrderServiceTest extends IntegrationTestSupport {
     //given
     Member orderer = memberRepository.save(aMember().build());
     Order order = orderRepository.save(
-        aOrder().orderStatus(OrderStatus.DELIVERING).orderer_id(orderer.getId()).orderMenus(new ArrayList<>()).build());
+        aOrder().orderStatus(OrderStatus.DELIVERING).orderer_id(orderer.getId())
+            .orderMenus(new ArrayList<>()).build());
 
     OrderDeleteRequest request = OrderDeleteRequest.builder()
         .orderId(order.getId())
@@ -285,7 +310,8 @@ class OrderServiceTest extends IntegrationTestSupport {
     //given
     Member orderer = memberRepository.save(aMember().build());
     Order order = orderRepository.save(
-        aOrder().orderStatus(OrderStatus.ORDERED).orderer_id(orderer.getId()).orderMenus(new ArrayList<>()).build());
+        aOrder().orderStatus(OrderStatus.ORDERED).orderer_id(orderer.getId())
+            .orderMenus(new ArrayList<>()).build());
 
     OrderDeleteRequest request = OrderDeleteRequest.builder()
         .orderId(order.getId())
@@ -296,7 +322,6 @@ class OrderServiceTest extends IntegrationTestSupport {
         .isInstanceOf(OrdererMissMatchException.class)
         .hasMessage("본인의 주문만 삭제할 수 있습니다.");
   }
-
 
 
   private static OrderCreateRequestBuilder buildOrderCreateRequest() {
