@@ -71,6 +71,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
 
+        log.info("CustomOAuth2UserService, loadUser : ");
         Map<String, Object> attributes = superClassLoadUser(userRequest);
         String accessTokenValue = userRequest.getAccessToken().getTokenValue();
         processDomain(attributes, accessTokenValue);
@@ -85,6 +86,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         for (String authority : token.getScopes()) {
             authorities.add(new SimpleGrantedAuthority("SCOPE_" + authority));
         }
+        log.info("성공");
         return UserPrincipal.create(member, attributes);
     }
 

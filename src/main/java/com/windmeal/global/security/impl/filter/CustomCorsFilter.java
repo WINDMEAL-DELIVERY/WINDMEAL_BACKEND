@@ -30,10 +30,13 @@ public class CustomCorsFilter implements Filter {
         response.setHeader("Access-Control-Allow-Headers",
                 "Origin, X-Requested-With, Content-Type, Accept, Key, Authorization");
 
+        log.info("cors filter : ");
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK);
+            log.info("통과 ");
         } else {
             chain.doFilter(req, res);
+            log.info("else ");
         }
     }
 
