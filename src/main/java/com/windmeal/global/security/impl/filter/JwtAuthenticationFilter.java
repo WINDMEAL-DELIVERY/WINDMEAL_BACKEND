@@ -40,14 +40,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // 먼저 해더를 조사한다. 그리고 유효한 토큰 문자열이 있다면 가져온다.
+        log.info("jwtFitler : ");
         String accessToken = resolveToken(request);
         if(StringUtils.hasText(accessToken) && tokenProvider.validateToken(accessToken)) {
             try{
                 Authentication authenticated = tokenProvider.getAuthentication(accessToken);
                 SecurityContextHolder.getContext().setAuthentication(authenticated);
+                log.info("통과");
             } catch (AuthenticationException authenticationException) {
                 authenticationException.printStackTrace();
                 log.error("인증 실패 - JwtAuthenticationFilter");
+                log.info("실패");
                 SecurityContextHolder.clearContext();
                 sendResponse(response, authenticationException);
             }

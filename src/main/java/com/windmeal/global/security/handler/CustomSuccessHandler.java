@@ -45,6 +45,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
             throws IOException, ServletException {
+        log.info("CustomSuccessHandler, onAuthenticationSuccess");
         setDefaultTargetUrl(determineTargetUrl(request, response, authentication));
         // 토큰을 추가하는 과정에서 에러가 발생하면 리다이렉트를 하는데, 이때 로직이 종료되지 않고 흘러가기 때문에 명시적으로 종료해줘야 한다.
         // 그러기 위해서 결과를 반환값으로 받고, 이에 따른 처리를 해주겠다.
@@ -53,6 +54,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             return;
         }
         clearAuthenticationAttributes(request, response);
+        log.info("성공");
         getRedirectStrategy().sendRedirect(request, response, getDefaultTargetUrl());
     }
 

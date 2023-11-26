@@ -32,6 +32,7 @@ public class CustomFailureHandler extends SimpleUrlAuthenticationFailureHandler 
 //        String targetUrl = CookieUtil.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
 //                .map(Cookie::getValue)
 //                .orElse(("/"));
+        log.info("CustomFailureHandler, onAuthenticationFailure");
         byte[] encode = Base64Utils.encode(exception.getLocalizedMessage().getBytes());
         String targetUrl = ERROR_REDIRECT;
         targetUrl = UriComponentsBuilder.fromUriString(targetUrl)
