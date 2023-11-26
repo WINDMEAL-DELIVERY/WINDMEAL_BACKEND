@@ -39,7 +39,7 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
             order.eta,
             order.deliveryFee,
             store.name,
-            order.orderMenus.size()
+            order.summary
         ))
         .from(order)
         .leftJoin(store).on(order.store_id.eq(store.id))

@@ -34,18 +34,17 @@ public class OrderListResponse {
   @Schema(description = "식당 이름", example = "불닭 마요 덮밥")
   private String name;
 
-  @Schema(description = "음식 수", example = "3")
-  private int menuCount;
+  @Schema(description = "주문 요약", example = "불닭 마요 덮밥 외 1개 2000원")
+  private String summary;
 
 
   public OrderListResponse(Long id, Point destination, LocalDateTime eta, Money deliveryFee,
-      String name,
-      int menuCount) {
+      String name, String summary) {
     this.id = id;
     this.destination = destination;
     this.eta = eta.toLocalTime();
     this.deliveryFee = deliveryFee;
     this.name = name;
-    this.menuCount = menuCount;
+    this.summary = summary;
   }
 }
