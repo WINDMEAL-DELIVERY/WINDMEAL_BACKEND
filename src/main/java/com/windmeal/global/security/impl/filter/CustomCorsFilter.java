@@ -29,7 +29,9 @@ public class CustomCorsFilter implements Filter {
         response.setHeader("Access-Control-Allow-Methods","*");
         response.setHeader("Access-Control-Max-Age", "3600");
         response.setHeader("Access-Control-Allow-Headers",
-                "Origin, X-Requested-With, Content-Type, Accept, Key, Authorization");
+                "*");
+//        response.setHeader("Access-Control-Allow-Headers",
+//                "Origin, X-Requested-With, Content-Type, Accept, Key, Authorization");
 
 
         log.info("cors 필터의 request 정보들");
