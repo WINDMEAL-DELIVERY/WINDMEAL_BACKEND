@@ -1,6 +1,7 @@
 package com.windmeal.chat.dto.response;
 
 import com.windmeal.chat.domain.ChatRoom;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +14,9 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(title = "채팅방 목록")
 public class ChatRoomListResponse {
+
     private Slice<ChatRoomSpecResponse> chatRoomSpecResponseList;
 
     public static ChatRoomListResponse of(Slice<ChatRoomSpecResponse> slice) {
