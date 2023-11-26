@@ -9,6 +9,7 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Enumeration;
 
 @Slf4j
 @Component
@@ -29,6 +30,19 @@ public class CustomCorsFilter implements Filter {
         response.setHeader("Access-Control-Max-Age", "3600");
         response.setHeader("Access-Control-Allow-Headers",
                 "Origin, X-Requested-With, Content-Type, Accept, Key, Authorization");
+
+
+        log.info("cors 필터의 request 정보들");
+        Enumeration<String> headerNames = request.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            String headerName = headerNames.nextElement();
+            Enumeration<String> headerValues = request.getHeaders(headerName);
+            while (headerValues.hasMoreElements()) {
+                String headerValue = headerValues.nextElement();
+                System.out.println("Header: " + headerName + " = " + headerValue);
+            }
+        }
+        log.info("cors 필터의 request 정보들 - 끝");
 
         log.info("cors filter : ");
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
