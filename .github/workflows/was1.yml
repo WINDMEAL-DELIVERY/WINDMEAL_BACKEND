@@ -2,7 +2,7 @@ name: WAS1
 
 on:
   push:
-    branches: [ "master", "auth_security" ]
+    branches: [ master, auth_security ]
 
 permissions:
   contents: read
