@@ -42,7 +42,7 @@ public class OrderDetailResponse {
   private Money totalPrice;//총 금액
 
   @Schema(description = "주문 상태", example = "ORDERED")
-  private OrderStatus orderStatus;//주문 상태
+  private String orderStatus;//주문 상태
 
 
   private List<OrderMenuRequest> orderMenu = new ArrayList<>();
@@ -52,7 +52,7 @@ public class OrderDetailResponse {
   public OrderDetailResponse(Order order, List<OrderMenu> orderMenus) {
     this.id = order.getId();
     this.destination = order.getDestination();
-    this.orderStatus=order.getOrderStatus();
+    this.orderStatus=order.getOrderStatus().getStatus();
     this.eta=order.getEta().toLocalTime();
     this.totalPrice=order.getTotalPrice();
     this.deliveryFee=order.getDeliveryFee();
