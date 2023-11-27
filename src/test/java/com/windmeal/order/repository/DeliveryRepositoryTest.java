@@ -3,6 +3,7 @@ package com.windmeal.order.repository;
 import com.windmeal.IntegrationTestSupport;
 import com.windmeal.member.domain.Member;
 import com.windmeal.member.repository.MemberRepository;
+import com.windmeal.model.place.PlaceRepository;
 import com.windmeal.order.domain.Delivery;
 import com.windmeal.order.domain.DeliveryStatus;
 import com.windmeal.order.domain.Order;
@@ -25,11 +26,14 @@ class DeliveryRepositoryTest extends IntegrationTestSupport {
   @Autowired
   MemberRepository memberRepository;
 
+  @Autowired
+  PlaceRepository placeRepository;
   @AfterEach
   void tearDown() {
     deliveryRepository.deleteAllInBatch();;
     orderRepository.deleteAllInBatch();
     memberRepository.deleteAllInBatch();
+    placeRepository.deleteAllInBatch();
   }
 
   @DisplayName("")

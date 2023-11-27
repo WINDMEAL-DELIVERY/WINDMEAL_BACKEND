@@ -4,6 +4,8 @@ import com.windmeal.generic.domain.Money;
 import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.member.exception.MemberNotFoundException;
 import com.windmeal.member.repository.MemberRepository;
+import com.windmeal.model.place.Place;
+import com.windmeal.model.place.PlaceRepository;
 import com.windmeal.order.domain.Order;
 import com.windmeal.order.domain.OrderStatus;
 import com.windmeal.order.dto.request.OrderCreateRequest;
@@ -35,9 +37,9 @@ public class OrderService {
 
   private final OrderValidator orderValidator;
   private final MemberRepository memberRepository;
-  private final MenuRepository menuRepository;
   private final OrderRepository orderRepository;
   private final OrderRequestMapper orderRequestMapper;
+  private final PlaceRepository placeRepository;
 
   @Transactional
   public OrderCreateResponse createOrder(OrderCreateRequest request) {
@@ -45,12 +47,14 @@ public class OrderService {
         .orElseThrow(() -> new MemberNotFoundException(ErrorCode.NOT_FOUND, "존재하지 않는 사용자입니다."));
 
     orderValidator.validate(request);
+    Place place = placeRepository.findByNameAndLongitudeAndLatitude(request.getPlaceName(),request.getLongitude(),request.getLatitude())
+        .orElseGet(() -> placeRepository.save(request.toPlaceEntity()));
     Order order = orderRequestMapper.mapFrom(request);
     Money totalPrice = calculateTotalPrice(request);
     String summary = getSummary(totalPrice, request.getMenus().get(0).getName(), calculateTotalSize(request));
-    order.place(totalPrice,summary);
+    order.place(totalPrice,summary,place);
     Order savedOrder = orderRepository.save(order);
-    return OrderCreateResponse.toResponse(savedOrder);
+    return OrderCreateResponse.toResponse(savedOrder,place);
   }
 
 
@@ -72,8 +76,8 @@ public class OrderService {
   }
 
   public Page<OrderListResponse> getAllOrder(Pageable pageable, Long storeId, String eta, String storeCategory,
-      Point point) {
-    return orderRepository.getOrderList(pageable,storeId,eta,storeCategory,point);
+      Long placeId) {
+    return orderRepository.getOrderList(pageable,storeId,eta,storeCategory,placeId);
   }
 
   /**

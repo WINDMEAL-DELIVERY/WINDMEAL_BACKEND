@@ -1,9 +1,8 @@
 package com.windmeal.store.dto.response;
 
-import com.windmeal.store.domain.Menu;
+import com.windmeal.model.place.Place;
 import com.windmeal.store.domain.MenuCategory;
 import com.windmeal.store.domain.Store;
-import com.windmeal.store.validator.StoreValidator;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -14,7 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.geo.Point;
+import org.springframework.beans.factory.annotation.Value;
 
 @Getter
 @AllArgsConstructor
@@ -22,6 +21,8 @@ import org.springframework.data.geo.Point;
 @NoArgsConstructor
 @Schema(title = "가게 정보")
 public class StoreMenuResponse {
+
+
   @Schema(description = "가게 ID", example = "1")
   private Long storeId;
   @Schema(description = "가게 이름", example = "신의 한컵")
@@ -35,13 +36,20 @@ public class StoreMenuResponse {
   @Schema(description = "가게 종료 시간", example = "23:00:00")
   private LocalTime closeTime;
 
-  private Point location;
+  @Schema(description = "장소 이름", example = "가천대학교")
+  private String placeName;
+  @Schema(description = "경도", example = "1.2345")
+  private Double longitude;
+
+  @Schema(description = "위도", example = "1.2345")
+  private Double latitude;
   @Schema(description = "현재 가게 운영 여부", example = "true")
   private boolean isOpen;
 
   private List<MenuCategoryResponse> menuCategories;
 
-  public StoreMenuResponse(Store store, List<MenuCategory> menuCategories, List<MenuResponse> menus) {
+  public StoreMenuResponse(Store store, List<MenuCategory> menuCategories, List<MenuResponse> menus,
+      Place place) {
 
     this.storeId = store.getId();
     this.name = store.getName();
@@ -49,7 +57,9 @@ public class StoreMenuResponse {
     this.photo = store.getPhoto();
     this.openTime = store.getOpenTime();
     this.closeTime = store.getCloseTime();
-    this.location = store.getLocation();
+    this.placeName = place.getName();
+    this.longitude = place.getLongitude();
+    this.latitude = place.getLatitude();
     this.isOpen = store.isOpen();
     this.menuCategories = toMenuCategories(menuCategories, menus);
   }

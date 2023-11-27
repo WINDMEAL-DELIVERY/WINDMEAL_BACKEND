@@ -11,6 +11,8 @@ import com.windmeal.generic.domain.Money;
 import com.windmeal.member.domain.Member;
 import com.windmeal.member.exception.MemberNotFoundException;
 import com.windmeal.member.repository.MemberRepository;
+import com.windmeal.model.place.Place;
+import com.windmeal.model.place.PlaceRepository;
 import com.windmeal.order.domain.Order;
 import com.windmeal.order.domain.OrderMenu;
 import com.windmeal.order.domain.OrderStatus;
@@ -79,6 +81,8 @@ class OrderServiceTest extends IntegrationTestSupport {
   MenuRepository menuRepository;
 
 
+  @Autowired
+  PlaceRepository placeRepository;
   @AfterEach
   void tearDown() {
     optionSpecificationRepository.deleteAllInBatch();
@@ -88,6 +92,7 @@ class OrderServiceTest extends IntegrationTestSupport {
     storeRepository.deleteAllInBatch();
     menuRepository.deleteAllInBatch();
     memberRepository.deleteAllInBatch();
+    placeRepository.deleteAllInBatch();
   }
 
   @DisplayName("주문 생성 시 주문자의 정보가 존재하지 않는다면 예외가 발생한다.")
@@ -120,12 +125,15 @@ class OrderServiceTest extends IntegrationTestSupport {
 
     //then
     Order findOrder = orderRepository.findById(orderResponse.getId()).get();
+    Place place = placeRepository.findByNameAndLongitudeAndLatitude(orderResponse.getPlaceName(),
+        orderResponse.getLongitude(),
+        orderResponse.getLatitude()).get();
 
     assertThat(findOrder)
-        .extracting(order -> order.getId(), order -> order.getDestination()
+        .extracting(order -> order.getId(), order -> place.getName()
             , order -> order.getSummary(), order -> order.getDeliveryFee().wons()
             , order -> order.getTotalPrice().wons(), order -> order.getOrderStatus())
-        .containsExactly(orderResponse.getId(), orderResponse.getDestination()
+        .containsExactly(orderResponse.getId(), orderResponse.getPlaceName()
             , orderResponse.getSummary(), orderResponse.getDeliveryFee().wons()
             , orderResponse.getTotalPrice().wons(), OrderStatus.ORDERED);
 
@@ -158,6 +166,9 @@ class OrderServiceTest extends IntegrationTestSupport {
         .storeId(store.getId())
         .memberId(orderer.getId())
         .eta(LocalTime.MAX)
+        .placeName("test")
+        .latitude(1.234)
+        .longitude(2.345)
         .menus(
             Arrays.asList(
                 buildOrderMenuRequest()

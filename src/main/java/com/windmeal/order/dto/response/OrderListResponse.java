@@ -22,8 +22,12 @@ public class OrderListResponse {
   @Schema(description = "주문 ID", example = "1")
   private Long id;
 
-  @Schema(description = "도착지 주소", example = "{\"x\":1.234,\"y\":2.3456}")
-  private Point destination;//도착지
+  @Schema(description = "장소 이름", example = "가천대학교")
+  private String placeName;
+  @Schema(description = "경도", example = "1.2345")
+  private Double longitude;
+  @Schema(description = "위도", example = "1.2345")
+  private Double latitude;
 
   @Schema(description = "도착 예상 시간", example = "23:10:20")
   private LocalTime eta; //Estimated Time of Arrival 도착 예정 시간
@@ -38,10 +42,12 @@ public class OrderListResponse {
   private String summary;
 
 
-  public OrderListResponse(Long id, Point destination, LocalDateTime eta, Money deliveryFee,
-      String name, String summary) {
+  public OrderListResponse(Long id, String placeName, Double longitude, Double latitude,
+      LocalDateTime eta, Money deliveryFee, String name, String summary) {
     this.id = id;
-    this.destination = destination;
+    this.placeName = placeName;
+    this.longitude = longitude;
+    this.latitude = latitude;
     this.eta = eta.toLocalTime();
     this.deliveryFee = deliveryFee;
     this.name = name;

@@ -2,6 +2,7 @@ package com.windmeal.order.mapper;
 
 import static java.util.stream.Collectors.toList;
 
+import com.windmeal.model.place.Place;
 import com.windmeal.order.domain.Order;
 import com.windmeal.order.domain.OrderMenu;
 import com.windmeal.order.domain.OrderMenuOptionGroup;
@@ -21,7 +22,6 @@ public class OrderRequestMapper {
         request.getMemberId(),
         request.getStoreId(),
         LocalDateTime.now(),
-        request.getDestination(),
         request.getEta(),
         request.getDeliveryFee(),
         request.getMenus().stream()

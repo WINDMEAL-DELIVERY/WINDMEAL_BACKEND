@@ -1,13 +1,11 @@
 package com.windmeal.order.dto.response;
 
 import com.windmeal.generic.domain.Money;
+import com.windmeal.model.place.Place;
 import com.windmeal.order.domain.Order;
 import com.windmeal.order.domain.OrderMenu;
 import com.windmeal.order.domain.OrderMenuOptionGroup;
 import com.windmeal.order.domain.OrderMenuOptionSpecification;
-import com.windmeal.order.domain.OrderStatus;
-import com.windmeal.order.dto.request.OrderCreateRequest;
-import com.windmeal.order.dto.request.OrderCreateRequest.OrderSpecRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -17,7 +15,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.geo.Point;
 
 @Getter
 @Builder
@@ -29,8 +26,12 @@ public class OrderDetailResponse {
   @Schema(description = "주문 ID", example = "1")
   private Long id;
 
-  @Schema(description = "도착지 주소", example = "{\"x\":1.234,\"y\":2.3456}")
-  private Point destination;//도착지
+  @Schema(description = "장소 이름", example = "가천대학교")
+  private String placeName;
+  @Schema(description = "경도", example = "1.2345")
+  private Double longitude;
+  @Schema(description = "위도", example = "1.2345")
+  private Double latitude;
 
   @Schema(description = "도착 예상 시간", example = "23:10:20")
   private LocalTime eta; //Estimated Time of Arrival 도착 예정 시간
@@ -49,9 +50,11 @@ public class OrderDetailResponse {
 
 
 
-  public OrderDetailResponse(Order order, List<OrderMenu> orderMenus) {
+  public OrderDetailResponse(Order order, List<OrderMenu> orderMenus, Place place) {
     this.id = order.getId();
-    this.destination = order.getDestination();
+    this.placeName=place.getName();
+    this.latitude=place.getLatitude();
+    this.longitude=place.getLongitude();
     this.orderStatus=order.getOrderStatus().getStatus();
     this.eta=order.getEta().toLocalTime();
     this.totalPrice=order.getTotalPrice();
@@ -60,7 +63,7 @@ public class OrderDetailResponse {
   }
 
   public static OrderDetailResponse from(Order order) {
-    return new OrderDetailResponse(order, order.getOrderMenus());
+    return new OrderDetailResponse(order, order.getOrderMenus(),order.getPlace());
   }
 
 

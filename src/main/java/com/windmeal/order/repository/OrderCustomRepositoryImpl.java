@@ -4,7 +4,6 @@ import static com.windmeal.order.domain.QOrder.order;
 import static com.windmeal.store.domain.QCategory.category;
 import static com.windmeal.store.domain.QStore.*;
 
-import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -31,11 +30,13 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
 
   @Override
   public Page<OrderListResponse> getOrderList(Pageable pageable, Long storeId, String eta,
-      String storeCategory, Point point) {
+      String storeCategory, Long placeId) {
     JPAQuery<OrderListResponse> query = jpaQueryFactory.select(Projections.constructor(
             OrderListResponse.class,
             order.id,
-            order.destination,
+            order.place.name,
+            order.place.longitude,
+            order.place.latitude,
             order.eta,
             order.deliveryFee,
             store.name,
@@ -43,7 +44,7 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
         ))
         .from(order)
         .leftJoin(store).on(order.store_id.eq(store.id))
-        .where(eqStoreId(storeId), eqEta(eta), eqStoreCategory(storeCategory),eqPoint(point));
+        .where(eqStoreId(storeId), eqEta(eta), eqStoreCategory(storeCategory),eqPlace(placeId));
 
 
     long size = query.fetchCount();
@@ -51,11 +52,11 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
     return new PageImpl<>(result, pageable, size);
   }
 
-  private BooleanExpression eqPoint(Point point) {
-    if(point==null){
+  private BooleanExpression eqPlace(Long placeId) {
+    if(placeId==null){
       return null;
     }else{
-      return store.location.eq(point);
+      return order.place.id.eq(placeId);
     }
 
   }

@@ -78,14 +78,14 @@ public class OrderController {
       Pageable pageable,
       @Parameter(description = "가게 id", required = false, schema = @Schema(example = "1"))
       @RequestParam(required = false) Long storeId,
-      @Parameter(description = "도착지 위치 정보", required = false, schema = @Schema(example = "1.2345,2.3445"))
-      @RequestParam(required = false) Point point,
-      @Parameter(description = "가게 id", required = false, schema = @Schema(example = "23:10:00"))
+      @Parameter(description = "도착지 id", required = false, schema = @Schema(example = "1"))
+      @RequestParam(required = false) Long placeId,
+      @Parameter(description = "도착 예정 시간", required = false, schema = @Schema(example = "23:10:00"))
       @RequestParam(required = false) String eta,
-      @Parameter(description = "가게 id", required = false, schema = @Schema(example = "카페"))
+      @Parameter(description = "검색 키워드", required = false, schema = @Schema(example = "카페"))
       @RequestParam(required = false) String storeCategory
   ){
-    return ResultDataResponseDTO.of(orderService.getAllOrder(pageable,storeId,eta,storeCategory,point));
+    return ResultDataResponseDTO.of(orderService.getAllOrder(pageable,storeId,eta,storeCategory,placeId));
   }
 
   @Operation(summary = "주문 내역 상세 조회", description = "주문 내역의 상세 내용을 조회합니다.")
