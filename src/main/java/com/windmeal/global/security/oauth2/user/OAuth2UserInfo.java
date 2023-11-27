@@ -1,6 +1,7 @@
 package com.windmeal.global.security.oauth2.user;
 
 import java.util.Map;
+import java.util.Optional;
 
 public abstract class OAuth2UserInfo {
     protected Map<String, Object> attributes;

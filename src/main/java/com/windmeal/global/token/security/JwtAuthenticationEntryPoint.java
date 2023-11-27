@@ -16,6 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Enumeration;
 
 @Slf4j
 @Component
@@ -26,6 +27,20 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+
+        log.info("JwtAuthenticationEntryPoint의 request 정보들");
+        Enumeration<String> headerNames = request.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            String headerName = headerNames.nextElement();
+            Enumeration<String> headerValues = request.getHeaders(headerName);
+            while (headerValues.hasMoreElements()) {
+                String headerValue = headerValues.nextElement();
+                System.out.println("Header: " + headerName + " = " + headerValue);
+            }
+        }
+        log.info("JwtAuthenticationEntryPoint의 request 정보들 - 끝");
+
+
         log.error(this.getClass().getName());
         ResponseDTO responseDTO = ResponseDTO.of(false, ErrorCode.UNAUTHORIZED, "사용자의 인증에 실패하였습니다.");
         String responseJSON = objectMapper.writeValueAsString(responseDTO);

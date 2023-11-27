@@ -1,5 +1,6 @@
 package com.windmeal.global.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.SerializationUtils;
 
 import javax.servlet.http.Cookie;
@@ -27,7 +28,7 @@ public class CookieUtil {
         cookie.setPath("/");
         cookie.setHttpOnly(true);
         cookie.setMaxAge(maxAge);
-
+        cookie.setSecure(true);
         response.addCookie(cookie);
     }
 
