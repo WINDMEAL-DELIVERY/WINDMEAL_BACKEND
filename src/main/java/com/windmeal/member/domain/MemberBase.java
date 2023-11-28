@@ -22,10 +22,18 @@ public class MemberBase  extends BaseTimeEntity {
 
     private String email;
 
+    @Column(name = "is_deleted", nullable = false, columnDefinition = "boolean default false")
+    private boolean isDeleted;
     @Enumerated(value = EnumType.STRING)
     private Authority authority;
 
     public MemberBase(String email, Authority authority) {
+        this.email = email;
+        this.authority = authority;
+    }
+
+    public MemberBase(Long id, String email, Authority authority) {
+        this.id = id;
         this.email = email;
         this.authority = authority;
     }
