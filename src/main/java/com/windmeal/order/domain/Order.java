@@ -46,6 +46,8 @@ public class Order extends BaseTimeEntity {
   @JoinColumn(name = "place_id")
   private Place place;
 
+  private String description;
+
   private LocalDateTime eta; //Estimated Time of Arrival 도착 예정 시간
 
   private String summary; //내용 요약 ex) 후라이드 치킨 1마리 외 3개 15000원
@@ -61,18 +63,19 @@ public class Order extends BaseTimeEntity {
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "order")
   private List<OrderMenu> orderMenus = new ArrayList<>();
 
-  public Order(Long orderer, Long store, LocalDateTime orderTime,  LocalTime eta,  Money deliveryFee,
+  public Order(Long orderer, Long store,String description, LocalDateTime orderTime,  LocalTime eta,  Money deliveryFee,
       List<OrderMenu> orderMenus) {
-    this(null, orderer, store, null, orderTime,eta,  deliveryFee, orderMenus);
+    this(null, orderer, store,description, null, orderTime,eta,  deliveryFee, orderMenus);
   }
 
   @Builder
-  public Order(Long id, Long orderer_id, Long store_id, OrderStatus orderStatus,
+  public Order(Long id, Long orderer_id, Long store_id,String description, OrderStatus orderStatus,
       LocalDateTime orderTime,  LocalTime eta,  Money deliveryFee,
       List<OrderMenu> orderMenus) {
     this.id = id;
     this.orderer_id = orderer_id;
     this.store_id = store_id;
+    this.description=description;
     this.orderStatus = orderStatus;
     this.orderTime = orderTime;
     this.eta = LocalDate.now().atTime(eta);

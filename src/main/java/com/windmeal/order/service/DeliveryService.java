@@ -12,6 +12,7 @@ import com.windmeal.order.domain.Order;
 import com.windmeal.order.domain.OrderCancel;
 import com.windmeal.order.dto.request.DeliveryCreateRequest;
 import com.windmeal.order.dto.request.DeliveryCancelRequest;
+import com.windmeal.order.dto.response.DeliveryListResponse;
 import com.windmeal.order.exception.DeliverOrdererSameException;
 import com.windmeal.order.exception.DeliveryNotFoundException;
 import com.windmeal.order.exception.OrderAlreadyMatchedException;
@@ -19,7 +20,10 @@ import com.windmeal.order.exception.OrderNotFoundException;
 import com.windmeal.order.repository.DeliveryRepository;
 import com.windmeal.order.repository.OrderCancelRepository;
 import com.windmeal.order.repository.OrderRepository;
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +46,7 @@ public class DeliveryService {
   private final OrderCancelRepository orderCancelRepository;
   @Transactional
   public void createDelivery(DeliveryCreateRequest request) {
+    System.out.println("request = " + request);
     Member deliver = memberRepository.findById(request.getMemberId())
         .orElseThrow(() -> new MemberNotFoundException(ErrorCode.NOT_FOUND, "존재하지 않는 사용자입니다."));
 
@@ -102,5 +107,14 @@ public class DeliveryService {
         .delivery(delivery)
         .content(request.getContent()).build();
     orderCancelRepository.save(orderCancel);
+  }
+
+
+  public Page<DeliveryListResponse> getOwnDelivering(Long memberId,Pageable pageable){
+    return deliveryRepository.getOwnDelivering(memberId, LocalDate.now(), pageable);
+  }
+
+  public Page<DeliveryListResponse> getOwnOrdering(Long memberId,Pageable pageable){
+    return deliveryRepository.getOwnOrdering(memberId, LocalDate.now(), pageable);
   }
 }

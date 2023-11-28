@@ -21,6 +21,7 @@ public class OrderRequestMapper {
     return new Order(
         request.getMemberId(),
         request.getStoreId(),
+        request.getDescription(),
         LocalDateTime.now(),
         request.getEta(),
         request.getDeliveryFee(),

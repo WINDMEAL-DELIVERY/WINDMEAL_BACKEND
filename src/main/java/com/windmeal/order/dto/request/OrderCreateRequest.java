@@ -35,6 +35,8 @@ public class OrderCreateRequest {
   private Double longitude;
   @Schema(description = "위도", example = "1.2345")
   private Double latitude;
+  @Schema(description = "추가 설명", example = "지하 1층 소웨 과실로 와주세요")
+  private String description;
   @Schema(description = "도착 예상 시간", example = "23:10:20")
   private LocalTime eta; //Estimated Time of Arrival 도착 예정 시간
   @Schema(description = "배달료", example = "5000")
