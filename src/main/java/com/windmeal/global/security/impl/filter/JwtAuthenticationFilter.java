@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.global.exception.ExceptionResponseDTO;
 import com.windmeal.global.token.util.TokenProvider;
+import com.windmeal.global.util.AES256Util;
 import com.windmeal.global.util.CookieUtil;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
@@ -29,71 +31,63 @@ import static com.windmeal.global.constants.JwtConstants.*;
  */
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    // OncePerRequestFilter는 요청당 한번만 동작하는 필터
-    private final TokenProvider tokenProvider;
-    private final ObjectMapper objectMapper;
+
+  // OncePerRequestFilter는 요청당 한번만 동작하는 필터
+  private final AES256Util aes256Util;
+  private final ObjectMapper objectMapper;
+  private final TokenProvider tokenProvider;
 
 
-    public JwtAuthenticationFilter(TokenProvider tokenProvider, ObjectMapper objectMapper) {
-        this.tokenProvider = tokenProvider;
-        this.objectMapper = objectMapper;
-    }
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        // 먼저 해더를 조사한다. 그리고 유효한 토큰 문자열이 있다면 가져온다.
-        log.info("jwtFilter의 request 정보들");
-        Enumeration<String> headerNames = request.getHeaderNames();
-        while (headerNames.hasMoreElements()) {
-            String headerName = headerNames.nextElement();
-            Enumeration<String> headerValues = request.getHeaders(headerName);
-            while (headerValues.hasMoreElements()) {
-                String headerValue = headerValues.nextElement();
-                System.out.println("Header: " + headerName + " = " + headerValue);
-            }
-        }
-        log.info("jwtFilter의 request 정보들 - 끝");
-        String accessToken = resolveToken(request);
-        if(StringUtils.hasText(accessToken) && tokenProvider.validateToken(accessToken)) {
-            try{
-                log.info("after validation ");
-                Authentication authenticated = tokenProvider.getAuthentication(accessToken);
-                SecurityContextHolder.getContext().setAuthentication(authenticated);
-                log.info("통과");
-            } catch (AuthenticationException authenticationException) {
-                authenticationException.printStackTrace();
-                log.error("인증 실패 - JwtAuthenticationFilter");
-                log.info("실패");
-                SecurityContextHolder.clearContext();
-                sendResponse(response, authenticationException);
-            }
-        }
-        filterChain.doFilter(request, response);
-    }
+  public JwtAuthenticationFilter(AES256Util aes256Util, ObjectMapper objectMapper,
+      TokenProvider tokenProvider) {
+    this.aes256Util = aes256Util;
+    this.objectMapper = objectMapper;
+    this.tokenProvider = tokenProvider;
+  }
 
-    /**
-     * 요청에 붙어서 넘어온 쿠키를 확인하여 토큰을 추출하는 메서드
-     * @param request
-     * @return 추출된 토큰값을 반환한다.
-     */
-    private String resolveToken(HttpServletRequest request) {
-        Cookie token = CookieUtil.getCookie(request, ACCESSTOKEN).orElse(null);
-        if(token != null) {
-            return token.getValue();
-        }
-        return null;
-    }
+  @Override
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+      FilterChain filterChain) throws ServletException, IOException {
+    // 먼저 해더를 조사한다. 그리고 유효한 토큰 문자열이 있다면 가져온다.
 
-    private void sendResponse(HttpServletResponse response, AuthenticationException authenticationException) {
-        response.setStatus(ErrorCode.UNAUTHORIZED.getCode());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding("UTF-8");
-        ExceptionResponseDTO responseDTO = ExceptionResponseDTO.of(ErrorCode.UNAUTHORIZED, authenticationException.getMessage());
-        log.error(authenticationException.getMessage());
-        try{
-            response.getWriter().write(objectMapper.writeValueAsString(responseDTO));
-        }catch (IOException e){
-            e.printStackTrace();
-        }
+    try {
+      String accessToken = resolveToken(request);
+      String decrypt = aes256Util.decrypt(accessToken);
+      if (StringUtils.hasText(decrypt) && tokenProvider.validateToken(decrypt)) {
+        Authentication authenticated = tokenProvider.getAuthentication(decrypt);
+        SecurityContextHolder.getContext().setAuthentication(authenticated);
+        // TODO 본래 AuthenticationException을 처리해주는 로직이 여기 있었는데, EntryPoint에서 알아서 처리해준다고 판단하여 제외하였다.
+      }
+    } catch (Exception e) {
+      // 암호화 관련 에러가 발생하면 이 곳에서 걸린다.
+      log.error(e.getMessage());
+      sendResponse(response, e);
     }
+    filterChain.doFilter(request, response);
+
+  }
+
+  private String resolveToken(HttpServletRequest request) {
+    String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
+    if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
+      return bearerToken.substring(7);
+    }
+    return null;
+  }
+
+
+  private void sendResponse(HttpServletResponse response, Exception exception) {
+    response.setStatus(ErrorCode.UNAUTHORIZED.getCode());
+    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+    response.setCharacterEncoding("UTF-8");
+    ExceptionResponseDTO responseDTO = ExceptionResponseDTO.of(ErrorCode.UNAUTHORIZED,
+        exception.getMessage());
+    log.error(exception.getMessage());
+    try {
+      response.getWriter().write(objectMapper.writeValueAsString(responseDTO));
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 
 }

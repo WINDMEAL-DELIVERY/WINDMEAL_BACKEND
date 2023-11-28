@@ -1,8 +1,8 @@
 package com.windmeal.global.token.util;
 
 import com.windmeal.global.token.dto.TokenInfoResponse;
+import com.windmeal.global.util.AES256Util;
 import com.windmeal.member.dto.response.MemberInfoDTO;
-import com.windmeal.member.exception.InvaildTokenException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;

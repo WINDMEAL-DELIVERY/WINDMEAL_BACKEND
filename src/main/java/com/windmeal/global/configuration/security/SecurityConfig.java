@@ -10,6 +10,7 @@ import com.windmeal.global.token.dao.RefreshTokenDAOImpl;
 import com.windmeal.global.token.security.JwtAccessDeniedHandler;
 import com.windmeal.global.token.security.JwtAuthenticationEntryPoint;
 import com.windmeal.global.token.util.TokenProvider;
+import com.windmeal.global.util.AES256Util;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -31,12 +32,13 @@ import org.springframework.security.web.firewall.StrictHttpFirewall;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+  private final AES256Util aes256Util;
+  private final ObjectMapper objectMapper;
   private final TokenProvider tokenProvider;
   private final RedisTemplate redisTemplate;
-  private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
   private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
   private final CustomOAuth2UserService customOAuth2UserService;
-  private final ObjectMapper objectMapper;
+  private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
   private static final String[] PERMIT_URL_ARRAY = {
       /* swagger v3 */
@@ -54,22 +56,23 @@ public class SecurityConfig {
 
   @Bean
   public RefreshTokenDAO refreshTokenDAO() {
-    //
-    return new RefreshTokenDAOImpl(redisTemplate, objectMapper);
+    return new RefreshTokenDAOImpl(objectMapper, redisTemplate);
   }
+
 
   /*
     해당 빈은 어쩔 수 없이 구현체에 의존하겠다.
    */
-    @Bean
-    public OAuth2AuthorizationRequestBasedOnCookieRepository authorizationRequestRepository() {
-        return new OAuth2AuthorizationRequestBasedOnCookieRepository();
-    }
+  @Bean
+  public OAuth2AuthorizationRequestBasedOnCookieRepository authorizationRequestRepository() {
+    return new OAuth2AuthorizationRequestBasedOnCookieRepository();
+  }
 
 
   @Bean
   public SimpleUrlAuthenticationSuccessHandler simpleUrlAuthenticationSuccessHandler() {
-    return new CustomSuccessHandler(tokenProvider, refreshTokenDAO(),authorizationRequestRepository());
+    return new CustomSuccessHandler(aes256Util, tokenProvider, refreshTokenDAO(),
+        authorizationRequestRepository());
   }
 
   @Bean
@@ -77,12 +80,14 @@ public class SecurityConfig {
     return new CustomFailureHandler(authorizationRequestRepository());
   }
 
+  // 리다이렉트 url에서 '//'를 허용하기 위해 방화벽의 설정을 허용해준다.
   @Bean
   public HttpFirewall customStrictHttpFirewall() {
     StrictHttpFirewall firewall = new StrictHttpFirewall();
     firewall.setAllowUrlEncodedDoubleSlash(true);
     return firewall;
   }
+
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -119,7 +124,7 @@ public class SecurityConfig {
 
         // JwtSecurityConfig 설정
         .and()
-        .apply(new JwtSecurityConfig(tokenProvider, objectMapper))
+        .apply(new JwtSecurityConfig(aes256Util, objectMapper, tokenProvider))
 
         // 아래는 Spring security가 제공하는 OAuth2를 활용하는 방식인데, 결국엔 세션이나 쿠키를 사용해야 한다는 문제점이 있다.
         // 따라서 아래의 방식을 사용하지 않고, 직접 OAuth2를 활용하여 소셜 로그인을 구현하겠다.
@@ -137,9 +142,11 @@ public class SecurityConfig {
 
         .and()
         .userInfoEndpoint()
-        .userService(customOAuth2UserService)   // 여기서 지정한 userService() 메서드에서 사용자, 즉 resource owner의 정보를 받는다.
+        .userService(
+            customOAuth2UserService)   // 여기서 지정한 userService() 메서드에서 사용자, 즉 resource owner의 정보를 받는다.
         .and()
-        .successHandler(simpleUrlAuthenticationSuccessHandler())   //위 과정을 통해 성공적으로 회원가입을 진행하거나 유저를 매핑했다면, successHandler를 호출하여 jwt 생성
+        .successHandler(
+            simpleUrlAuthenticationSuccessHandler())   //위 과정을 통해 성공적으로 회원가입을 진행하거나 유저를 매핑했다면, successHandler를 호출하여 jwt 생성
         .failureHandler(simpleUrlAuthenticationFailureHandler());   // 실패했다면 실패 핸들러를 호출
 
 //                .and()

@@ -22,6 +22,7 @@ import java.util.Optional;
 
 import static com.windmeal.global.constants.JwtConstants.ACCESSTOKEN;
 import static com.windmeal.global.constants.JwtConstants.ACCESS_TOKEN_EXPIRES_IN;
+import static com.windmeal.global.constants.JwtConstants.AUTHORIZATION_HEADER;
 
 @Slf4j
 @RestController
@@ -32,13 +33,10 @@ public class AuthController {
 
     @PostMapping("/reissue")
     public ResultDataResponseDTO reissue(HttpServletRequest request, HttpServletResponse response) {
-        // 쿠키에서 accessToken을 가져온 뒤, 여기서 정보를 가져와서 refreshToken의 key로 조합한 뒤 토큰을 찾는다.
-        // 토큰이 존재하고 유효하다면 새로운 엑세스 토큰을 만들어 발급해주고, 그렇지 않다면 예외를 발생시킨다.
-        Optional<Cookie> cookie = CookieUtil.getCookie(request, ACCESSTOKEN);
+        String code = request.getHeader(AUTHORIZATION_HEADER);
         String clientIpAddress = ClientIpUtil.getClientIpAddress(request);
-        String accessToken = authService.reissue(cookie, clientIpAddress);
-        CookieUtil.deleteCookie(request, response, ACCESSTOKEN);
-        CookieUtil.addCookie(response, ACCESSTOKEN, accessToken, ACCESS_TOKEN_EXPIRES_IN);
+        String accessToken = authService.reissue(Optional.ofNullable(code), clientIpAddress);
+        response.setHeader(AUTHORIZATION_HEADER, accessToken);
         return ResultDataResponseDTO.empty();
     }
 
