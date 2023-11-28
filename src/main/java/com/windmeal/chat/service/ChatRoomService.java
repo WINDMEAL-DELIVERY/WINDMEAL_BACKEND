@@ -43,17 +43,16 @@ public class ChatRoomService {
      */
     @Transactional
     public ChatRoomResponse createChatRoom(ChatRoomSaveRequest requestDTO, Long currentMemberId) {
-        Long ownerId = requestDTO.getOwnerId();
-        if(!currentMemberId.equals(ownerId)) {
-            throw new InvalidRequesterException(ErrorCode.VALIDATION_ERROR, "요청자와 접속자의 정보가 다릅니다.");
-        }
-        Long guestId = requestDTO.getGuestId();
-        Member owner = memberRepository.findById(ownerId)
-                .orElseThrow(() -> new MemberNotFoundException(ErrorCode.NOT_FOUND, "해당 사용자를 찾을 수 없습니다."));
-        Member guest = memberRepository.findById(guestId)
-                .orElseThrow(() -> new MemberNotFoundException(ErrorCode.NOT_FOUND, "해당 사용자를 찾을 수 없습니다."));
+
         Order order = orderRepository.findById(requestDTO.getOrderId())
                 .orElseThrow(() -> new OrderNotFoundException(ErrorCode.NOT_FOUND, "주문이 존재하지 않습니다."));
+
+        Member owner = memberRepository.findById(order.getOrderer_id())
+                .orElseThrow(() -> new MemberNotFoundException(ErrorCode.NOT_FOUND, "주문 작성자를 찾을 수 없습니다."));
+
+        Member guest = memberRepository.findById(currentMemberId)
+                .orElseThrow(() -> new MemberNotFoundException(ErrorCode.NOT_FOUND, "해당 사용자를 찾을 수 없습니다."));
+
         // 주문이 진행중이면 채팅방을 생성할 수 없다.
         if(!order.getOrderStatus().equals(OrderStatus.ORDERED)) {
             throw new OrderAlreadyMatchedException(ErrorCode.BAD_REQUEST, "이미 매칭된 주문입니다.");

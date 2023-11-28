@@ -1,11 +1,13 @@
 package com.windmeal.chat.dto.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(title = "채팅방 단일 조회")
 public class ChatRoomResponse {
     private Long roomId;
     private Long ownerId;

@@ -86,7 +86,6 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         for (String authority : token.getScopes()) {
             authorities.add(new SimpleGrantedAuthority("SCOPE_" + authority));
         }
-        log.info("성공");
         return UserPrincipal.create(member, attributes);
     }
 
