@@ -52,16 +52,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     try {
       String accessToken = resolveToken(request);
-      String decrypt = aes256Util.decrypt(accessToken);
-      if (StringUtils.hasText(decrypt) && tokenProvider.validateToken(decrypt)) {
-        Authentication authenticated = tokenProvider.getAuthentication(decrypt);
-        SecurityContextHolder.getContext().setAuthentication(authenticated);
-        // TODO 본래 AuthenticationException을 처리해주는 로직이 여기 있었는데, EntryPoint에서 알아서 처리해준다고 판단하여 제외하였다.
+      if (accessToken != null) {
+        String decrypt = aes256Util.decrypt(accessToken);
+        if (StringUtils.hasText(decrypt) && tokenProvider.validateToken(decrypt)) {
+          Authentication authenticated = tokenProvider.getAuthentication(decrypt);
+          SecurityContextHolder.getContext().setAuthentication(authenticated);
+        }
       }
     } catch (Exception e) {
       // 암호화 관련 에러가 발생하면 이 곳에서 걸린다.
-      log.error(e.getMessage());
+      log.error(e.getClass().getName());
       sendResponse(response, e);
+      return;
     }
     filterChain.doFilter(request, response);
 
