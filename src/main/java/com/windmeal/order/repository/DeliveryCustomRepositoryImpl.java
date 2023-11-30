@@ -20,6 +20,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 
 @RequiredArgsConstructor
 public class DeliveryCustomRepositoryImpl implements DeliveryCustomRepository {
@@ -27,9 +29,9 @@ public class DeliveryCustomRepositoryImpl implements DeliveryCustomRepository {
   private final JPAQueryFactory jpaQueryFactory;
 
   @Override
-  public Page<DeliveryListResponse> getOwnDelivering(Long memberId, LocalDate today,
+  public Slice<DeliveryListResponse> getOwnDelivering(Long memberId, LocalDate today,
       Pageable pageable) {
-    JPAQuery<DeliveryListResponse> query = jpaQueryFactory.select(
+    List<DeliveryListResponse> content = jpaQueryFactory.select(
             Projections.constructor(DeliveryListResponse.class,
                 delivery.id,
                 order.id,
@@ -47,16 +49,21 @@ public class DeliveryCustomRepositoryImpl implements DeliveryCustomRepository {
             delivery.deliver.id.eq(memberId),
             delivery.deliveryStatus.eq(DeliveryStatus.DELIVERING),
             eqEta(today)
-        );
-    long size = query.fetchCount();
-    List<DeliveryListResponse> result = query.fetch();
-    return new PageImpl<>(result, pageable, size);
+        )
+        .offset(pageable.getOffset())
+        .limit(pageable.getPageSize() + 1).fetch();
+    boolean hasNext = false;
+    if (content.size() > pageable.getPageSize()) {
+      content.remove(pageable.getPageSize());
+      hasNext = true;
+    }
+    return new SliceImpl(content, pageable, hasNext);
   }
 
   @Override
-  public Page<DeliveryListResponse> getOwnOrdering(Long memberId, LocalDate today,
+  public Slice<DeliveryListResponse> getOwnOrdering(Long memberId, LocalDate today,
       Pageable pageable) {
-    JPAQuery<DeliveryListResponse> query = jpaQueryFactory.select(
+    List<DeliveryListResponse> content = jpaQueryFactory.select(
             Projections.constructor(DeliveryListResponse.class,
                 delivery.id,
                 order.id,
@@ -74,10 +81,15 @@ public class DeliveryCustomRepositoryImpl implements DeliveryCustomRepository {
             order.orderer_id.eq(memberId),
             delivery.deliveryStatus.eq(DeliveryStatus.DELIVERING),
             eqEta(today)
-        );
-    long size = query.fetchCount();
-    List<DeliveryListResponse> result = query.fetch();
-    return new PageImpl<>(result, pageable, size);
+        )
+        .offset(pageable.getOffset())
+        .limit(pageable.getPageSize() + 1).fetch();
+    boolean hasNext = false;
+    if (content.size() > pageable.getPageSize()) {
+      content.remove(pageable.getPageSize());
+      hasNext = true;
+    }
+    return new SliceImpl(content, pageable, hasNext);
   }
 
   private BooleanExpression eqEta(LocalDate now) {

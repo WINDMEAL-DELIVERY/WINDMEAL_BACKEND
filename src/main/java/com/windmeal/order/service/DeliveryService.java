@@ -24,6 +24,7 @@ import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -110,11 +111,11 @@ public class DeliveryService {
   }
 
 
-  public Page<DeliveryListResponse> getOwnDelivering(Long memberId,Pageable pageable){
+  public Slice<DeliveryListResponse> getOwnDelivering(Long memberId,Pageable pageable){
     return deliveryRepository.getOwnDelivering(memberId, LocalDate.now(), pageable);
   }
 
-  public Page<DeliveryListResponse> getOwnOrdering(Long memberId,Pageable pageable){
+  public Slice<DeliveryListResponse> getOwnOrdering(Long memberId,Pageable pageable){
     return deliveryRepository.getOwnOrdering(memberId, LocalDate.now(), pageable);
   }
 }

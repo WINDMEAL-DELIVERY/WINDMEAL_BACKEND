@@ -20,6 +20,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.geo.Point;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -74,7 +75,7 @@ public class OrderController {
    * @return
    */
   @GetMapping("/order")
-  public ResultDataResponseDTO<Page<OrderListResponse>> getAllOrder(
+  public ResultDataResponseDTO<Slice<OrderListResponse>> getAllOrder(
       Pageable pageable,
       @Parameter(description = "가게 id", required = false, schema = @Schema(example = "1"))
       @RequestParam(required = false) Long storeId,

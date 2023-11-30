@@ -18,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.geo.Point;
 
 @RequiredArgsConstructor
@@ -29,9 +31,9 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
 
 
   @Override
-  public Page<OrderListResponse> getOrderList(Pageable pageable, Long storeId, String eta,
+  public Slice<OrderListResponse> getOrderList(Pageable pageable, Long storeId, String eta,
       String storeCategory, Long placeId) {
-    JPAQuery<OrderListResponse> query = jpaQueryFactory.select(Projections.constructor(
+    List<OrderListResponse> content = jpaQueryFactory.select(Projections.constructor(
             OrderListResponse.class,
             order.id,
             order.place.name,
@@ -44,12 +46,16 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
         ))
         .from(order)
         .leftJoin(store).on(order.store_id.eq(store.id))
-        .where(eqStoreId(storeId), eqEta(eta), eqStoreCategory(storeCategory),eqPlace(placeId));
+        .where(eqStoreId(storeId), eqEta(eta), eqStoreCategory(storeCategory), eqPlace(placeId))
+        .offset(pageable.getOffset())
+        .limit(pageable.getPageSize() + 1).fetch();
 
-
-    long size = query.fetchCount();
-    List<OrderListResponse> result = query.fetch();
-    return new PageImpl<>(result, pageable, size);
+    boolean hasNext = false;
+    if (content.size() > pageable.getPageSize()) {
+      content.remove(pageable.getPageSize());
+      hasNext = true;
+    }
+    return new SliceImpl(content, pageable, hasNext);
   }
 
   private BooleanExpression eqPlace(Long placeId) {

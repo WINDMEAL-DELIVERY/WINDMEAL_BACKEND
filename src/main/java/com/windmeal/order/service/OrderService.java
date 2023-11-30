@@ -26,6 +26,7 @@ import com.windmeal.store.repository.MenuRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.geo.Point;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,13 +76,14 @@ public class OrderService {
     orderRepository.deleteById(request.getOrderId());
   }
 
-  public Page<OrderListResponse> getAllOrder(Pageable pageable, Long storeId, String eta, String storeCategory,
+
+  public Slice<OrderListResponse> getAllOrder(Pageable pageable, Long storeId, String eta, String storeCategory,
       Long placeId) {
     return orderRepository.getOrderList(pageable,storeId,eta,storeCategory,placeId);
   }
 
   /**
-   * 주문 상세 내용 조
+   * 주문 상세 내용 조회
    * @param orderId
    * @return
    */
