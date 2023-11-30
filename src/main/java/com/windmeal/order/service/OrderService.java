@@ -2,6 +2,7 @@ package com.windmeal.order.service;
 
 import com.windmeal.generic.domain.Money;
 import com.windmeal.global.exception.ErrorCode;
+import com.windmeal.global.wrapper.RestSlice;
 import com.windmeal.member.exception.MemberNotFoundException;
 import com.windmeal.member.repository.MemberRepository;
 import com.windmeal.model.place.Place;
@@ -24,6 +25,8 @@ import com.windmeal.store.domain.Menu;
 import com.windmeal.store.exception.MenuNotFoundException;
 import com.windmeal.store.repository.MenuRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -42,6 +45,7 @@ public class OrderService {
   private final OrderRequestMapper orderRequestMapper;
   private final PlaceRepository placeRepository;
 
+//  @CacheEvict(value = "Orders", allEntries = true, cacheManager = "contentCacheManager")
   @Transactional
   public OrderCreateResponse createOrder(OrderCreateRequest request) {
     memberRepository.findById(request.getMemberId())
@@ -77,7 +81,8 @@ public class OrderService {
   }
 
 
-  public Slice<OrderListResponse> getAllOrder(Pageable pageable, Long storeId, String eta, String storeCategory,
+//  @Cacheable(value = "Orders", key = "#pageable.pageNumber", cacheManager = "contentCacheManager")
+  public RestSlice<OrderListResponse> getAllOrder(Pageable pageable, Long storeId, String eta, String storeCategory,
       Long placeId) {
     return orderRepository.getOrderList(pageable,storeId,eta,storeCategory,placeId);
   }

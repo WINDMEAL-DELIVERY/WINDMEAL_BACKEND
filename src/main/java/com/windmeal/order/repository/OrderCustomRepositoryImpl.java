@@ -8,6 +8,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.windmeal.global.wrapper.RestSlice;
 import com.windmeal.order.dto.response.OrderListResponse;
 import com.windmeal.store.domain.QStoreCategory;
 import java.time.LocalDate;
@@ -31,7 +32,7 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
 
 
   @Override
-  public Slice<OrderListResponse> getOrderList(Pageable pageable, Long storeId, String eta,
+  public RestSlice<OrderListResponse> getOrderList(Pageable pageable, Long storeId, String eta,
       String storeCategory, Long placeId) {
     List<OrderListResponse> content = jpaQueryFactory.select(Projections.constructor(
             OrderListResponse.class,
@@ -55,7 +56,7 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
       content.remove(pageable.getPageSize());
       hasNext = true;
     }
-    return new SliceImpl(content, pageable, hasNext);
+    return new RestSlice(new SliceImpl(content, pageable, hasNext));
   }
 
   private BooleanExpression eqPlace(Long placeId) {

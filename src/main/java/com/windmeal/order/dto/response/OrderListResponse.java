@@ -1,6 +1,12 @@
 package com.windmeal.order.dto.response;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import com.windmeal.generic.domain.Money;
+import com.windmeal.generic.domain.MoneyDeserializer;
+import com.windmeal.generic.domain.MoneySerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -15,7 +21,6 @@ import org.springframework.data.geo.Point;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Schema(title = "주문 리스트 조회")
 public class OrderListResponse {
 
@@ -29,9 +34,14 @@ public class OrderListResponse {
   @Schema(description = "위도", example = "1.2345")
   private Double latitude;
 
+
+  @JsonSerialize(using = LocalTimeSerializer.class)
+  @JsonDeserialize(using = LocalTimeDeserializer.class)
   @Schema(description = "도착 예상 시간", example = "23:10:20")
   private LocalTime eta; //Estimated Time of Arrival 도착 예정 시간
 
+//  @JsonSerialize(using = MoneySerializer.class)
+//  @JsonDeserialize(using = MoneyDeserializer.class)
   @Schema(description = "배달료", example = "5000")
   private Money deliveryFee;//배달료
 
