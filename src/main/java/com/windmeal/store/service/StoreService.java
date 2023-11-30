@@ -25,6 +25,7 @@ import com.windmeal.store.validator.StoreValidator;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -82,7 +83,7 @@ public class StoreService {
 
     findStore.updateInfo(request,place);
   }
-
+  @Cacheable(value = "Store", key = "#storeId", cacheManager = "contentCacheManager")
   public StoreMenuResponse getStoreInfo(Long storeId) {
     Store store = storeRepository.findById(storeId)
         .orElseThrow(() -> new StoreNotFoundException(ErrorCode.NOT_FOUND, "매장이 존재하지 않습니다."));

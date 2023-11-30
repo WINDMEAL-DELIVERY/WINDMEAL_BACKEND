@@ -1,5 +1,9 @@
 package com.windmeal.store.dto.response;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import com.windmeal.model.place.Place;
 import com.windmeal.store.domain.MenuCategory;
 import com.windmeal.store.domain.Store;
@@ -31,8 +35,12 @@ public class StoreMenuResponse {
   private String phoneNumber;
   @Schema(description = "가게 사진 url", example = "http://test.s3/test")
   private String photo;
+  @JsonSerialize(using = LocalTimeSerializer.class)
+  @JsonDeserialize(using = LocalTimeDeserializer.class)
   @Schema(description = "가게 오픈 시간", example = "00:00:00")
   private LocalTime openTime;
+  @JsonSerialize(using = LocalTimeSerializer.class)
+  @JsonDeserialize(using = LocalTimeDeserializer.class)
   @Schema(description = "가게 종료 시간", example = "23:00:00")
   private LocalTime closeTime;
 
@@ -44,7 +52,7 @@ public class StoreMenuResponse {
   @Schema(description = "위도", example = "1.2345")
   private Double latitude;
   @Schema(description = "현재 가게 운영 여부", example = "true")
-  private boolean isOpen;
+  private Boolean isOpen;
 
   private List<MenuCategoryResponse> menuCategories;
 

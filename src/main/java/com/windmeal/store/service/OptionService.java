@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +39,7 @@ public class OptionService {
         savedOptionGroup.getId());
   }
 
+  @Cacheable(value = "Menu", key = "#menuId", cacheManager = "contentCacheManager")
   public MenuOptionResponse getMenuGroups(Long menuId) {
     Menu menu = menuRepository.findById(menuId)
         .orElseThrow(() -> new MenuNotFoundException(
