@@ -1,6 +1,7 @@
 package com.windmeal.generic.domain;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Objects;
@@ -11,7 +12,6 @@ import lombok.Getter;
 
 @Embeddable
 @Getter
-@JsonDeserialize(using = MoneyDeserializer.class)
 public class Money {
 
   public static final Money ZERO = Money.wons(0);
