@@ -12,6 +12,7 @@ import com.windmeal.store.domain.MenuCategory;
 import com.windmeal.store.domain.Store;
 import com.windmeal.store.dto.request.StoreCreateRequest;
 import com.windmeal.store.dto.request.StoreUpdateRequest;
+import com.windmeal.store.dto.response.AllStoreResponse;
 import com.windmeal.store.dto.response.MenuResponse;
 import com.windmeal.store.dto.response.StoreMenuResponse;
 import com.windmeal.store.dto.response.StoreResponse;
@@ -26,6 +27,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -92,5 +95,9 @@ public class StoreService {
         .collect(Collectors.toList());
     List<MenuResponse> menus = menuRepository.findByMenuCategoryIdIn(menuCategoryIds);
     return new StoreMenuResponse(store, menuCategories, menus,store.getPlace());
+  }
+
+  public Slice<AllStoreResponse> getAllStoreInfo(Pageable pageable){
+    return storeRepository.getAllStoreInfo(pageable);
   }
 }
