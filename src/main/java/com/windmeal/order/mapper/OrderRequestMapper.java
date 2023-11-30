@@ -2,6 +2,7 @@ package com.windmeal.order.mapper;
 
 import static java.util.stream.Collectors.toList;
 
+import com.windmeal.model.place.Place;
 import com.windmeal.order.domain.Order;
 import com.windmeal.order.domain.OrderMenu;
 import com.windmeal.order.domain.OrderMenuOptionGroup;
@@ -20,8 +21,8 @@ public class OrderRequestMapper {
     return new Order(
         request.getMemberId(),
         request.getStoreId(),
+        request.getDescription(),
         LocalDateTime.now(),
-        request.getDestination(),
         request.getEta(),
         request.getDeliveryFee(),
         request.getMenus().stream()
@@ -34,6 +35,8 @@ public class OrderRequestMapper {
   private OrderMenu toOrderMenu(OrderMenuRequest orderMenuRequest) {
     return OrderMenu.builder()
         .menu_id(orderMenuRequest.getMenuId())
+        .price(orderMenuRequest.getPrice())
+        .name(orderMenuRequest.getName())
         .count(orderMenuRequest.getCount())
         .groups(orderMenuRequest.getGroups().stream()
             .map(this::toOrderMenuOptionGroup)
@@ -44,6 +47,7 @@ public class OrderRequestMapper {
   private OrderMenuOptionGroup toOrderMenuOptionGroup(OrderGroupRequest orderGroupRequest) {
     return OrderMenuOptionGroup.builder()
         .option_group_id(orderGroupRequest.getOptionGroupId())
+        .name(orderGroupRequest.getName())
         .specs(orderGroupRequest.getSpecs().stream()
             .map(this::toOrderMenuOptionSpecification).collect(toList()))
         .build();
@@ -53,6 +57,8 @@ public class OrderRequestMapper {
       OrderSpecRequest orderSpecRequest) {
     return OrderMenuOptionSpecification.builder()
         .option_specification_id(orderSpecRequest.getOptionSpecId())
+        .name(orderSpecRequest.getName())
+        .price(orderSpecRequest.getPrice())
         .build();
   }
 

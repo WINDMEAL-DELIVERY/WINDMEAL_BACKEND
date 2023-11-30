@@ -1,8 +1,10 @@
 package com.windmeal.generic.domain;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.function.Function;
 import javax.persistence.Embeddable;
 import lombok.Getter;
@@ -10,7 +12,6 @@ import lombok.Getter;
 
 @Embeddable
 @Getter
-@JsonDeserialize(using = MoneyDeserializer.class)
 public class Money {
 
   public static final Money ZERO = Money.wons(0);
@@ -75,22 +76,22 @@ public class Money {
 //        return amount.doubleValue();
 //    }
 //
-//    public boolean equals(Object object) {
-//        if (this == object) {
-//            return true;
-//        }
-//
-//        if (!(object instanceof Money)) {
-//            return false;
-//        }
-//
-//        Money other = (Money) object;
-//        return Objects.equals(amount.doubleValue(), other.amount.doubleValue());
-//    }
-//
-//    public int hashCode() {
-//        return Objects.hashCode(amount);
-//    }
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+
+        if (!(object instanceof Money)) {
+            return false;
+        }
+
+        Money other = (Money) object;
+        return Objects.equals(price, other.getPrice());
+    }
+
+    public int hashCode() {
+        return Objects.hashCode(price);
+    }
 //
 //    public String toString() {
 //        return amount.toString() + "원";

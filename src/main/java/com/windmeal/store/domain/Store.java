@@ -1,6 +1,7 @@
 package com.windmeal.store.domain;
 
 import com.windmeal.member.domain.Member;
+import com.windmeal.model.place.Place;
 import com.windmeal.store.dto.request.StoreUpdateRequest;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,21 +37,26 @@ public class Store {
 
   private LocalTime closeTime;
 
-  private Point location;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "place_id")
+  private Place place;
 
   @OneToMany(mappedBy = "store")
   private List<StoreCategory> storeCategoryList = new ArrayList<>();
 
+
+
   @Builder
   public Store(Member owner, String name, String phoneNumber, String photo, LocalTime openTime,
-      LocalTime closeTime, Point location) {
+      LocalTime closeTime, Place place) {
     this.owner = owner;
     this.name = name;
     this.phoneNumber = phoneNumber;
     this.photo = photo;
     this.openTime = openTime;
     this.closeTime = closeTime;
-    this.location = location;
+    this.place = place;
   }
 
   @Builder
@@ -75,12 +81,12 @@ public class Store {
     this.photo = updatePhoto;
   }
 
-  public void updateInfo(StoreUpdateRequest updateRequest) {
+  public void updateInfo(StoreUpdateRequest updateRequest,Place place) {
     this.name = updateRequest.getName();
     this.phoneNumber = updateRequest.getPhoneNumber();
     this.closeTime = updateRequest.getCloseTime();
     this.openTime = updateRequest.getOpenTime();
-    this.location = new Point(updateRequest.getLatitude(), updateRequest.getLongitude());
+    this.place = place;
 
   }
 }

@@ -169,7 +169,7 @@ public class OrderValidatorTest {
     //then
     Assertions.assertThatThrownBy(
             () -> validator.validate(orderCreateRequest, store, new HashMap<>() {{
-              put(1L, aMenu().build());
+              put(1L, aMenu().price(Money.wons(1000)).name("test").build());
             }}))
         .isInstanceOf(OrderGroupEmptyException.class)
         .hasMessage("필수 옵션을 선택해주세요.");
@@ -190,7 +190,8 @@ public class OrderValidatorTest {
     Assertions.assertThatThrownBy(
             () -> validator.validate(orderCreateRequest, store, new HashMap<>() {{
               put(1L, aMenu()
-
+                  .name("test")
+                  .price(Money.wons(1000))
                   .optionGroups(Arrays.asList(aOptionGroup()
                       .isMultipleOption(false)
                       .build()))
@@ -214,7 +215,8 @@ public class OrderValidatorTest {
                 .build())).build();
     validator.validate(orderCreateRequest, store, new HashMap<>() {{
       put(1L, aMenu()
-
+          .price(Money.wons(1000))
+          .name("test")
           .optionGroups(Arrays.asList(aOptionGroup()
               .build()))
           .build());
@@ -246,8 +248,8 @@ public class OrderValidatorTest {
         .id(1L)
         .isMultipleOption(true)
         .isEssentialOption(true)
-        .optionSpecifications(Arrays.asList(aOptionSpecification().build(),
-            aOptionSpecification().build()))
+        .optionSpecifications(Arrays.asList(aOptionSpecification().id(1L).price(Money.wons(1000)).name("test1").build(),
+            aOptionSpecification().price(Money.wons(1000)).id(2L).name("test2").build()))
         ;
   }
 
@@ -260,12 +262,14 @@ public class OrderValidatorTest {
         .builder()
         .menuId(1L)
         .count(2)
+        .name("test")
+        .price(Money.wons(1000))
         .groups(Arrays.asList(
             buildOrderGroupRequest()
                 .optionGroupId(1L)
                 .specs(Arrays.asList(
-                    buildOrderSpecRequest().optionSpecId(1L).build(),
-                    buildOrderSpecRequest().optionSpecId(2L).build()
+                    buildOrderSpecRequest().optionSpecId(1L).name("test1").price(Money.wons(1000)).build(),
+                    buildOrderSpecRequest().optionSpecId(2L).name("test2").price(Money.wons(1000)).build()
                 )).build()
         ));
   }

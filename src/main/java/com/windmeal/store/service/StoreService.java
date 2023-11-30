@@ -3,12 +3,16 @@ package com.windmeal.store.service;
 
 import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.member.domain.Member;
+import com.windmeal.member.exception.MemberNotFoundException;
 import com.windmeal.member.repository.MemberRepository;
+import com.windmeal.model.place.Place;
+import com.windmeal.model.place.PlaceRepository;
 import com.windmeal.store.domain.Category;
 import com.windmeal.store.domain.MenuCategory;
 import com.windmeal.store.domain.Store;
 import com.windmeal.store.dto.request.StoreCreateRequest;
 import com.windmeal.store.dto.request.StoreUpdateRequest;
+import com.windmeal.store.dto.response.AllStoreResponse;
 import com.windmeal.store.dto.response.MenuResponse;
 import com.windmeal.store.dto.response.StoreMenuResponse;
 import com.windmeal.store.dto.response.StoreResponse;
@@ -22,6 +26,9 @@ import com.windmeal.store.validator.StoreValidator;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,22 +44,26 @@ public class StoreService {
   private final MenuCategoryRepository menuCategoryRepository;
   private final MenuRepository menuRepository;
   private final CategoryRepository categoryRepository;
-  private final StoreValidator storeValidator;
+  private final PlaceRepository placeRepository;
 
   @Transactional
   public StoreResponse createStore(StoreCreateRequest request, String imgUrl) {
     Member findMember = memberRepository.findById(request.getMemberId())
-        .orElseThrow(); //Member Not Found 예외 추가 예정
-    Store savedStore = storeRepository.save(request.toEntity(findMember, imgUrl));
-    categoryRepository.createCategories(
-        request.getCategoryList());//category 에 존재하지 않는 경우 bulk 작업으로 저장
-    List<Long> categoryIdList = categoryRepository.findAllByNameIn(request.getCategoryList())
-        .stream()
-        .map(Category::getId).collect(
-            Collectors.toList());
-    storeCategoryRepository.createStoreCategories(categoryIdList, savedStore.getId());
+        .orElseThrow(() -> new MemberNotFoundException(ErrorCode.NOT_FOUND,"사용자가 존재하지 않습니다.")); //Member Not Found 예외 추가 예정
+    Place place = placeRepository.findByNameAndLongitudeAndLatitude(request.getPlaceName(),request.getLongitude(),request.getLatitude())
+        .orElseGet(() -> placeRepository.save(request.toPlaceEntity()));
 
-    return StoreResponse.of(savedStore);
+    Store savedStore = storeRepository.save(request.toEntity(findMember, imgUrl,place));
+    if(!request.getCategoryList().isEmpty()) {
+      categoryRepository.createCategories(
+          request.getCategoryList());//category 에 존재하지 않는 경우 bulk 작업으로 저장
+      List<Long> categoryIdList = categoryRepository.findAllByNameIn(request.getCategoryList())
+          .stream()
+          .map(Category::getId).collect(
+              Collectors.toList());
+      storeCategoryRepository.createStoreCategories(categoryIdList, savedStore.getId());
+    }
+    return StoreResponse.of(savedStore,place);
   }
 
   @Transactional
@@ -67,13 +78,15 @@ public class StoreService {
   }
 
   @Transactional
-  public void updateStoreInfo(Long storeId, StoreUpdateRequest updateRequest) {
+  public void updateStoreInfo(Long storeId, StoreUpdateRequest request) {
     Store findStore = storeRepository.findById(storeId).orElseThrow(
         () -> new StoreNotFoundException(ErrorCode.NOT_FOUND, "매장이 존재하지 않습니다."));
+    Place place = placeRepository.findByNameAndLongitudeAndLatitude(request.getPlaceName(),request.getLongitude(),request.getLatitude())
+        .orElseGet(() -> placeRepository.save(request.toPlaceEntity()));
 
-    findStore.updateInfo(updateRequest);
+    findStore.updateInfo(request,place);
   }
-
+  @Cacheable(value = "Store", key = "#storeId", cacheManager = "contentCacheManager")
   public StoreMenuResponse getStoreInfo(Long storeId) {
     Store store = storeRepository.findById(storeId)
         .orElseThrow(() -> new StoreNotFoundException(ErrorCode.NOT_FOUND, "매장이 존재하지 않습니다."));
@@ -81,6 +94,10 @@ public class StoreService {
     List<Long> menuCategoryIds = menuCategories.stream().map(MenuCategory::getId)
         .collect(Collectors.toList());
     List<MenuResponse> menus = menuRepository.findByMenuCategoryIdIn(menuCategoryIds);
-    return new StoreMenuResponse(store, menuCategories, menus);
+    return new StoreMenuResponse(store, menuCategories, menus,store.getPlace());
+  }
+
+  public Slice<AllStoreResponse> getAllStoreInfo(Pageable pageable){
+    return storeRepository.getAllStoreInfo(pageable);
   }
 }

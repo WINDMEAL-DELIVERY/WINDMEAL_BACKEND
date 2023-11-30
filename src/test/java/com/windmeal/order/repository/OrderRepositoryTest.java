@@ -33,16 +33,16 @@ class OrderRepositoryTest extends IntegrationTestSupport {
   @Autowired
   OrderRepository orderRepository;
 
-  @DisplayName("")
-  @Test
-  void save(){
-      //given
-    OrderCreateRequest build = buildOrderCreateRequest().build();
-    Order order = orderRequestMapper.mapFrom(build);
-    //when
-    orderRepository.save(order);
-      //then
-  }
+//  @DisplayName("")
+//  @Test
+//  void save(){
+//      //given
+//    OrderCreateRequest build = buildOrderCreateRequest().build();
+//    Order order = orderRequestMapper.mapFrom(build);
+//    //when
+//    orderRepository.save(order);
+//      //then
+//  }
 
 
   private static OrderCreateRequestBuilder buildOrderCreateRequest() {

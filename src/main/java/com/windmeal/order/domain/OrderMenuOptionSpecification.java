@@ -1,6 +1,7 @@
 package com.windmeal.order.domain;
 
 
+import com.windmeal.generic.domain.Money;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,12 +31,17 @@ public class OrderMenuOptionSpecification {
     @Column(name = "option_specification_id")
     private Long option_specification_id;
 
-
+    private Money price;
+    private String name;
 
     @Builder
-    public OrderMenuOptionSpecification(Long option_specification_id) {
+    public OrderMenuOptionSpecification(Long option_specification_id, Money price, String name) {
         this.option_specification_id = option_specification_id;
+        this.price = price;
+        this.name = name;
     }
+
+
 
     public void setOrderMenuOptionGroup(OrderMenuOptionGroup orderMenuOptionGroup) {
         this.orderMenuOptionGroup = orderMenuOptionGroup;

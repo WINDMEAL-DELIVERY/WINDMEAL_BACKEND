@@ -30,16 +30,19 @@ public class Delivery extends BaseTimeEntity {
     @Enumerated(value = EnumType.STRING)
     private DeliveryStatus deliveryStatus;
 
-
-
     @Builder
-    public Delivery(Member deliver, Order order) {
+    public Delivery(Member deliver, Order order, DeliveryStatus deliveryStatus) {
         this.deliver = deliver;
         this.order = order;
-        delivering();
+        this.deliveryStatus = deliveryStatus;
     }
+
 
     private void delivering(){
         this.deliveryStatus=DeliveryStatus.DELIVERING;
+    }
+
+    public void canceled() {
+        this.deliveryStatus=DeliveryStatus.CANCELED;
     }
 }

@@ -3,6 +3,8 @@ package com.windmeal.order.domain;
 
 import com.windmeal.generic.domain.Money;
 import com.windmeal.model.BaseTimeEntity;
+import com.windmeal.model.place.Place;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,9 +42,13 @@ public class Order extends BaseTimeEntity {
 
   private LocalDateTime orderTime;
 
-  private Point destination;//도착지
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "place_id")
+  private Place place;
 
-  private LocalTime eta; //Estimated Time of Arrival 도착 예정 시간
+  private String description;
+
+  private LocalDateTime eta; //Estimated Time of Arrival 도착 예정 시간
 
   private String summary; //내용 요약 ex) 후라이드 치킨 1마리 외 3개 15000원
 
@@ -57,22 +63,22 @@ public class Order extends BaseTimeEntity {
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "order")
   private List<OrderMenu> orderMenus = new ArrayList<>();
 
-  public Order(Long orderer, Long store, LocalDateTime orderTime, Point destination, LocalTime eta,  Money deliveryFee,
+  public Order(Long orderer, Long store,String description, LocalDateTime orderTime,  LocalTime eta,  Money deliveryFee,
       List<OrderMenu> orderMenus) {
-    this(null, orderer, store, null, orderTime,destination,eta,  deliveryFee, orderMenus);
+    this(null, orderer, store,description, null, orderTime,eta,  deliveryFee, orderMenus);
   }
 
   @Builder
-  public Order(Long id, Long orderer_id, Long store_id, OrderStatus orderStatus,
-      LocalDateTime orderTime, Point destination, LocalTime eta,  Money deliveryFee,
+  public Order(Long id, Long orderer_id, Long store_id,String description, OrderStatus orderStatus,
+      LocalDateTime orderTime,  LocalTime eta,  Money deliveryFee,
       List<OrderMenu> orderMenus) {
     this.id = id;
     this.orderer_id = orderer_id;
     this.store_id = store_id;
+    this.description=description;
     this.orderStatus = orderStatus;
     this.orderTime = orderTime;
-    this.destination = destination;
-    this.eta = eta;
+    this.eta = LocalDate.now().atTime(eta);
     this.deliveryFee = deliveryFee;
     orderMenus.forEach(orderMenu -> {
       orderMenu.setOrder(this);
@@ -83,9 +89,10 @@ public class Order extends BaseTimeEntity {
 
 
 
-  public void place(Money totalPrice, String summary){
+  public void place(Money totalPrice, String summary,Place place){
       this.totalPrice = totalPrice;
       this.summary = summary;
+      this.place = place;
       ordered();
   }
 
@@ -101,5 +108,7 @@ public class Order extends BaseTimeEntity {
     this.orderStatus=OrderStatus.DELIVERED;
   }
 
-
+  public void canceled(){
+    this.orderStatus=OrderStatus.CANCELED;
+  }
 }

@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 
 @Getter
 @AllArgsConstructor
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Schema(title = "메뉴 정보")
 public class MenuResponse {
+
   @Schema(description = "메뉴 ID", example = "1")
   private Long menuId;
   @Schema(description = "메뉴 카테고리 ID", example = "1")

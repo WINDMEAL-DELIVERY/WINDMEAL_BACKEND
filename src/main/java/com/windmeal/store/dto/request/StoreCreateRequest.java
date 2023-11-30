@@ -1,6 +1,7 @@
 package com.windmeal.store.dto.request;
 
 import com.windmeal.member.domain.Member;
+import com.windmeal.model.place.Place;
 import com.windmeal.store.domain.Store;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
@@ -35,7 +36,8 @@ public class StoreCreateRequest {
   private LocalTime openTime;
   @Schema(description = "가게 종료 시간", example = "23:00:00")
   private LocalTime closeTime;
-
+  @Schema(description = "장소 이름", example = "가천대학교")
+  private String placeName;
   @Schema(description = "경도", example = "1.2345")
   private Double longitude;
 
@@ -45,7 +47,15 @@ public class StoreCreateRequest {
   @Schema(description = "카테고리 이름(검색을 위한 카테고리)", example = "카페")
   private List<String> categoryList;
 
-  public Store toEntity(Member member, String imgUrl) {
+
+  public Place toPlaceEntity(){
+    return Place.builder()
+        .name(this.placeName)
+        .latitude(this.latitude)
+        .longitude(this.longitude)
+        .build();
+  }
+  public Store toEntity(Member member, String imgUrl, Place place) {
     return Store.builder()
         .owner(member)
         .name(this.name)
@@ -53,7 +63,7 @@ public class StoreCreateRequest {
         .photo(imgUrl)
         .openTime(this.openTime)
         .closeTime(this.closeTime)
-        .location(new Point(latitude, longitude))
+        .place(place)
         .build();
   }
 

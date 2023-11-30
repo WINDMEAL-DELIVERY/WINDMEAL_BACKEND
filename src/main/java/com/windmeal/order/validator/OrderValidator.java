@@ -19,9 +19,12 @@ import com.windmeal.order.exception.OrderEmptyException;
 import com.windmeal.order.exception.OrderGroupEmptyException;
 import com.windmeal.order.exception.OrderGroupIsNotMultipleException;
 import com.windmeal.order.exception.OrderMenuCountException;
+import com.windmeal.order.exception.OrderSpecificationChangeException;
 import com.windmeal.store.domain.Menu;
 import com.windmeal.store.domain.OptionGroup;
+import com.windmeal.store.domain.OptionSpecification;
 import com.windmeal.store.domain.Store;
+import com.windmeal.store.exception.MenuChangeException;
 import com.windmeal.store.exception.MenuNotFoundException;
 import com.windmeal.store.exception.StoreNotFoundException;
 import com.windmeal.store.exception.StoreNotOpenException;
@@ -77,6 +80,10 @@ public class OrderValidator {
     if (menu == null) {
       throw new MenuNotFoundException(ErrorCode.BAD_REQUEST, "메뉴가 존재하지 않습니다.");
     }
+
+    if(!(menu.getName().equals(requestMenu.getName())&&menu.getPrice().wons()==requestMenu.getPrice().wons())){
+      throw new MenuChangeException(ErrorCode.BAD_REQUEST, "메뉴가 변경되었습니다.");
+    }
     Map<Long, List<OrderSpecRequest>> menuGroups = getMenuGroups(requestMenu);
     for (OptionGroup optionGroup : menu.getOptionGroups()) {
       isGroupSatisfied(optionGroup, menuGroups.getOrDefault(optionGroup.getId(), new ArrayList<>()));
@@ -100,7 +107,12 @@ public class OrderValidator {
       throw new OrderGroupIsNotMultipleException(ErrorCode.BAD_REQUEST,"1개의 옵션만 선택 가능합니다.");
     }
 
+    if(satisfied(optionGroup.getOptionSpecifications(), optionSpecs).size()!=optionSpecs.size()){
+      throw new OrderSpecificationChangeException(ErrorCode.BAD_REQUEST,"메뉴 상세 정보가 변경되었습니다.");
+    }
+
   }
+
 
   private Store getStore(OrderCreateRequest request) {
     return storeRepository.findById(request.getStoreId())
@@ -114,5 +126,12 @@ public class OrderValidator {
   }
   private List<Long> getMenuIds(List<OrderMenuRequest> menus) {
     return menus.stream().map(OrderMenuRequest::getMenuId).collect(toList());
+  }
+
+  private List<OrderSpecRequest> satisfied(List<OptionSpecification> optionSpecs,List<OrderSpecRequest> options) {
+    return optionSpecs
+        .stream()
+        .flatMap(spec -> options.stream().filter(spec::isSatisfiedBy))
+        .collect(toList());
   }
 }

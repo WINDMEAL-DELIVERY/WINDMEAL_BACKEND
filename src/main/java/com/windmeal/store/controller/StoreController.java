@@ -5,6 +5,7 @@ import com.windmeal.global.exception.ExceptionResponseDTO;
 import com.windmeal.global.exception.ResultDataResponseDTO;
 import com.windmeal.store.dto.request.StoreCreateRequest;
 import com.windmeal.store.dto.request.StoreUpdateRequest;
+import com.windmeal.store.dto.response.AllStoreResponse;
 import com.windmeal.store.dto.response.StoreMenuResponse;
 import com.windmeal.store.dto.response.StoreResponse;
 import com.windmeal.store.service.StoreService;
@@ -16,6 +17,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -115,5 +118,15 @@ public class StoreController {
   public ResultDataResponseDTO<StoreMenuResponse> getStoreInfo(@PathVariable Long storeId) {
     return ResultDataResponseDTO.of(storeService.getStoreInfo(storeId));
 
+  }
+
+  @Operation(summary = "모든 가게 정보 조회", description = "모든 가게의 정보가 조회됩니다.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "OK"),
+      @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근",
+          content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class)))})
+  @GetMapping("/store")
+  public ResultDataResponseDTO<Slice<AllStoreResponse>> getAllStoreInfo(Pageable pageable){
+    return ResultDataResponseDTO.of(storeService.getAllStoreInfo(pageable));
   }
 }

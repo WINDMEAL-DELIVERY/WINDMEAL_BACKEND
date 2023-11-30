@@ -2,6 +2,7 @@ package com.windmeal.member.domain;
 
 import com.windmeal.model.BaseTimeEntity;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,4 +25,13 @@ public class BlackList extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "black_member_id", updatable = false, referencedColumnName = "member_id")
     private Member blacked;
+
+    public static BlackList place(Member requester, Member blacked) {
+        return new BlackList(requester,blacked);
+    }
+
+    private BlackList(Member requester, Member blacked) {
+        this.requester = requester;
+        this.blacked = blacked;
+    }
 }
