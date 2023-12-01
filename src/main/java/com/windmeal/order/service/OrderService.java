@@ -26,6 +26,7 @@ import com.windmeal.store.exception.MenuNotFoundException;
 import com.windmeal.store.repository.MenuRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -45,7 +46,7 @@ public class OrderService {
   private final OrderRequestMapper orderRequestMapper;
   private final PlaceRepository placeRepository;
 
-//  @CacheEvict(value = "Orders", allEntries = true, cacheManager = "contentCacheManager")
+  @CacheEvict(value = "Orders", allEntries = true, cacheManager = "contentCacheManager") //데이터 삭제
   @Transactional
   public OrderCreateResponse createOrder(OrderCreateRequest request) {
     memberRepository.findById(request.getMemberId())
@@ -81,7 +82,9 @@ public class OrderService {
   }
 
 
-//  @Cacheable(value = "Orders", key = "#pageable.pageNumber", cacheManager = "contentCacheManager")
+  @Cacheable(value = "Orders", key = "#pageable.pageNumber", cacheManager = "contentCacheManager",
+      condition = "#storeId == null&&#pageable.pageNumber==0"
+          + "&&#eta==null&&#storeCategory==null&&#placeId==null")
   public RestSlice<OrderListResponse> getAllOrder(Pageable pageable, Long storeId, String eta, String storeCategory,
       Long placeId) {
     return orderRepository.getOrderList(pageable,storeId,eta,storeCategory,placeId);
