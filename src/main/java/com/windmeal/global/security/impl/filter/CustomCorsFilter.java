@@ -37,6 +37,7 @@ public class CustomCorsFilter implements Filter {
 //        } else {
 //            chain.doFilter(req, res);
 //        }
+        chain.doFilter(req,res);
     }
 
     @Override
