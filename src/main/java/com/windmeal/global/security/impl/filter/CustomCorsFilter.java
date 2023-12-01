@@ -32,11 +32,11 @@ public class CustomCorsFilter implements Filter {
 //                "*");
         response.setHeader("Access-Control-Allow-Headers",
                 "Content-Type, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Authorization, X-Requested-With, requestId, Correlation-Id");
-        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
-            response.setStatus(HttpServletResponse.SC_OK);
-        } else {
-            chain.doFilter(req, res);
-        }
+//        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+//            response.setStatus(HttpServletResponse.SC_OK);
+//        } else {
+//            chain.doFilter(req, res);
+//        }
     }
 
     @Override
