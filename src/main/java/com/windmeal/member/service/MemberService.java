@@ -7,6 +7,7 @@ import com.windmeal.member.dto.request.NicknameRequest;
 import com.windmeal.member.exception.DuplicatedNicknameException;
 import com.windmeal.member.exception.MemberNotFoundException;
 import com.windmeal.member.repository.MemberRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,11 @@ public class MemberService {
     }
 
     public boolean checkNickname(String nickname) {
+        // was 1과 2의 결과가 다른 현상의 원인을 추적하기 위해 로그를 찍어보겠다.
+        List<Member> all = memberRepository.findAll();
+        for (Member member : all) {
+            log.info(member.getId() + " " + member.getNickname());
+        }
         return memberRepository.existsByNickname(nickname);
     }
 
