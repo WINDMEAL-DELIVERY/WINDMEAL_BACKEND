@@ -43,7 +43,7 @@ public class MemberController {
     @GetMapping(value = "/nickname/{nickname}/exists")
     public ResultDataResponseDTO<Boolean> checkNickname(@PathVariable String nickname) {
         Boolean result = memberService.checkNickname(nickname);
-        return ResultDataResponseDTO.of(!result);
+        return ResultDataResponseDTO.of(result);
     }
 
 }
