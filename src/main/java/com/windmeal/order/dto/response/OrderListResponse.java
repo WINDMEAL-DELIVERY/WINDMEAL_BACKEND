@@ -27,12 +27,19 @@ public class OrderListResponse {
   @Schema(description = "주문 ID", example = "1")
   private Long id;
 
+  @Schema(description = "주문자 ID", example = "1")
+  private Long memberId;
+
+  @Schema(description = "주문자 닉네임", example = "dong")
+  private String memberNickName;
+
   @Schema(description = "장소 이름", example = "가천대학교")
   private String placeName;
   @Schema(description = "경도", example = "1.2345")
   private Double longitude;
   @Schema(description = "위도", example = "1.2345")
   private Double latitude;
+
 
 
   @JsonSerialize(using = LocalTimeSerializer.class)
@@ -52,9 +59,12 @@ public class OrderListResponse {
   private String summary;
 
 
-  public OrderListResponse(Long id, String placeName, Double longitude, Double latitude,
-      LocalDateTime eta, Money deliveryFee, String name, String summary) {
+  public OrderListResponse(Long id, Long memberId, String memberNickName, String placeName,
+      Double longitude, Double latitude, LocalDateTime eta, Money deliveryFee, String name,
+      String summary) {
     this.id = id;
+    this.memberId = memberId;
+    this.memberNickName = memberNickName;
     this.placeName = placeName;
     this.longitude = longitude;
     this.latitude = latitude;

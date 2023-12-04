@@ -4,6 +4,7 @@ import com.windmeal.generic.domain.Money;
 import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.global.wrapper.RestSlice;
 import com.windmeal.member.exception.MemberNotFoundException;
+import com.windmeal.member.repository.BlackListRepository;
 import com.windmeal.member.repository.MemberRepository;
 import com.windmeal.model.place.Place;
 import com.windmeal.model.place.PlaceRepository;
@@ -21,17 +22,12 @@ import com.windmeal.order.exception.OrdererMissMatchException;
 import com.windmeal.order.mapper.OrderRequestMapper;
 import com.windmeal.order.repository.OrderRepository;
 import com.windmeal.order.validator.OrderValidator;
-import com.windmeal.store.domain.Menu;
-import com.windmeal.store.exception.MenuNotFoundException;
-import com.windmeal.store.repository.MenuRepository;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.geo.Point;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,6 +42,7 @@ public class OrderService {
   private final OrderRequestMapper orderRequestMapper;
   private final PlaceRepository placeRepository;
 
+  private final BlackListRepository blackListRepository;
   @CacheEvict(value = "Orders", allEntries = true, cacheManager = "contentCacheManager") //데이터 삭제
   @Transactional
   public OrderCreateResponse createOrder(OrderCreateRequest request) {
@@ -124,7 +121,22 @@ public class OrderService {
   }
 
 
+  public RestSlice<OrderListResponse> removeBlackMemberOrder(
+      RestSlice<OrderListResponse> allOrder, Long memberId) {
 
+    List<Long> requesterIds = allOrder.getContent().stream().map(OrderListResponse::getMemberId)
+        .collect(Collectors.toList());
 
+    List<Long> blackOrderIds = blackListRepository.getBlackListByBlackMemberAndRequesterIn(
+        memberId, requesterIds);
 
+    for (Long blackOrderId : blackOrderIds) {
+      System.out.println("blackOrderId = " + blackOrderId);
+    }
+    List<OrderListResponse> result = allOrder.getContent().stream()
+        .filter(orderListResponse -> !blackOrderIds.contains(orderListResponse.getMemberId())).collect(
+            Collectors.toList());
+
+    return new RestSlice(result, allOrder.getNumber(), allOrder.getSize());
+  }
 }

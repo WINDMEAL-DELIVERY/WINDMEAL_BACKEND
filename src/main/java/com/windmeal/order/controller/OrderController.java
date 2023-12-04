@@ -2,6 +2,8 @@ package com.windmeal.order.controller;
 
 import com.windmeal.global.exception.ExceptionResponseDTO;
 import com.windmeal.global.exception.ResultDataResponseDTO;
+import com.windmeal.global.util.SecurityUtil;
+import com.windmeal.global.wrapper.RestSlice;
 import com.windmeal.order.dto.request.OrderCreateRequest;
 import com.windmeal.order.dto.request.OrderDeleteRequest;
 import com.windmeal.order.dto.response.OrderDetailResponse;
@@ -17,6 +19,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -86,7 +89,17 @@ public class OrderController {
       @Parameter(description = "검색 키워드", required = false, schema = @Schema(example = "카페"))
       @RequestParam(required = false) String storeCategory
   ){
-    return ResultDataResponseDTO.of(orderService.getAllOrder(pageable,storeId,eta,storeCategory,placeId));
+    RestSlice<OrderListResponse> allOrder = orderService.getAllOrder(pageable, storeId, eta,
+        storeCategory, placeId);
+
+    Long memberId = SecurityUtil.getCurrentNullableMemberId();
+    System.out.println("memberId = " + memberId);
+    if(memberId==null)
+      return ResultDataResponseDTO.of(allOrder);
+
+    RestSlice<OrderListResponse> orders = orderService.removeBlackMemberOrder(allOrder,memberId);
+
+    return ResultDataResponseDTO.of(orders);
   }
 
   @Operation(summary = "주문 내역 상세 조회", description = "주문 내역의 상세 내용을 조회합니다.")

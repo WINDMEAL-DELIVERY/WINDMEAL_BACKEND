@@ -9,6 +9,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.windmeal.global.wrapper.RestSlice;
+import com.windmeal.member.domain.QMember;
 import com.windmeal.order.dto.response.OrderListResponse;
 import com.windmeal.store.domain.QStoreCategory;
 import java.time.LocalDate;
@@ -37,6 +38,8 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
     List<OrderListResponse> content = jpaQueryFactory.select(Projections.constructor(
             OrderListResponse.class,
             order.id,
+            QMember.member.id,
+            QMember.member.nickname,
             order.place.name,
             order.place.longitude,
             order.place.latitude,
@@ -46,6 +49,7 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
             order.summary
         ))
         .from(order)
+        .leftJoin(QMember.member).on(QMember.member.id.eq(order.orderer_id))
         .leftJoin(store).on(order.store_id.eq(store.id))
         .where(eqStoreId(storeId), eqEta(eta), eqStoreCategory(storeCategory), eqPlace(placeId))
         .offset(pageable.getOffset())
