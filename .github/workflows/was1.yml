@@ -2,7 +2,7 @@ name: WAS1
 
 on:
   push:
-    branches: [ master, auth_security ]
+    branches: [ master ]
 
 permissions:
   contents: read
@@ -72,4 +72,4 @@ jobs:
           sudo docker container prune -f
           sudo docker pull ${{ secrets.WAS1_DOCKER_USERNAME }}/${{ secrets.WAS1_DOCKER_REPO }}
           sudo docker run -d -p 8080:8080 --name windmeal_delivery ${{ secrets.WAS1_DOCKER_USERNAME }}/${{ secrets.WAS1_DOCKER_REPO }}
-          docker image prune
+          sudo docker image prune -f

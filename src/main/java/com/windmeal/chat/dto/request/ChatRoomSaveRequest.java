@@ -3,22 +3,21 @@ package com.windmeal.chat.dto.request;
 import com.windmeal.chat.domain.ChatRoom;
 import com.windmeal.member.domain.Member;
 import com.windmeal.order.domain.Order;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(title = "주문(게시글)에 대한 채팅방 생성")
 public class ChatRoomSaveRequest {
 
-    private Long ownerId;
-    private Long guestId;
+    @Schema(description = "게시글의 ID", example = "3")
     private Long orderId;
 
-    public static ChatRoomSaveRequest of(Long ownerId, Long guestId, Long orderId) {
+    public static ChatRoomSaveRequest of(Long orderId) {
         return ChatRoomSaveRequest.builder()
-                .ownerId(ownerId)
-                .guestId(guestId)
                 .orderId(orderId)
                 .build();
     }

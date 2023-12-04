@@ -3,6 +3,7 @@ package com.windmeal.global.token.dao;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.windmeal.global.token.dto.RefreshTokenResponse;
+import com.windmeal.global.util.AES256Util;
 import com.windmeal.global.util.ClientIpUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,32 +17,36 @@ import static com.windmeal.global.constants.JwtConstants.REFRESH_TOKEN_EXPIRES_I
 
 @RequiredArgsConstructor
 public class RefreshTokenDAOImpl implements RefreshTokenDAO {
-    private final RedisTemplate redisTemplate;
-    private final ObjectMapper objectMapper;
+
+  private final ObjectMapper objectMapper;
+  private final RedisTemplate redisTemplate;
 
 
-    /**
-     * RefreshToken을 설정해주는 부분이다.
-     * @param memberId
-     * @param email 채팅서버에서 jwt만으로 사용자의 정보를 얻고 refreshToken의 존재 여부를 알기 위해 이메일을 추가했다.
-     * @param refreshToken
-     */
-    @Override
-    public void createRefreshToken(Long memberId, String email, String refreshToken, String clientIp) throws JsonProcessingException {
-        String value = objectMapper.writeValueAsString(RefreshTokenResponse.of(refreshToken, clientIp));
-        redisTemplate.opsForValue().set(PREFIX_REFRESHTOKEN + memberId + email
-                , value
-                , Duration.ofSeconds(REFRESH_TOKEN_EXPIRES_IN));
-    }
+  /**
+   * 암호화된 토큰과 키를 refresh token을 redis에 저장한다.
+   * @param key
+   * @param refreshToken
+   * @param clientIp
+   * @throws Exception
+   */
+  @Override
+  public void createRefreshToken(String key, String refreshToken, String clientIp)
+      throws Exception {
+    String value = objectMapper.writeValueAsString(RefreshTokenResponse.of(refreshToken, clientIp));
+    redisTemplate.opsForValue().set(key
+        , value
+        , Duration.ofSeconds(REFRESH_TOKEN_EXPIRES_IN));
+  }
 
-    @Override
-    public Optional<String> getRefreshToken(Long memberId, String email) {
-        return Optional.ofNullable((String) redisTemplate.opsForValue().get(PREFIX_REFRESHTOKEN + memberId + email));
-    }
+  @Override
+  public Optional<String> getRefreshToken(String key) throws Exception{
+    return Optional.ofNullable(
+        (String) redisTemplate.opsForValue().get(key));
+  }
 
-    @Override
-    public void removeRefreshToken(Long memberId, String email) {
-        redisTemplate.delete(PREFIX_REFRESHTOKEN + memberId + email);
-    }
+  @Override
+  public void removeRefreshToken(Long memberId, String email) {
+    redisTemplate.delete(PREFIX_REFRESHTOKEN + memberId + email);
+  }
 }
 

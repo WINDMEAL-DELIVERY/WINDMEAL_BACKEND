@@ -30,6 +30,7 @@ public class ChatRoomController {
     @Operation(summary = "채팅방 생성 요청", description = "채팅방이 생성됩니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "채팅방 생성 성공"),
+            @ApiResponse(responseCode = "400", description = "이미 배달 중인 주문"),
             @ApiResponse(responseCode = "400", description = "요청자와 접속자의 정보가 다름"),
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자"),
             @ApiResponse(responseCode = "404", description = "해당되는 사용자가 존재하지 않음"),
