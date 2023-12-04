@@ -77,9 +77,9 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
       );
       token = aes256Util.encrypt(tokenDTO.getAccessToken());
     } catch (Exception e) {
-      if(e.getClass().equals(JsonProcessingException.class))
+      if (e.getClass().equals(JsonProcessingException.class)) {
         log.error("리프레쉬 토큰 직렬화 에러");
-      else{
+      } else {
         // JsonProcessingException 예외가 아니라면 암호화와 관련된 예외이다.
         log.error(e.getMessage());
       }
@@ -107,13 +107,13 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
     Map<String, Object> attributes = principal.getAttributes();
     Optional<String> nickname = Optional.ofNullable(
-        (String) attributes.getOrDefault("nickname", null));
+        (String) attributes.getOrDefault(NICKNAME_KEY, null));
     Optional<String> redirectUri = CookieUtil.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
         .map(Cookie::getValue);
     String resultUri =
         nickname.isPresent() ? redirectUri.orElse(DEFAULT_OAUTH_REDIRECT) : NICKNAME_REDIRECT;
-    // 암호화된 토큰을 파라미터에 추가
-    String uriString = UriComponentsBuilder.fromUriString(resultUri).queryParam("code", encryptedToken)
+    String uriString = UriComponentsBuilder.fromUriString(resultUri)
+        .queryParam("code", encryptedToken)
         .build().toUriString();
     return uriString;
   }
