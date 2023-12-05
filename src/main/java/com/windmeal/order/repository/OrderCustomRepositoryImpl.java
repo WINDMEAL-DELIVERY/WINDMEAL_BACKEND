@@ -1,12 +1,12 @@
 package com.windmeal.order.repository;
 
+import static com.windmeal.member.domain.QBlackList.blackList;
 import static com.windmeal.order.domain.QOrder.order;
 import static com.windmeal.store.domain.QCategory.category;
 import static com.windmeal.store.domain.QStore.*;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.windmeal.global.wrapper.RestSlice;
 import com.windmeal.member.domain.QMember;
@@ -17,12 +17,8 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
-import org.springframework.data.geo.Point;
 
 @RequiredArgsConstructor
 public class OrderCustomRepositoryImpl implements OrderCustomRepository {
@@ -34,7 +30,7 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
 
   @Override
   public RestSlice<OrderListResponse> getOrderList(Pageable pageable, Long storeId, String eta,
-      String storeCategory, Long placeId) {
+      String storeCategory, Long placeId, Long memberId) {
     List<OrderListResponse> content = jpaQueryFactory.select(Projections.constructor(
             OrderListResponse.class,
             order.id,
@@ -51,7 +47,8 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
         .from(order)
         .leftJoin(QMember.member).on(QMember.member.id.eq(order.orderer_id))
         .leftJoin(store).on(order.store_id.eq(store.id))
-        .where(eqStoreId(storeId), eqEta(eta), eqStoreCategory(storeCategory), eqPlace(placeId))
+        .where(eqStoreId(storeId), eqEta(eta), eqStoreCategory(storeCategory), eqPlace(placeId),eqBlackList(memberId))
+        .orderBy(order.createdDate.desc())
         .offset(pageable.getOffset())
         .limit(pageable.getPageSize() + 1).fetch();
 
@@ -109,6 +106,16 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
   private BooleanExpression eqStoreId(Long storeId) {
     if (storeId != null) {
       return order.store_id.eq(storeId);
+    }
+    return null;
+  }
+
+  private BooleanExpression eqBlackList(Long memberId) {
+    if(memberId!=null){
+      return order.orderer_id.notIn(
+          jpaQueryFactory.select(blackList.requester.id)
+              .from(blackList)
+              .where(blackList.blacked.id.eq(memberId)).fetch());
     }
     return null;
   }

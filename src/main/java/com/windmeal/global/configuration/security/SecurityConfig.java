@@ -119,8 +119,8 @@ public class SecurityConfig {
         .antMatchers(PERMIT_URL_ARRAY).permitAll()
         .antMatchers("/auth/**").permitAll()
         .antMatchers("/oauth2/**").permitAll()
-        .anyRequest().authenticated()
-//        .anyRequest().permitAll()
+//        .anyRequest().authenticated()
+        .anyRequest().permitAll()
 
         // JwtSecurityConfig 설정
         .and()

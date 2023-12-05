@@ -43,7 +43,7 @@ public class OrderService {
   private final PlaceRepository placeRepository;
 
   private final BlackListRepository blackListRepository;
-  @CacheEvict(value = "Orders", allEntries = true, cacheManager = "contentCacheManager") //데이터 삭제
+//  @CacheEvict(value = "Orders", allEntries = true, cacheManager = "contentCacheManager") //데이터 삭제
   @Transactional
   public OrderCreateResponse createOrder(OrderCreateRequest request) {
     memberRepository.findById(request.getMemberId())
@@ -79,12 +79,12 @@ public class OrderService {
   }
 
 
-  @Cacheable(value = "Orders", key = "#pageable.pageNumber", cacheManager = "contentCacheManager",
-      condition = "#storeId == null&&#pageable.pageNumber==0"
-          + "&&#eta==null&&#storeCategory==null&&#placeId==null")
+//  @Cacheable(value = "Orders", key = "#pageable.pageNumber", cacheManager = "contentCacheManager",
+//      condition = "#storeId == null&&#pageable.pageNumber==0"
+//          + "&&#eta==null&&#storeCategory==null&&#placeId==null")
   public RestSlice<OrderListResponse> getAllOrder(Pageable pageable, Long storeId, String eta, String storeCategory,
-      Long placeId) {
-    return orderRepository.getOrderList(pageable,storeId,eta,storeCategory,placeId);
+      Long placeId, Long memberId) {
+    return orderRepository.getOrderList(pageable,storeId,eta,storeCategory,placeId,memberId);
   }
 
   /**

@@ -89,15 +89,9 @@ public class OrderController {
       @Parameter(description = "검색 키워드", required = false, schema = @Schema(example = "카페"))
       @RequestParam(required = false) String storeCategory
   ){
-    RestSlice<OrderListResponse> allOrder = orderService.getAllOrder(pageable, storeId, eta,
-        storeCategory, placeId);
-
     Long memberId = SecurityUtil.getCurrentNullableMemberId();
-    System.out.println("memberId = " + memberId);
-    if(memberId==null)
-      return ResultDataResponseDTO.of(allOrder);
-
-    RestSlice<OrderListResponse> orders = orderService.removeBlackMemberOrder(allOrder,memberId);
+    RestSlice<OrderListResponse> orders = orderService.getAllOrder(pageable, storeId, eta,
+        storeCategory, placeId,memberId);
 
     return ResultDataResponseDTO.of(orders);
   }
