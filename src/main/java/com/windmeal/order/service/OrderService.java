@@ -4,6 +4,7 @@ import com.windmeal.generic.domain.Money;
 import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.global.wrapper.RestSlice;
 import com.windmeal.member.exception.MemberNotFoundException;
+import com.windmeal.member.repository.BlackListRepository;
 import com.windmeal.member.repository.MemberRepository;
 import com.windmeal.model.place.Place;
 import com.windmeal.model.place.PlaceRepository;
@@ -15,22 +16,19 @@ import com.windmeal.order.dto.request.OrderDeleteRequest;
 import com.windmeal.order.dto.response.OrderCreateResponse;
 import com.windmeal.order.dto.response.OrderDetailResponse;
 import com.windmeal.order.dto.response.OrderListResponse;
+import com.windmeal.order.dto.response.OrderMapListResponse;
 import com.windmeal.order.exception.OrderAlreadyMatchedException;
 import com.windmeal.order.exception.OrderNotFoundException;
 import com.windmeal.order.exception.OrdererMissMatchException;
 import com.windmeal.order.mapper.OrderRequestMapper;
 import com.windmeal.order.repository.OrderRepository;
 import com.windmeal.order.validator.OrderValidator;
-import com.windmeal.store.domain.Menu;
-import com.windmeal.store.exception.MenuNotFoundException;
-import com.windmeal.store.repository.MenuRepository;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.geo.Point;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,7 +43,8 @@ public class OrderService {
   private final OrderRequestMapper orderRequestMapper;
   private final PlaceRepository placeRepository;
 
-//  @CacheEvict(value = "Orders", allEntries = true, cacheManager = "contentCacheManager")
+  private final BlackListRepository blackListRepository;
+  @CacheEvict(value = "Orders", allEntries = true, cacheManager = "contentCacheManager") //데이터 삭제
   @Transactional
   public OrderCreateResponse createOrder(OrderCreateRequest request) {
     memberRepository.findById(request.getMemberId())
@@ -81,12 +80,29 @@ public class OrderService {
   }
 
 
-//  @Cacheable(value = "Orders", key = "#pageable.pageNumber", cacheManager = "contentCacheManager")
+//  @Cacheable(value = "Orders", key = "#pageable.pageNumber", cacheManager = "contentCacheManager",
+//      condition = "#storeId == null&&#pageable.pageNumber==0"
+//          + "&&#eta==null&&#storeCategory==null&&#placeId==null")
   public RestSlice<OrderListResponse> getAllOrder(Pageable pageable, Long storeId, String eta, String storeCategory,
-      Long placeId) {
-    return orderRepository.getOrderList(pageable,storeId,eta,storeCategory,placeId);
+      Long placeId, Long memberId) {
+    return orderRepository.getOrderList(pageable,storeId,eta,storeCategory,placeId,memberId);
   }
 
+  /**
+   * 지도에 보여줄 데이터 조회
+   * 주문이 추가된 경우, 배달이 성사된 경우 캐시 초기화
+   * @param storeId
+   * @param eta
+   * @param storeCategory
+   * @param placeId
+   * @return
+   */
+  @Cacheable(value = "Orders", key = "0",cacheManager = "contentCacheManager",
+            condition = "#storeId == null&&#eta==null&&#storeCategory==null&&#placeId==null")
+  public List<OrderMapListResponse> getAllOrdersForMap(Long storeId, String eta, String storeCategory,
+      Long placeId) {
+    return orderRepository.getOrderMapList(storeId,eta,storeCategory,placeId);
+  }
   /**
    * 주문 상세 내용 조회
    * @param orderId
@@ -121,7 +137,22 @@ public class OrderService {
   }
 
 
+  public RestSlice<OrderListResponse> removeBlackMemberOrder(
+      RestSlice<OrderListResponse> allOrder, Long memberId) {
 
+    List<Long> requesterIds = allOrder.getContent().stream().map(OrderListResponse::getMemberId)
+        .collect(Collectors.toList());
 
+    List<Long> blackOrderIds = blackListRepository.getBlackListByBlackMemberAndRequesterIn(
+        memberId, requesterIds);
 
+    for (Long blackOrderId : blackOrderIds) {
+      System.out.println("blackOrderId = " + blackOrderId);
+    }
+    List<OrderListResponse> result = allOrder.getContent().stream()
+        .filter(orderListResponse -> !blackOrderIds.contains(orderListResponse.getMemberId())).collect(
+            Collectors.toList());
+
+    return new RestSlice(result, allOrder.getNumber(), allOrder.getSize());
+  }
 }

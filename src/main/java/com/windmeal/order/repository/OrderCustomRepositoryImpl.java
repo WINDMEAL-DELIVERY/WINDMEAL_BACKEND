@@ -1,27 +1,26 @@
 package com.windmeal.order.repository;
 
+import static com.windmeal.member.domain.QBlackList.blackList;
 import static com.windmeal.order.domain.QOrder.order;
 import static com.windmeal.store.domain.QCategory.category;
 import static com.windmeal.store.domain.QStore.*;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.windmeal.global.wrapper.RestSlice;
+import com.windmeal.member.domain.QMember;
+import com.windmeal.order.domain.OrderStatus;
 import com.windmeal.order.dto.response.OrderListResponse;
+import com.windmeal.order.dto.response.OrderMapListResponse;
 import com.windmeal.store.domain.QStoreCategory;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
-import org.springframework.data.geo.Point;
 
 @RequiredArgsConstructor
 public class OrderCustomRepositoryImpl implements OrderCustomRepository {
@@ -29,14 +28,32 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
 
   private final JPAQueryFactory jpaQueryFactory;
 
+  @Override
+  public List<OrderMapListResponse> getOrderMapList(Long storeId, String eta,
+      String storeCategory, Long placeId){
 
+    return jpaQueryFactory.select(Projections.constructor(
+        OrderMapListResponse.class,
+            order.store_id,
+            store.name,
+            order.store_id.count(),
+            store.place.longitude,
+            store.place.latitude
+        ))
+        .from(order)
+        .leftJoin(store).on(store.id.eq(order.store_id))
+        .where(eqStoreId(storeId), eqEta(eta), eqStoreCategory(storeCategory), eqPlace(placeId),eqOrderStatus(OrderStatus.ORDERED))
+        .groupBy(order.store_id).fetch();
+  }
 
   @Override
   public RestSlice<OrderListResponse> getOrderList(Pageable pageable, Long storeId, String eta,
-      String storeCategory, Long placeId) {
+      String storeCategory, Long placeId, Long memberId) {
     List<OrderListResponse> content = jpaQueryFactory.select(Projections.constructor(
             OrderListResponse.class,
             order.id,
+            QMember.member.id,
+            QMember.member.nickname,
             order.place.name,
             order.place.longitude,
             order.place.latitude,
@@ -46,8 +63,10 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
             order.summary
         ))
         .from(order)
+        .leftJoin(QMember.member).on(QMember.member.id.eq(order.orderer_id))
         .leftJoin(store).on(order.store_id.eq(store.id))
-        .where(eqStoreId(storeId), eqEta(eta), eqStoreCategory(storeCategory), eqPlace(placeId))
+        .where(eqStoreId(storeId), eqEta(eta), eqStoreCategory(storeCategory), eqPlace(placeId),eqBlackList(memberId),eqOrderStatus(OrderStatus.ORDERED))
+        .orderBy(order.createdDate.desc())
         .offset(pageable.getOffset())
         .limit(pageable.getPageSize() + 1).fetch();
 
@@ -105,6 +124,20 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
   private BooleanExpression eqStoreId(Long storeId) {
     if (storeId != null) {
       return order.store_id.eq(storeId);
+    }
+    return null;
+  }
+
+  private BooleanExpression eqOrderStatus(OrderStatus orderStatus) {
+    return order.orderStatus.eq(orderStatus);
+  }
+
+  private BooleanExpression eqBlackList(Long memberId) {
+    if(memberId!=null){
+      return order.orderer_id.notIn(
+          jpaQueryFactory.select(blackList.requester.id)
+              .from(blackList)
+              .where(blackList.blacked.id.eq(memberId)).fetch());
     }
     return null;
   }

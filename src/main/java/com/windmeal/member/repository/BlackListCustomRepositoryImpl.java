@@ -35,4 +35,13 @@ public class BlackListCustomRepositoryImpl implements BlackListCustomRepository{
     List<BlackListResponse> result = query.fetch();
     return new PageImpl<>(result, pageable, size);
   }
+
+  @Override
+  public List<Long> getBlackListByBlackMemberAndRequesterIn(Long blackMemberId,
+      List<Long> requesterId) {
+    return jpaQueryFactory.select(blackList.requester.id)
+        .from(blackList)
+        .where(blackList.blacked.id.eq(blackMemberId),blackList.requester.id.in(requesterId)).fetch();
+//    return null;
+  }
 }

@@ -11,7 +11,9 @@ import com.querydsl.core.types.dsl.DateTimePath;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.windmeal.order.domain.DeliveryStatus;
+import com.windmeal.order.domain.OrderStatus;
 import com.windmeal.order.dto.response.DeliveryListResponse;
+import com.windmeal.order.dto.response.OrderingListResponse;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -50,6 +52,7 @@ public class DeliveryCustomRepositoryImpl implements DeliveryCustomRepository {
             delivery.deliveryStatus.eq(DeliveryStatus.DELIVERING),
             eqEta(today)
         )
+        .orderBy(delivery.createdDate.desc())
         .offset(pageable.getOffset())
         .limit(pageable.getPageSize() + 1).fetch();
     boolean hasNext = false;
@@ -61,27 +64,31 @@ public class DeliveryCustomRepositoryImpl implements DeliveryCustomRepository {
   }
 
   @Override
-  public Slice<DeliveryListResponse> getOwnOrdering(Long memberId, LocalDate today,
+  public Slice<OrderingListResponse> getOwnOrdering(Long memberId, LocalDate today,
       Pageable pageable) {
-    List<DeliveryListResponse> content = jpaQueryFactory.select(
-            Projections.constructor(DeliveryListResponse.class,
-                delivery.id,
+    List<OrderingListResponse> content = jpaQueryFactory.select(
+            Projections.constructor(OrderingListResponse.class,
+//                delivery.id,
                 order.id,
-                delivery.deliveryStatus,
+                order.orderStatus,
                 order.summary,
                 order.description,
                 place.name,
                 jpaQueryFactory.select(member.nickname).from(member)
                     .where(member.id.eq(delivery.deliver.id))
             ))
-        .from(delivery)
-        .join(delivery.order, order)
-        .join(order.place, place)
+        .from(order)
+//        .leftJoin(delivery).on(order.id.eq(delivery.order.id))
+//    (delivery.order, order)
+        .leftJoin(place).on(order.place.id.eq(place.id))
         .where(
             order.orderer_id.eq(memberId),
-            delivery.deliveryStatus.eq(DeliveryStatus.DELIVERING),
+            order.orderStatus.eq(OrderStatus.ORDERED)
+                .or(order.orderStatus.eq(OrderStatus.DELIVERING)),
+//            delivery.deliveryStatus.eq(DeliveryStatus.DELIVERING),
             eqEta(today)
         )
+        .orderBy(order.createdDate.desc())
         .offset(pageable.getOffset())
         .limit(pageable.getPageSize() + 1).fetch();
     boolean hasNext = false;
