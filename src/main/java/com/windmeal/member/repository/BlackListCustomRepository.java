@@ -7,4 +7,6 @@ import org.springframework.data.domain.Page;
 
 public interface BlackListCustomRepository {
   Page<BlackListResponse> getBlackListByRequesterId(Pageable pageable, Long requesterId);
+
+  List<Long> getBlackListByBlackMemberAndRequesterIn(Long blackMemberId, List<Long> requesterId);
 }

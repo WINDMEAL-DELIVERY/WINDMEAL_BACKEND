@@ -2,12 +2,14 @@ package com.windmeal.order.controller;
 
 import com.windmeal.global.exception.ExceptionResponseDTO;
 import com.windmeal.global.exception.ResultDataResponseDTO;
+import com.windmeal.global.util.SecurityUtil;
+import com.windmeal.global.wrapper.RestSlice;
 import com.windmeal.order.dto.request.OrderCreateRequest;
 import com.windmeal.order.dto.request.OrderDeleteRequest;
 import com.windmeal.order.dto.response.OrderDetailResponse;
 import com.windmeal.order.dto.response.OrderListResponse;
+import com.windmeal.order.dto.response.OrderMapListResponse;
 import com.windmeal.order.service.OrderService;
-import com.windmeal.store.dto.request.StoreCreateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,13 +17,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.time.LocalTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.geo.Point;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -86,7 +85,29 @@ public class OrderController {
       @Parameter(description = "검색 키워드", required = false, schema = @Schema(example = "카페"))
       @RequestParam(required = false) String storeCategory
   ){
-    return ResultDataResponseDTO.of(orderService.getAllOrder(pageable,storeId,eta,storeCategory,placeId));
+    Long memberId = SecurityUtil.getCurrentNullableMemberId();
+    RestSlice<OrderListResponse> orders = orderService.getAllOrder(pageable, storeId, eta,
+        storeCategory, placeId,memberId);
+
+    return ResultDataResponseDTO.of(orders);
+  }
+
+
+  @GetMapping("/order/map")
+  public ResultDataResponseDTO<List<OrderMapListResponse>> getAllOrdersForMap(
+      @Parameter(description = "가게 id", required = false, schema = @Schema(example = "1"))
+      @RequestParam(required = false) Long storeId,
+      @Parameter(description = "도착지 id", required = false, schema = @Schema(example = "1"))
+      @RequestParam(required = false) Long placeId,
+      @Parameter(description = "도착 예정 시간", required = false, schema = @Schema(example = "23:10:00"))
+      @RequestParam(required = false) String eta,
+      @Parameter(description = "검색 키워드", required = false, schema = @Schema(example = "카페"))
+      @RequestParam(required = false) String storeCategory
+  ){
+    List<OrderMapListResponse> orders = orderService.getAllOrdersForMap(storeId, eta,
+        storeCategory, placeId);
+
+    return ResultDataResponseDTO.of(orders);
   }
 
   @Operation(summary = "주문 내역 상세 조회", description = "주문 내역의 상세 내용을 조회합니다.")
@@ -101,4 +122,6 @@ public class OrderController {
   public ResultDataResponseDTO<OrderDetailResponse> getOrderDetail(@PathVariable Long orderId){
     return ResultDataResponseDTO.of(orderService.getOrderDetail(orderId));
   }
+
+
 }

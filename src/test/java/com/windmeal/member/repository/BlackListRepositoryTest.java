@@ -6,6 +6,7 @@ import com.windmeal.IntegrationTestSupport;
 import com.windmeal.member.domain.BlackList;
 import com.windmeal.member.domain.Member;
 import com.windmeal.member.dto.response.BlackListResponse;
+import java.util.Arrays;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,4 +41,14 @@ class BlackListRepositoryTest extends IntegrationTestSupport {
         .containsExactly("test");
   }
 
+
+  @DisplayName("")
+  @Test
+  void getBlackListByBlackMemberAndRequesterIn(){
+      //given
+
+      //when
+          blackListRepository.getBlackListByBlackMemberAndRequesterIn(0L, Arrays.asList(1L,2L));
+      //then
+  }
 }

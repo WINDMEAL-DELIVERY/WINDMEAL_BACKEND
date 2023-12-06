@@ -13,6 +13,7 @@ import com.windmeal.order.domain.OrderCancel;
 import com.windmeal.order.dto.request.DeliveryCreateRequest;
 import com.windmeal.order.dto.request.DeliveryCancelRequest;
 import com.windmeal.order.dto.response.DeliveryListResponse;
+import com.windmeal.order.dto.response.OrderingListResponse;
 import com.windmeal.order.exception.DeliverOrdererSameException;
 import com.windmeal.order.exception.DeliveryNotFoundException;
 import com.windmeal.order.exception.OrderAlreadyMatchedException;
@@ -47,7 +48,6 @@ public class DeliveryService {
   private final OrderCancelRepository orderCancelRepository;
   @Transactional
   public void createDelivery(DeliveryCreateRequest request) {
-    System.out.println("request = " + request);
     Member deliver = memberRepository.findById(request.getMemberId())
         .orElseThrow(() -> new MemberNotFoundException(ErrorCode.NOT_FOUND, "존재하지 않는 사용자입니다."));
 
@@ -115,7 +115,7 @@ public class DeliveryService {
     return deliveryRepository.getOwnDelivering(memberId, LocalDate.now(), pageable);
   }
 
-  public Slice<DeliveryListResponse> getOwnOrdering(Long memberId,Pageable pageable){
+  public Slice<OrderingListResponse> getOwnOrdering(Long memberId,Pageable pageable){
     return deliveryRepository.getOwnOrdering(memberId, LocalDate.now(), pageable);
   }
 }
