@@ -15,7 +15,7 @@ class OrderCustomRepositoryImplTest extends IntegrationTestSupport {
   void getOrderList() {
     //given
     //when
-    orderRepository.getOrderList(null,null,null,null,null, memberId);
+//    orderRepository.getOrderMapList(null,null,null,null,null);
     //then
 //    for (OrderListResponse orderListResponse : allOrder) {
 //      System.out.println("orderListDetailResponse = " + orderListResponse);

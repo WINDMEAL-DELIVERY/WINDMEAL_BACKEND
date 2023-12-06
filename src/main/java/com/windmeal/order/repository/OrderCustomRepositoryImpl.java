@@ -10,7 +10,9 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.windmeal.global.wrapper.RestSlice;
 import com.windmeal.member.domain.QMember;
+import com.windmeal.order.domain.OrderStatus;
 import com.windmeal.order.dto.response.OrderListResponse;
+import com.windmeal.order.dto.response.OrderMapListResponse;
 import com.windmeal.store.domain.QStoreCategory;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -26,7 +28,23 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
 
   private final JPAQueryFactory jpaQueryFactory;
 
+  @Override
+  public List<OrderMapListResponse> getOrderMapList(Long storeId, String eta,
+      String storeCategory, Long placeId){
 
+    return jpaQueryFactory.select(Projections.constructor(
+        OrderMapListResponse.class,
+            order.store_id,
+            store.name,
+            order.store_id.count(),
+            store.place.longitude,
+            store.place.latitude
+        ))
+        .from(order)
+        .leftJoin(store).on(store.id.eq(order.store_id))
+        .where(eqStoreId(storeId), eqEta(eta), eqStoreCategory(storeCategory), eqPlace(placeId),eqOrderStatus(OrderStatus.ORDERED))
+        .groupBy(order.store_id).fetch();
+  }
 
   @Override
   public RestSlice<OrderListResponse> getOrderList(Pageable pageable, Long storeId, String eta,
@@ -47,7 +65,7 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
         .from(order)
         .leftJoin(QMember.member).on(QMember.member.id.eq(order.orderer_id))
         .leftJoin(store).on(order.store_id.eq(store.id))
-        .where(eqStoreId(storeId), eqEta(eta), eqStoreCategory(storeCategory), eqPlace(placeId),eqBlackList(memberId))
+        .where(eqStoreId(storeId), eqEta(eta), eqStoreCategory(storeCategory), eqPlace(placeId),eqBlackList(memberId),eqOrderStatus(OrderStatus.ORDERED))
         .orderBy(order.createdDate.desc())
         .offset(pageable.getOffset())
         .limit(pageable.getPageSize() + 1).fetch();
@@ -108,6 +126,10 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
       return order.store_id.eq(storeId);
     }
     return null;
+  }
+
+  private BooleanExpression eqOrderStatus(OrderStatus orderStatus) {
+    return order.orderStatus.eq(orderStatus);
   }
 
   private BooleanExpression eqBlackList(Long memberId) {

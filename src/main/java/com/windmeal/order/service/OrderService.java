@@ -16,6 +16,7 @@ import com.windmeal.order.dto.request.OrderDeleteRequest;
 import com.windmeal.order.dto.response.OrderCreateResponse;
 import com.windmeal.order.dto.response.OrderDetailResponse;
 import com.windmeal.order.dto.response.OrderListResponse;
+import com.windmeal.order.dto.response.OrderMapListResponse;
 import com.windmeal.order.exception.OrderAlreadyMatchedException;
 import com.windmeal.order.exception.OrderNotFoundException;
 import com.windmeal.order.exception.OrdererMissMatchException;
@@ -43,7 +44,7 @@ public class OrderService {
   private final PlaceRepository placeRepository;
 
   private final BlackListRepository blackListRepository;
-//  @CacheEvict(value = "Orders", allEntries = true, cacheManager = "contentCacheManager") //데이터 삭제
+  @CacheEvict(value = "Orders", allEntries = true, cacheManager = "contentCacheManager") //데이터 삭제
   @Transactional
   public OrderCreateResponse createOrder(OrderCreateRequest request) {
     memberRepository.findById(request.getMemberId())
@@ -87,6 +88,21 @@ public class OrderService {
     return orderRepository.getOrderList(pageable,storeId,eta,storeCategory,placeId,memberId);
   }
 
+  /**
+   * 지도에 보여줄 데이터 조회
+   * 주문이 추가된 경우, 배달이 성사된 경우 캐시 초기화
+   * @param storeId
+   * @param eta
+   * @param storeCategory
+   * @param placeId
+   * @return
+   */
+  @Cacheable(value = "Orders", key = "0",cacheManager = "contentCacheManager",
+            condition = "#storeId == null&&#eta==null&&#storeCategory==null&&#placeId==null")
+  public List<OrderMapListResponse> getAllOrdersForMap(Long storeId, String eta, String storeCategory,
+      Long placeId) {
+    return orderRepository.getOrderMapList(storeId,eta,storeCategory,placeId);
+  }
   /**
    * 주문 상세 내용 조회
    * @param orderId
