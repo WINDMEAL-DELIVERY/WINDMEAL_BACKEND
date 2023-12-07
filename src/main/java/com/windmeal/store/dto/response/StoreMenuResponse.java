@@ -84,8 +84,10 @@ public class StoreMenuResponse {
   }
 
   @Getter
+  @AllArgsConstructor
+  @NoArgsConstructor
   @Schema(title = "가게 메뉴 정보")
-  private class MenuCategoryResponse {
+  private static class MenuCategoryResponse {
     @Schema(description = "메뉴 카테고리 ID", example = "1")
     private Long menuCategoryId;
     @Schema(description = "메뉴 카테고리 이름", example = "인기 상품")
