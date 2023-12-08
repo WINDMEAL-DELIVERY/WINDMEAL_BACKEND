@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Schema(title = "내가 요청한 주문 목록")
 public class OrderingListResponse {
-  @Schema(description = "배달 ID", example = "1")
+//  @Schema(description = "배달 ID", example = "1")
 //  private Long deliveryId;
   @Schema(description = "주문 ID", example = "1")
   private Long orderId;
