@@ -12,20 +12,21 @@ import com.windmeal.global.token.dao.RefreshTokenDAO;
 import com.windmeal.global.token.dto.RefreshTokenResponse;
 import com.windmeal.global.token.util.TokenProvider;
 import com.windmeal.global.util.AES256Util;
-import com.windmeal.global.util.ClientIpUtil;
 import com.windmeal.member.domain.Member;
-import com.windmeal.member.dto.response.MemberInfoDTO;
-import com.windmeal.member.exception.*;
+import com.windmeal.member.exception.EmptyAccessTokenException;
+import com.windmeal.member.exception.EmptyRefreshTokenException;
+import com.windmeal.member.exception.EncryptionException;
+import com.windmeal.member.exception.InvalidRefreshTokenException;
+import com.windmeal.member.exception.InvalidRegistrationException;
+import com.windmeal.member.exception.MemberNotFoundException;
 import com.windmeal.member.repository.MemberRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.servlet.http.Cookie;
-import java.util.Optional;
 import org.springframework.util.StringUtils;
 
 @Slf4j

@@ -2,7 +2,8 @@ package com.windmeal.order.domain;
 
 import com.windmeal.member.domain.Member;
 import com.windmeal.model.BaseEntity;
-import com.windmeal.model.BaseTimeEntity;
+import com.windmeal.model.event.EventPublisher;
+import com.windmeal.order.domain.event.DeliveryCancelEvent;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -41,5 +42,7 @@ public class OrderCancel extends BaseEntity {
         this.content = content;
         order.canceled();
         delivery.canceled();
+        //TODO 취소한 사람이 아닌 사람에게 알람을 위한 event
+        EventPublisher.publish(new DeliveryCancelEvent(content));
     }
 }
