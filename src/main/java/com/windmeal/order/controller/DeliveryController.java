@@ -58,9 +58,12 @@ public class DeliveryController {
     deliveryService.cancelDelivery(request);
   }
 
-  //TODO 내가 배달중인 목록
 
   @GetMapping("/delivery")
+  @Operation(summary = "내가 배달중인 목록", description = "메인 페이지")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "OK")
+  })
   public ResultDataResponseDTO getOwnDelivering(Pageable pageable){
     Long memberId = SecurityUtil.getCurrentNullableMemberId();
 
@@ -69,14 +72,43 @@ public class DeliveryController {
     return ResultDataResponseDTO.of(deliveryService.getOwnDelivering(memberId,pageable));
   }
 
-  //TODO 내가 요청한 목록
   @GetMapping("/delivery/order")
+  @Operation(summary = "내가 요청한 목록", description = "메인 페이지")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "OK")
+  })
   public ResultDataResponseDTO getOwnOrdering(Pageable pageable){
     Long memberId = SecurityUtil.getCurrentNullableMemberId();
 
     if(memberId==null) return ResultDataResponseDTO.empty();
 
     return ResultDataResponseDTO.of(deliveryService.getOwnOrdering(memberId,pageable));
+  }
+
+
+  @GetMapping("/ordered")
+  @Operation(summary = "내가 주문했던 목록", description = "마이 페이지")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "OK")
+  })
+  public ResultDataResponseDTO getOwnOrdered(Pageable pageable){
+    Long memberId = SecurityUtil.getCurrentMemberId();
+
+
+    return ResultDataResponseDTO.of(null);
+  }
+
+
+  @GetMapping("/delivered")
+  @Operation(summary = "내가 배달했던 목록", description = "마이 페이지")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "OK")
+  })
+  public ResultDataResponseDTO getOwnDelivered(Pageable pageable){
+    Long memberId = SecurityUtil.getCurrentMemberId();
+
+
+    return ResultDataResponseDTO.of(null);
   }
 
 }
