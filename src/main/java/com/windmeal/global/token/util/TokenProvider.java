@@ -18,6 +18,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -94,7 +95,7 @@ public class TokenProvider implements InitializingBean {
                 .build();
     }
 
-    public String createAccessToken(Authentication authentication) {
+    public String createAccessToken(Authentication authentication, String nickname) {
         String authorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
         Date currentDate = new Date();
@@ -105,6 +106,7 @@ public class TokenProvider implements InitializingBean {
                 .setSubject(authentication.getName())
                 .claim(EMAIL, details.getPassword())
                 .claim(AUTHORITIES_KEY, authorities)
+                .claim(NICKNAME_KEY, nickname)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .setIssuedAt(currentDate)
                 .setExpiration(accessValidity)

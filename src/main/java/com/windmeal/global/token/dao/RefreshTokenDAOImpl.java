@@ -39,7 +39,7 @@ public class RefreshTokenDAOImpl implements RefreshTokenDAO {
   }
 
   @Override
-  public Optional<String> getRefreshToken(String key) throws Exception{
+  public Optional<String> getRefreshToken(String key){
     return Optional.ofNullable(
         (String) redisTemplate.opsForValue().get(key));
   }
