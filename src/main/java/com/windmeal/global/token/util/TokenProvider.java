@@ -1,11 +1,13 @@
 package com.windmeal.global.token.util;
 
+import com.windmeal.global.security.oauth2.user.UserPrincipal;
 import com.windmeal.global.token.dto.TokenInfoResponse;
 import com.windmeal.global.util.AES256Util;
 import com.windmeal.member.dto.response.MemberInfoDTO;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +28,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.windmeal.global.constants.JwtConstants.*;
+import static com.windmeal.global.constants.SecurityConstants.NICKNAME_KEY;
 
 /**
  * 토큰 생성, 토큰 검증, 인증 객체 조회 등의 역할을 수행하는 유사 유틸 클래스
@@ -63,10 +66,15 @@ public class TokenProvider implements InitializingBean {
         Date accessValidity = new Date(currentTime + ACCESS_TOKEN_EXPIRES_IN);
         Date refreshValidity = new Date(currentTime + REFRESH_TOKEN_EXPIRES_IN);
         UserDetails details = (UserDetails) authentication.getPrincipal();
+        // 닉네임 파트
+        UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+        Map<String, Object> attributes = principal.getAttributes();
+        String nickname = (String) attributes.get(NICKNAME_KEY);
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim(EMAIL, details.getPassword())
                 .claim(AUTHORITIES_KEY, authorities)
+                .claim(NICKNAME_KEY, nickname)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .setIssuedAt(currentDate)
                 .setExpiration(accessValidity)

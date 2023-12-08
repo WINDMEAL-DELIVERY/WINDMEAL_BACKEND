@@ -33,11 +33,6 @@ public class MemberService {
     }
 
     public boolean checkNickname(String nickname) {
-        // was 1과 2의 결과가 다른 현상의 원인을 추적하기 위해 로그를 찍어보겠다.
-        List<Member> all = memberRepository.findAll();
-        for (Member member : all) {
-            log.info(member.getId() + " " + member.getNickname());
-        }
         return memberRepository.existsByNickname(nickname);
     }
 

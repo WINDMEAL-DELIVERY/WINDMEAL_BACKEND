@@ -26,8 +26,9 @@ public class MemberController {
     @Operation(summary = "닉네임 등록 요청", description = "최초 회원가입 시, 닉네임을 추가로 입력 받습니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "닉네임 설정 성공"),
-            @ApiResponse(responseCode = "400", description = "이미 존재하는 닉네임"),
-            @ApiResponse(responseCode = "404", description = "해당되는 사용자가 존재하지 않음")
+            @ApiResponse(responseCode = "400", description = "이미 사용 중인 닉네임입니다."),
+            @ApiResponse(responseCode = "400", description = "닉네임에는 특수문자가 포함될 수 없습니다."),
+            @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없습니다.")
     })
     @PostMapping(value = "/nickname")
     public ResultDataResponseDTO<String> registerNickname(@Valid @RequestBody NicknameRequest request) {
