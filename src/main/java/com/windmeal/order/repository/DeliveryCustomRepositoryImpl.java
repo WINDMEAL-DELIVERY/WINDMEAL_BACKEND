@@ -8,6 +8,7 @@ import static com.windmeal.order.domain.QOrder.order;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.DateTimePath;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.windmeal.order.domain.DeliveryStatus;
@@ -45,8 +46,8 @@ public class DeliveryCustomRepositoryImpl implements DeliveryCustomRepository {
                     .where(member.id.eq(order.orderer_id))
             ))
         .from(delivery)
-        .join(delivery.order, order)
-        .join(order.place, place)
+        .innerJoin(delivery.order, order)
+        .innerJoin(order.place, place)
         .where(
             delivery.deliver.id.eq(memberId),
             delivery.deliveryStatus.eq(DeliveryStatus.DELIVERING),
@@ -68,19 +69,21 @@ public class DeliveryCustomRepositoryImpl implements DeliveryCustomRepository {
       Pageable pageable) {
     List<OrderingListResponse> content = jpaQueryFactory.select(
             Projections.constructor(OrderingListResponse.class,
-//                delivery.id,
                 order.id,
                 order.orderStatus,
                 order.summary,
                 order.description,
                 place.name,
-                jpaQueryFactory.select(member.nickname).from(member)
-                    .where(member.id.eq(delivery.deliver.id))
+                member.nickname
             ))
-        .from(order)
-//        .leftJoin(delivery).on(order.id.eq(delivery.order.id))
-//    (delivery.order, order)
-        .leftJoin(place).on(order.place.id.eq(place.id))
+        .from(delivery)
+//        .leftJoin(order,delivery.order)
+        .rightJoin(delivery.order,order)
+        .innerJoin(order.place,place)
+        .innerJoin(delivery.deliver,member)
+
+//        .innerJoin(delivery.deliver,member)
+
         .where(
             order.orderer_id.eq(memberId),
             order.orderStatus.eq(OrderStatus.ORDERED)
