@@ -11,7 +11,7 @@ public class EventPublisher {
         EventPublisher.eventPublisher = publisher;
     }
 
-    public static void raise(Event event){
+    public static void publish(Event event){
         if(eventPublisher != null){
             eventPublisher.publishEvent(event);
         }
