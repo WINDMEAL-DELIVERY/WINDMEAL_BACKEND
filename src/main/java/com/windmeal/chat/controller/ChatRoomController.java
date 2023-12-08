@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/chat")
+@RequestMapping("/api/chatroom")
 @Tag(name = "채팅방", description = "채팅방 관련 API 입니다.")
 public class ChatRoomController {
 
@@ -41,7 +41,7 @@ public class ChatRoomController {
         return ResultDataResponseDTO.of(chatRoomService.createChatRoom(requestDTO, currentMemberId));
     }
 
-    @GetMapping("/chatroom")
+    @GetMapping
     @Operation(summary = "채팅방 조회 요청", description = "사용자가 속한 채팅방 목록을 조회합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "채팅방 조회 성공"),

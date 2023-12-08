@@ -65,13 +65,13 @@ public class ChatRoomService {
     /**
      * 채팅방 조회를 관장하는 메서드
      * 현재 사용자가 속한 모든 채팅방을 조회하고, 채팅방의 아이디와 속한 사용자들의 아이디를 리스트로 반환한다
+     * 사용자가 처음 접속하면 자신이 속한 채팅방을 모두 구독해야 하기 때문에, 채팅방의 아이디 리스트가 필요할 것이고, 이를 위해 호출될 api에 사용된다.
+     * 이전에 나간 채팅방일 경우 해당 로직에서 조회되지 않는다.
+     * TODO 상대방이 채팅방을 나가지 않았을 경우, 상대의 알람 토큰을 함께 전달해주어야 한다.
      * @param memberId
      * @return ChatRoomListResponse
      */
     public ChatRoomListResponse getChatRoomsByMemberId(Long memberId, Pageable pageable) {
-        // owner, guest 여부에 관계 없이 사용자가 참여한 채팅방 리스트를 반환받는다.
-        // 사용자가 처음 접속하면 자신이 속한 채팅방을 모두 구독해야 하기 때문에, 채팅방의 아이디 리스트가 필요할 것이다.
-        // 자신이 삭제한 채팅방일 경우 조회되지 않는다.
         Slice<ChatRoomListResponse.ChatRoomSpecResponse> chatRoomSpecResponses = chatRoomRepository.findChatRoomsByMemberId(memberId, pageable);
         return ChatRoomListResponse.of(chatRoomSpecResponses);
     }
