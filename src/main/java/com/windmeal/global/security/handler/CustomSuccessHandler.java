@@ -62,6 +62,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
   private Optional<String> addToken(HttpServletRequest request, HttpServletResponse response,
       Authentication authentication) throws IOException {
+    // 닉네임이 존재할 경우 클레임에 포함하고, 그렇지 않은 경우 클레임에 포함하지 않는다.
     TokenInfoResponse.TokenDetail tokenDTO = tokenProvider.createToken(authentication);
     UserDetails userDetails = (UserDetails) authentication.getPrincipal();
     // authentication.getDetails 로도 IP 주소르 받아올 수 있는데, 프록시나 로드밸런서의 아이피가 아닌 사용자의 아이피인지 잘 모르겠다.

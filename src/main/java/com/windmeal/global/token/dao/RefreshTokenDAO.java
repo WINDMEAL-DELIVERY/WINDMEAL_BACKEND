@@ -6,6 +6,6 @@ import java.util.Optional;
 
 public interface RefreshTokenDAO {
     void createRefreshToken(String key, String refreshToken, String ip) throws Exception;
-    Optional<String> getRefreshToken(String key) throws Exception;
+    Optional<String> getRefreshToken(String key);
     void removeRefreshToken(Long memberId, String email);
 }
