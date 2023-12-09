@@ -75,6 +75,10 @@ dependencies {
 	//querydsl
 	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
 	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
+//	implementation 'com.querydsl:querydsl-mongodb'
+	implementation("com.querydsl:querydsl-mongodb:5.0.0") {
+		exclude group: "org.mongodb", module: "mongo-java-driver"
+	}
 
 	// Swagger 3.0.0
 	implementation 'org.springdoc:springdoc-openapi-ui:1.5.7'
@@ -97,6 +101,7 @@ def querydslDir = "$buildDir/generated/querydsl"
 querydsl {
 	jpa = true
 	querydslSourcesDir = querydslDir
+	springDataMongo = true
 }
 // build 시 사용할 sourceSet 추가
 sourceSets {

@@ -46,10 +46,8 @@ public class ChatRoomService {
 
         Order order = orderRepository.findById(requestDTO.getOrderId())
                 .orElseThrow(() -> new OrderNotFoundException(ErrorCode.NOT_FOUND, "주문이 존재하지 않습니다."));
-
         Member owner = memberRepository.findById(order.getOrderer_id())
                 .orElseThrow(() -> new MemberNotFoundException(ErrorCode.NOT_FOUND, "주문 작성자를 찾을 수 없습니다."));
-
         Member guest = memberRepository.findById(currentMemberId)
                 .orElseThrow(() -> new MemberNotFoundException(ErrorCode.NOT_FOUND, "해당 사용자를 찾을 수 없습니다."));
 
