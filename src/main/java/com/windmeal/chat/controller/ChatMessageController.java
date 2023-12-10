@@ -26,7 +26,9 @@ public class ChatMessageController {
 
   @Operation(summary = "채팅방의 메시지 조회", description = "전달한 채팅방의 메시자를 페이지네이션으로 조회합니다")
   @ApiResponses({
-
+      @ApiResponse(responseCode = "200", description = "채팅 메시지 조회 성공"),
+      @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자"),
+      @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없습니다."),
   })
   @GetMapping("/{chatroomId}")
   public ResultDataResponseDTO<ChatMessageResponse> messageList(@PathVariable Long chatroomId,
