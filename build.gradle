@@ -46,15 +46,12 @@ dependencies {
 
 	// oauth 관련 의존성
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-//	implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
 
 	// jwt 관련 의존성
 	compileOnly group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
-//	testImplementation 'org.springframework.security:spring-security-test'
-//	implementation 'org.springframework.boot:spring-boot-starter-security'
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -68,7 +65,6 @@ dependencies {
 	implementation 'com.querydsl:querydsl-spatial'
 
 	//redis
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.springframework.boot:spring-boot-starter-cache'
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 	implementation 'com.fasterxml.jackson.core:jackson-databind'
@@ -79,15 +75,21 @@ dependencies {
 	//querydsl
 	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
 	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
+//	implementation 'com.querydsl:querydsl-mongodb'
+	implementation("com.querydsl:querydsl-mongodb:5.0.0") {
+		exclude group: "org.mongodb", module: "mongo-java-driver"
+	}
 
 	// Swagger 3.0.0
 	implementation 'org.springdoc:springdoc-openapi-ui:1.5.7'
 	implementation 'org.springdoc:springdoc-openapi-security:1.5.7'
 
-
 	// redisson
 	implementation 'org.redisson:redisson-spring-boot-starter:3.21.1'
-//	implementation 'org.redisson:redisson-spring-boot-starter'
+
+	// mongodb
+	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
 }
 
 /*
@@ -99,6 +101,7 @@ def querydslDir = "$buildDir/generated/querydsl"
 querydsl {
 	jpa = true
 	querydslSourcesDir = querydslDir
+	springDataMongo = true
 }
 // build 시 사용할 sourceSet 추가
 sourceSets {

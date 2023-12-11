@@ -50,6 +50,11 @@ public class OrderCreateRequest {
         .build();
   }
 
+  public OrderCreateRequest toServiceDto(Long memberId) {
+    this.memberId = memberId;
+    return this;
+  }
+
   @Getter
   @Builder
   @AllArgsConstructor

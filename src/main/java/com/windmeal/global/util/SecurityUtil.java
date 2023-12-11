@@ -61,7 +61,7 @@ public class SecurityUtil {
     private static void authenticationCheck(Authentication authentication) {
         if(authentication == null || authentication.getName() == null ||
                 authentication.getName().equals(ANONYMOUSUSER)) {
-            throw new NotAuthorizedException(ErrorCode.UNAUTHORIZED, "인증되지 않은 사용자입니다.");
+            throw new NotAuthorizedException();
         }
     }
 }

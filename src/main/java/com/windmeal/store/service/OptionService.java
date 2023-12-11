@@ -32,8 +32,7 @@ public class OptionService {
   @Transactional
   public void createOption(OptionCreateRequest request,Long menuId) {
     Menu menu = menuRepository.findById(menuId)
-        .orElseThrow(() -> new MenuNotFoundException(
-            ErrorCode.NOT_FOUND, "메뉴가 존재하지 않습니다."));
+        .orElseThrow(() -> new MenuNotFoundException());
     OptionGroup savedOptionGroup = optionGroupRepository.save(request.toOptionGroupEntity(menu));
     optionSpecificationRepository.createOptionSpecs(request.getOptionSpec(),
         savedOptionGroup.getId());
@@ -42,8 +41,7 @@ public class OptionService {
   @Cacheable(value = "Menu", key = "#menuId", cacheManager = "contentCacheManager")
   public MenuOptionResponse getMenuGroups(Long menuId) {
     Menu menu = menuRepository.findById(menuId)
-        .orElseThrow(() -> new MenuNotFoundException(
-            ErrorCode.NOT_FOUND, "메뉴가 존재하지 않습니다."));
+        .orElseThrow(() -> new MenuNotFoundException());
     List<OptionGroup> optionGroups = optionGroupRepository.findByMenuId(menu.getId());
     List<Long> optionGroupIdList = optionGroups.stream().map(OptionGroup::getId).collect(Collectors.toList());
     Map<Long, List<OptionSpecResponse>> optionSpecs = optionSpecificationRepository.findByOptionGroupIdIn(

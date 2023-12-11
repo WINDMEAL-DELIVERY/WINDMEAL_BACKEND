@@ -44,7 +44,8 @@ public class OrderController {
   })
   @PostMapping("/order")
   public void createOrder(@RequestBody OrderCreateRequest request){
-    orderService.createOrder(request);
+    Long memberId = SecurityUtil.getCurrentMemberId();
+    orderService.createOrder(request.toServiceDto(memberId));
   }
 
   @Operation(summary = "주문 요청 삭제 요청", description = "주문 요청이 삭제됩니다.")
@@ -124,4 +125,15 @@ public class OrderController {
   }
 
 
+  @GetMapping("/ordered")
+  @Operation(summary = "내가 주문했던 목록 조회", description = "마이 페이지")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "OK")
+  })
+  public ResultDataResponseDTO getOwnOrdered(Pageable pageable){
+    Long memberId = SecurityUtil.getCurrentMemberId();
+
+
+    return ResultDataResponseDTO.of(null);
+  }
 }

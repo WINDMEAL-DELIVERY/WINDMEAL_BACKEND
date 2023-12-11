@@ -8,4 +8,8 @@ public class DuplicatedNicknameException extends GeneralException {
     public DuplicatedNicknameException(ErrorCode errorCode, String message) {
         super(errorCode, message);
     }
+
+    public DuplicatedNicknameException() {
+        super(ErrorCode.VALIDATION_ERROR, "이미 사용 중인 닉네임입니다.");
+    }
 }

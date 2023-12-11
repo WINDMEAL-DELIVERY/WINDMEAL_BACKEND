@@ -11,6 +11,10 @@ public class MenuNotFoundException extends GeneralException {
   }
 
   public MenuNotFoundException(String s) {
-    super(s);
+    super(ErrorCode.NOT_FOUND, s);
+  }
+
+  public MenuNotFoundException() {
+    super(ErrorCode.NOT_FOUND, "메뉴가 존재하지 않습니다.");
   }
 }

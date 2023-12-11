@@ -24,10 +24,10 @@ public class BlackListService {
   @Transactional
   public void addBlackList(Long requestMemberId, BlackListCreateRequest request){
     Member requestMember = memberRepository.findById(requestMemberId)
-        .orElseThrow(() -> new MemberNotFoundException(ErrorCode.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+        .orElseThrow(() -> new MemberNotFoundException());
 
     Member blackMember = memberRepository.findByEmail(request.getEmail())
-        .orElseThrow(() -> new MemberNotFoundException(ErrorCode.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+        .orElseThrow(() -> new MemberNotFoundException());
 
     BlackList blackList = BlackList.place(requestMember, blackMember);
     blackListRepository.save(blackList);
@@ -36,10 +36,10 @@ public class BlackListService {
   @Transactional
   public void deleteBlackList(Long requestMemberId, BlackListDeleteRequest request){
     Member requestMember = memberRepository.findById(requestMemberId)
-        .orElseThrow(() -> new MemberNotFoundException(ErrorCode.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+        .orElseThrow(() -> new MemberNotFoundException());
 
     BlackList blackList = blackListRepository.findById(request.getBlackListId())
-        .orElseThrow(() -> new BlackListNotFoundException(ErrorCode.NOT_FOUND, "해당 벤은 존재하지 않습니다."));
+        .orElseThrow(() -> new BlackListNotFoundException());
 
     blackListRepository.delete(blackList);
   }

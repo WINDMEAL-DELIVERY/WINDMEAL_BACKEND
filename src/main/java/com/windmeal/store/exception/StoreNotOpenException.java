@@ -11,6 +11,10 @@ public class StoreNotOpenException extends GeneralException {
   }
 
   public StoreNotOpenException(String s) {
-    super(s);
+    super(ErrorCode.BAD_REQUEST,s);
+  }
+
+  public StoreNotOpenException() {
+    super(ErrorCode.BAD_REQUEST, "가게 운영시간이 아닙니다.");
   }
 }

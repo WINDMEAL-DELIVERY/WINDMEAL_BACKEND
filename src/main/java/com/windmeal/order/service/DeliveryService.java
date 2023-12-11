@@ -20,12 +20,11 @@ import com.windmeal.order.exception.DeliverOrdererSameException;
 import com.windmeal.order.exception.DeliveryNotFoundException;
 import com.windmeal.order.exception.OrderAlreadyMatchedException;
 import com.windmeal.order.exception.OrderNotFoundException;
-import com.windmeal.order.repository.DeliveryRepository;
-import com.windmeal.order.repository.OrderCancelRepository;
-import com.windmeal.order.repository.OrderRepository;
+import com.windmeal.order.repository.delivery.DeliveryRepository;
+import com.windmeal.order.repository.order.OrderCancelRepository;
+import com.windmeal.order.repository.order.OrderRepository;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -51,16 +50,16 @@ public class DeliveryService {
   @Transactional
   public void createDelivery(DeliveryCreateRequest request) {
     Member deliver = memberRepository.findById(request.getMemberId())
-        .orElseThrow(() -> new MemberNotFoundException(ErrorCode.NOT_FOUND, "존재하지 않는 사용자입니다."));
+        .orElseThrow(() -> new MemberNotFoundException());
 
     Order order = orderRepository.findById(request.getOrderId())
-        .orElseThrow(() -> new OrderNotFoundException(ErrorCode.NOT_FOUND, "존재하지 않는 주문입니다."));
+        .orElseThrow(() -> new OrderNotFoundException());
 
     Member orderer = memberRepository.findById(order.getOrderer_id())
-        .orElseThrow(() -> new MemberNotFoundException(ErrorCode.NOT_FOUND, "존재하지 않는 사용자입니다."));
+        .orElseThrow(() -> new MemberNotFoundException());
 
     if(order.getOrderer_id().equals(deliver.getId())){
-      throw new DeliverOrdererSameException(ErrorCode.BAD_REQUEST,"본인의 주문을 배달할 수 없습니다.");
+      throw new DeliverOrdererSameException();
     }
     deliverySave(deliver, order);
 
@@ -73,7 +72,7 @@ public class DeliveryService {
     deliveryRepository.findByOrderIdAndDeliveryStatusNot(order.getId(),DeliveryStatus.CANCELED)
         .ifPresent(
             delivery -> {
-              throw new OrderAlreadyMatchedException(ErrorCode.BAD_REQUEST, "이미 매칭된 주문입니다.");
+              throw new OrderAlreadyMatchedException();
             });
 
     Delivery delivery = new Delivery(deliver, order,DeliveryStatus.DELIVERING);
@@ -86,7 +85,7 @@ public class DeliveryService {
     deliveryRepository.findByOrderId(order.getId())
         .ifPresent(
             delivery -> {
-              throw new OrderAlreadyMatchedException(ErrorCode.BAD_REQUEST, "이미 매칭된 주문입니다.");
+              throw new OrderAlreadyMatchedException();
             });
 
     Delivery delivery = new Delivery(deliver, order,DeliveryStatus.DELIVERING);
@@ -102,12 +101,12 @@ public class DeliveryService {
   @Transactional
   public void cancelDelivery(DeliveryCancelRequest request) {
     Order order = orderRepository.findById(request.getOrderId())
-        .orElseThrow(() -> new OrderNotFoundException(ErrorCode.NOT_FOUND, "존재하지 않는 주문입니다."));
+        .orElseThrow(() -> new OrderNotFoundException());
     Member cancelMember = memberRepository.findById(request.getMemberId())
-        .orElseThrow(() -> new MemberNotFoundException(ErrorCode.NOT_FOUND, "존재하지 않는 사용자입니다."));
+        .orElseThrow(() -> new MemberNotFoundException());
     Delivery delivery = deliveryRepository.findByOrderIdAndDeliveryStatus(order.getId(),
             DeliveryStatus.DELIVERING)
-        .orElseThrow(() -> new DeliveryNotFoundException(ErrorCode.NOT_FOUND, "배달 요청이 존재하지 않습니다."));
+        .orElseThrow(() -> new DeliveryNotFoundException());
 
 
     OrderCancel orderCancel = OrderCancel.builder()

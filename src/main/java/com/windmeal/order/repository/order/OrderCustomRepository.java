@@ -1,4 +1,4 @@
-package com.windmeal.order.repository;
+package com.windmeal.order.repository.order;
 
 import com.windmeal.global.wrapper.RestSlice;
 import com.windmeal.order.dto.response.OrderListResponse;

@@ -1,13 +1,28 @@
 package com.windmeal.global.token.util;
 
+import static com.windmeal.global.constants.JwtConstants.ACCESS_TOKEN_EXPIRES_IN;
+import static com.windmeal.global.constants.JwtConstants.AUTHORITIES_KEY;
+import static com.windmeal.global.constants.JwtConstants.BEARER_PREFIX;
+import static com.windmeal.global.constants.JwtConstants.EMAIL;
+import static com.windmeal.global.constants.JwtConstants.REFRESH_TOKEN_EXPIRES_IN;
+import static com.windmeal.global.constants.SecurityConstants.NICKNAME_KEY;
+
 import com.windmeal.global.security.oauth2.user.UserPrincipal;
 import com.windmeal.global.token.dto.TokenInfoResponse;
-import com.windmeal.global.util.AES256Util;
-import com.windmeal.member.dto.response.MemberInfoDTO;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import java.security.Key;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
 import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,16 +34,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-
-import java.security.Key;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static com.windmeal.global.constants.JwtConstants.*;
-import static com.windmeal.global.constants.SecurityConstants.NICKNAME_KEY;
 
 /**
  * 토큰 생성, 토큰 검증, 인증 객체 조회 등의 역할을 수행하는 유사 유틸 클래스
@@ -94,7 +99,7 @@ public class TokenProvider implements InitializingBean {
                 .build();
     }
 
-    public String createAccessToken(Authentication authentication) {
+    public String createAccessToken(Authentication authentication, String nickname) {
         String authorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
         Date currentDate = new Date();
@@ -105,6 +110,7 @@ public class TokenProvider implements InitializingBean {
                 .setSubject(authentication.getName())
                 .claim(EMAIL, details.getPassword())
                 .claim(AUTHORITIES_KEY, authorities)
+                .claim(NICKNAME_KEY, nickname)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .setIssuedAt(currentDate)
                 .setExpiration(accessValidity)
@@ -121,18 +127,6 @@ public class TokenProvider implements InitializingBean {
                         .collect(Collectors.toList());
         User principal = new User(claims.getSubject(), (String) claims.get(EMAIL), authorities);
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
-//        throw new InvaildTokenException("토큰이 유효하지 않습니다.");
-    }
-
-    public Optional<MemberInfoDTO> getMemberInfoFromToken(String token) {
-        Long userId = null;
-        String email = null;
-        Claims claims = parseClaims(token);
-        if (!claims.isEmpty()) {
-            userId = Long.parseLong(claims.getSubject());
-            email = (String) claims.get(EMAIL);
-        }
-        return MemberInfoDTO.ofNullable(userId, email);
     }
 
     public boolean validateToken(String token) {
