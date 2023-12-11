@@ -24,7 +24,7 @@ public class ChatMessageService {
   public ChatMessageResponse findChatMessages(Long chatroomId, Long currentMemberId,
       Pageable pageable) {
     if (!memberRepository.existsById(currentMemberId)) {
-      throw new MemberNotFoundException(ErrorCode.NOT_FOUND, "사용자를 찾을 수 없습니다.");
+      throw new MemberNotFoundException();
     }
     Slice<MessageDocument> messageDocuments = messageDocumentRepository.findByChatroomId(chatroomId,
         pageable);

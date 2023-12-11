@@ -12,4 +12,7 @@ public class NotAuthorizedException extends GeneralException {
     public NotAuthorizedException(ErrorCode errorCode, String message) {
         super(errorCode, message);
     }
+    public NotAuthorizedException() {
+        super(ErrorCode.UNAUTHORIZED, "인증되지 않은 사용자입니다.");
+    }
 }

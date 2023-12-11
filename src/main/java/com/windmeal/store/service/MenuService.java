@@ -24,8 +24,7 @@ public class MenuService {
   @Transactional
   public MenuResponse createMenu(MenuCreateRequest request,String imageUrl) {
     MenuCategory menuCategory = menuCategoryRepository.findById(request.getMenuCategoryId())
-        .orElseThrow(() -> new MenuCategoryNotFoundException(
-            ErrorCode.NOT_FOUND, "메뉴 카테고리를 지정해주세요"));
+        .orElseThrow(() -> new MenuCategoryNotFoundException());
     Menu savedMenu = menuRepository.save(request.toEntity(menuCategory, imageUrl));
     return MenuResponse.of(savedMenu);
   }

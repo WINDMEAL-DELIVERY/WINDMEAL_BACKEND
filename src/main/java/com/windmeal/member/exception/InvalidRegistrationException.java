@@ -12,4 +12,8 @@ public class InvalidRegistrationException extends GeneralException {
       String message) {
     super(errorCode, message);
   }
+
+  public InvalidRegistrationException() {
+    super(ErrorCode.VALIDATION_ERROR, "닉네임이 등록되지 않은 사용자입니다.");
+  }
 }

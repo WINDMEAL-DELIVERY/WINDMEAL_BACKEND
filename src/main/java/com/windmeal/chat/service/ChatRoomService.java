@@ -38,15 +38,15 @@ public class ChatRoomService {
     public ChatRoomResponse createChatRoom(ChatRoomSaveRequest requestDTO, Long currentMemberId) {
 
         Order order = orderRepository.findById(requestDTO.getOrderId())
-                .orElseThrow(() -> new OrderNotFoundException(ErrorCode.NOT_FOUND, "주문이 존재하지 않습니다."));
+                .orElseThrow(() -> new OrderNotFoundException());
         Member owner = memberRepository.findById(order.getOrderer_id())
-                .orElseThrow(() -> new MemberNotFoundException(ErrorCode.NOT_FOUND, "주문 작성자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new MemberNotFoundException("주문 작성자를 찾을 수 없습니다."));
         Member guest = memberRepository.findById(currentMemberId)
-                .orElseThrow(() -> new MemberNotFoundException(ErrorCode.NOT_FOUND, "해당 사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new MemberNotFoundException("해당 사용자를 찾을 수 없습니다."));
 
         // 주문이 진행중이면 채팅방을 생성할 수 없다.
         if(!order.getOrderStatus().equals(OrderStatus.ORDERED)) {
-            throw new OrderAlreadyMatchedException(ErrorCode.BAD_REQUEST, "이미 매칭된 주문입니다.");
+            throw new OrderAlreadyMatchedException();
         }
         ChatroomDocument chatRoom = chatroomDocumentRepository.save(
             requestDTO.toDocument(owner, guest, order));

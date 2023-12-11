@@ -11,6 +11,10 @@ public class MenuChangeException extends GeneralException {
   }
 
   public MenuChangeException(String s) {
-    super(s);
+    super(ErrorCode.BAD_REQUEST,s);
+  }
+
+  public MenuChangeException() {
+    super(ErrorCode.BAD_REQUEST, "메뉴가 변경되었습니다.");
   }
 }

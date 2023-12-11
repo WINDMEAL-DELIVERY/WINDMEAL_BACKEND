@@ -32,14 +32,14 @@ public class CategoryService {
   @Transactional
   public void updateCategory(CategoryUpdateRequest request) {
     Category category = categoryJpaRepository.findById(request.getId()).orElseThrow(
-        () -> new CategoryNotFoundException(ErrorCode.NOT_FOUND, "카테고리가 존재하지 않습니다."));
+        () -> new CategoryNotFoundException());
     category.updateName(request.getName());
   }
 
   @Transactional
   public void deleteCategory(CategoryUpdateRequest request) {
     categoryJpaRepository.findById(request.getId()).orElseThrow(
-        () -> new CategoryNotFoundException(ErrorCode.NOT_FOUND, "카테고리가 존재하지 않습니다."));
+        () -> new CategoryNotFoundException());
     categoryJpaRepository.deleteById(request.getId());
   }
 

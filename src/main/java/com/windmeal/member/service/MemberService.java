@@ -28,9 +28,9 @@ public class MemberService {
   @Transactional
   public String registerNickname(NicknameRequest request, Long currentMemberId) {
     Member member = memberRepository.findById(currentMemberId)
-        .orElseThrow(() -> new MemberNotFoundException(ErrorCode.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+        .orElseThrow(() -> new MemberNotFoundException());
     if (memberRepository.existsByNickname(request.getNickname())) {
-      throw new DuplicatedNicknameException(ErrorCode.VALIDATION_ERROR, "이미 사용 중인 닉네임입니다.");
+      throw new DuplicatedNicknameException();
     }
     member.updateNickname(request.getNickname());
     return member.getNickname();
@@ -45,7 +45,7 @@ public class MemberService {
     // TODO 토큰 암호화 후 저장
     String decrypt = aes256Util.encrypt(memberInfoRequest.getAlarmToken());
     Member member = memberRepository.findById(currentMemberId)
-        .orElseThrow(() -> new MemberNotFoundException(ErrorCode.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+        .orElseThrow(() -> new MemberNotFoundException());
     return MemberInfoDTO.of(member.getId(), member.getEmail(), member.getNickname());
   }
 

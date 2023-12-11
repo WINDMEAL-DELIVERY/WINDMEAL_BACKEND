@@ -48,7 +48,7 @@ public class OrderService {
   @Transactional
   public OrderCreateResponse createOrder(OrderCreateRequest request) {
     memberRepository.findById(request.getMemberId())
-        .orElseThrow(() -> new MemberNotFoundException(ErrorCode.NOT_FOUND, "존재하지 않는 사용자입니다."));
+        .orElseThrow(() -> new MemberNotFoundException());
 
     orderValidator.validate(request);
     Place place = placeRepository.findByNameAndLongitudeAndLatitude(request.getPlaceName(),request.getLongitude(),request.getLatitude())
@@ -66,14 +66,14 @@ public class OrderService {
   @Transactional
   public void deleteOrder(OrderDeleteRequest request) {
     Order order = orderRepository.findById(request.getOrderId())
-        .orElseThrow(() -> new OrderNotFoundException(ErrorCode.NOT_FOUND, "존재하지 않는 주문입니다."));
+        .orElseThrow(() -> new OrderNotFoundException());
 
     if(!order.getOrderStatus().equals(OrderStatus.ORDERED)){
-      throw new OrderAlreadyMatchedException(ErrorCode.BAD_REQUEST, "이미 배달 요청이 성사된 주문은 삭제할 수 없습니다.");
+      throw new OrderAlreadyMatchedException("이미 배달 요청이 성사된 주문은 삭제할 수 없습니다.");
     }
 
     if(!order.getOrderer_id().equals(request.getMemberId())){
-      throw new OrdererMissMatchException(ErrorCode.BAD_REQUEST, "본인의 주문만 삭제할 수 있습니다.");
+      throw new OrdererMissMatchException();
     }
 
     orderRepository.deleteById(request.getOrderId());
@@ -110,7 +110,7 @@ public class OrderService {
    */
   public OrderDetailResponse getOrderDetail(Long orderId) {
     Order order = orderRepository.findById(orderId)
-        .orElseThrow(() -> new OrderNotFoundException(ErrorCode.NOT_FOUND, "존재하지 않는 주문입니다."));
+        .orElseThrow(() -> new OrderNotFoundException());
 
     return OrderDetailResponse.from(order);
   }

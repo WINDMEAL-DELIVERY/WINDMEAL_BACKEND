@@ -30,8 +30,7 @@ public class MenuCategoryService {
   @Transactional
   public MenuCategoryResponse createMenuCategory(MenuCategoryCreateRequest request,Long storeId) {
     Store store = storeRepository.findById(storeId)
-        .orElseThrow(() -> new StoreNotFoundException(
-            ErrorCode.NOT_FOUND, "가게가 존재하지 않습니다."));
+        .orElseThrow(() -> new StoreNotFoundException());
 
     MenuCategory savedMenuCategory = menuCategoryRepository.save(request.toEntity(store));
     return MenuCategoryResponse.of(savedMenuCategory,store.getId());
@@ -43,7 +42,7 @@ public class MenuCategoryService {
 
     MenuCategory menuCategory = menuCategoryRepository.findById(menuCategoryId)
         .orElseThrow(
-            () -> new MenuCategoryNotFoundException(ErrorCode.NOT_FOUND, "메뉴 카테고리가 존재하지 않습니다."));
+            () -> new MenuCategoryNotFoundException());
 
     menuCategory.updateName(request.getName());
   }

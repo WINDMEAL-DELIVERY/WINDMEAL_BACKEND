@@ -60,15 +60,15 @@ public class OrderValidator {
 
   void validate(OrderCreateRequest request,Store store, Map<Long, Menu> menu) {
     if (!store.isOpen()) {
-      throw new StoreNotOpenException(ErrorCode.BAD_REQUEST, "가게 운영시간이 아닙니다.");
+      throw new StoreNotOpenException();
     }
 
     if (request.getMenus().isEmpty()) {
-      throw new OrderEmptyException(ErrorCode.BAD_REQUEST, "주문 항목이 비어있습니다.");
+      throw new OrderEmptyException();
     }
 
     if(request.getDeliveryFee().isLessThan(Money.MIN)){
-      throw new OrderDeliveryFeeException(ErrorCode.BAD_REQUEST,String.format("배달료는 %s 이상 입력해주세요.",Money.MIN.wons()));
+      throw new OrderDeliveryFeeException(String.format("배달료는 %s 이상 입력해주세요.",Money.MIN.wons()));
     }
     for (OrderMenuRequest requestMenu : request.getMenus()) {
       validateMenu(requestMenu, menu.getOrDefault(requestMenu.getMenuId(), null));
@@ -77,14 +77,14 @@ public class OrderValidator {
 
   private void validateMenu(OrderMenuRequest requestMenu, Menu menu) {
     if (requestMenu.getCount() <= 0) {
-      throw new OrderMenuCountException(ErrorCode.BAD_REQUEST, "메뉴의 수량을 1개 이상 입력해주세요.");
+      throw new OrderMenuCountException();
     }
     if (menu == null) {
-      throw new MenuNotFoundException(ErrorCode.BAD_REQUEST, "메뉴가 존재하지 않습니다.");
+      throw new MenuNotFoundException();
     }
 
     if(!(menu.getName().equals(requestMenu.getName())&&menu.getPrice().wons()==requestMenu.getPrice().wons())){
-      throw new MenuChangeException(ErrorCode.BAD_REQUEST, "메뉴가 변경되었습니다.");
+      throw new MenuChangeException();
     }
 
     Map<Long, List<OrderSpecRequest>> menuGroups = getMenuGroups(requestMenu);
@@ -102,7 +102,7 @@ public class OrderValidator {
         .filter(key -> !collect.contains(key))
         .findFirst()
         .ifPresent(key -> {
-          throw new OrderGroupValidException(ErrorCode.BAD_REQUEST,"옵션 선택이 잘못되었습니다.");
+          throw new OrderGroupValidException();
         });
   }
 
@@ -117,15 +117,15 @@ public class OrderValidator {
 
     //필수 옵션인데 1개도 선택되지 않은 경우
     if(optionGroup.getIsEssentialOption() && optionSpecs.isEmpty()){
-      throw new OrderGroupEmptyException(ErrorCode.BAD_REQUEST,"필수 옵션을 선택해주세요.");
+      throw new OrderGroupEmptyException();
     }
     //다중 선택 옵션이 없는데 1개 이상 선택한 경우
     if(!optionGroup.getIsMultipleOption()&& optionSpecs.size()>1){
-      throw new OrderGroupIsNotMultipleException(ErrorCode.BAD_REQUEST,"1개의 옵션만 선택 가능합니다.");
+      throw new OrderGroupIsNotMultipleException();
     }
 
     if(satisfied(optionGroup.getOptionSpecifications(), optionSpecs).size()!=optionSpecs.size()){
-      throw new OrderSpecificationChangeException(ErrorCode.BAD_REQUEST,"메뉴 상세 정보가 변경되었습니다.");
+      throw new OrderSpecificationChangeException();
     }
 
   }
@@ -133,13 +133,12 @@ public class OrderValidator {
 
   private Store getStore(OrderCreateRequest request) {
     return storeRepository.findById(request.getStoreId())
-        .orElseThrow(() -> new StoreNotFoundException(
-            ErrorCode.NOT_FOUND, "존재하지 않는 매장입니다."));
+        .orElseThrow(() -> new StoreNotFoundException());
   }
 
   private Member getMember(OrderCreateRequest request) {
     return memberRepository.findById(request.getMemberId())
-        .orElseThrow(() -> new MemberNotFoundException(ErrorCode.NOT_FOUND, "존재하지 않는 사용자입니다."));
+        .orElseThrow(() -> new MemberNotFoundException());
   }
   private List<Long> getMenuIds(List<OrderMenuRequest> menus) {
     return menus.stream().map(OrderMenuRequest::getMenuId).collect(toList());

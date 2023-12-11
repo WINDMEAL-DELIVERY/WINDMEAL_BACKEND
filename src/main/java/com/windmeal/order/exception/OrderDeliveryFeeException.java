@@ -11,6 +11,6 @@ public class OrderDeliveryFeeException extends GeneralException {
   }
 
   public OrderDeliveryFeeException(String s) {
-    super(s);
+    super(ErrorCode.BAD_REQUEST,s);
   }
 }

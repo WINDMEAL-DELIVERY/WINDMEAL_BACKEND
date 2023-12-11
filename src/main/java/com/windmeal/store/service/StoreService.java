@@ -49,7 +49,7 @@ public class StoreService {
   @Transactional
   public StoreResponse createStore(StoreCreateRequest request, String imgUrl) {
     Member findMember = memberRepository.findById(request.getMemberId())
-        .orElseThrow(() -> new MemberNotFoundException(ErrorCode.NOT_FOUND,"사용자가 존재하지 않습니다.")); //Member Not Found 예외 추가 예정
+        .orElseThrow(() -> new MemberNotFoundException()); //Member Not Found 예외 추가 예정
     Place place = placeRepository.findByNameAndLongitudeAndLatitude(request.getPlaceName(),request.getLongitude(),request.getLatitude())
         .orElseGet(() -> placeRepository.save(request.toPlaceEntity()));
 
@@ -69,7 +69,7 @@ public class StoreService {
   @Transactional
   public String updateStorePhoto(Long storeId, String updateUrl) {
     Store findStore = storeRepository.findById(storeId).orElseThrow(
-        () -> new StoreNotFoundException(ErrorCode.NOT_FOUND, "매장이 존재하지 않습니다."));
+        () -> new StoreNotFoundException());
 
     String originalPhoto = findStore.getPhoto();
     findStore.updatePhoto(updateUrl);
@@ -80,7 +80,7 @@ public class StoreService {
   @Transactional
   public void updateStoreInfo(Long storeId, StoreUpdateRequest request) {
     Store findStore = storeRepository.findById(storeId).orElseThrow(
-        () -> new StoreNotFoundException(ErrorCode.NOT_FOUND, "매장이 존재하지 않습니다."));
+        () -> new StoreNotFoundException());
     Place place = placeRepository.findByNameAndLongitudeAndLatitude(request.getPlaceName(),request.getLongitude(),request.getLatitude())
         .orElseGet(() -> placeRepository.save(request.toPlaceEntity()));
 
@@ -89,7 +89,7 @@ public class StoreService {
   @Cacheable(value = "Store", key = "#storeId", cacheManager = "contentCacheManager")
   public StoreMenuResponse getStoreInfo(Long storeId) {
     Store store = storeRepository.findById(storeId)
-        .orElseThrow(() -> new StoreNotFoundException(ErrorCode.NOT_FOUND, "매장이 존재하지 않습니다."));
+        .orElseThrow(() -> new StoreNotFoundException());
     List<MenuCategory> menuCategories = menuCategoryRepository.findByStoreId(store.getId());
     List<Long> menuCategoryIds = menuCategories.stream().map(MenuCategory::getId)
         .collect(Collectors.toList());

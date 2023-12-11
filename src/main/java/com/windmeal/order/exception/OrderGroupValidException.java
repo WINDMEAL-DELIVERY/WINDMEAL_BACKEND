@@ -9,7 +9,10 @@ public class OrderGroupValidException extends GeneralException {
     super(errorCode, message);
   }
 
+  public OrderGroupValidException() {
+    super(ErrorCode.BAD_REQUEST,"옵션 선택이 잘못되었습니다.");
+  }
   public OrderGroupValidException(String s) {
-    super(s);
+    super(ErrorCode.BAD_REQUEST,s);
   }
 }
