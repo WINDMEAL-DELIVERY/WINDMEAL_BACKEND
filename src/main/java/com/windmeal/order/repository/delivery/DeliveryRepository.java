@@ -1,4 +1,4 @@
-package com.windmeal.order.repository;
+package com.windmeal.order.repository.delivery;
 
 import com.windmeal.order.domain.Delivery;
 import com.windmeal.order.domain.DeliveryStatus;

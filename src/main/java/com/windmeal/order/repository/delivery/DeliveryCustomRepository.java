@@ -1,4 +1,4 @@
-package com.windmeal.order.repository;
+package com.windmeal.order.repository.delivery;
 
 import com.windmeal.order.dto.response.DeliveryListResponse;
 import com.windmeal.order.dto.response.OrderingListResponse;

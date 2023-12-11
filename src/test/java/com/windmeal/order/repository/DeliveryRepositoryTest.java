@@ -7,6 +7,8 @@ import com.windmeal.model.place.PlaceRepository;
 import com.windmeal.order.domain.Delivery;
 import com.windmeal.order.domain.DeliveryStatus;
 import com.windmeal.order.domain.Order;
+import com.windmeal.order.repository.delivery.DeliveryRepository;
+import com.windmeal.order.repository.order.OrderRepository;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import org.assertj.core.api.Assertions;

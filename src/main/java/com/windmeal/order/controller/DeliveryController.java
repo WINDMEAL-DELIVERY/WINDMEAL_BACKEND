@@ -86,21 +86,10 @@ public class DeliveryController {
   }
 
 
-  @GetMapping("/ordered")
-  @Operation(summary = "내가 주문했던 목록", description = "마이 페이지")
-  @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "OK")
-  })
-  public ResultDataResponseDTO getOwnOrdered(Pageable pageable){
-    Long memberId = SecurityUtil.getCurrentMemberId();
-
-
-    return ResultDataResponseDTO.of(null);
-  }
 
 
   @GetMapping("/delivered")
-  @Operation(summary = "내가 배달했던 목록", description = "마이 페이지")
+  @Operation(summary = "내가 배달했던 목록 조회", description = "마이 페이지")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "OK")
   })

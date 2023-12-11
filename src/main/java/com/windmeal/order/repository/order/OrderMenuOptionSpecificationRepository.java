@@ -1,4 +1,4 @@
-package com.windmeal.order.repository;
+package com.windmeal.order.repository.order;
 
 import com.windmeal.order.domain.OrderMenuOptionSpecification;
 import org.springframework.data.jpa.repository.JpaRepository;

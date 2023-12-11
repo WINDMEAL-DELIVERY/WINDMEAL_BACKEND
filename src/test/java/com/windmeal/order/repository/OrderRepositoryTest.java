@@ -2,7 +2,6 @@ package com.windmeal.order.repository;
 
 import com.windmeal.IntegrationTestSupport;
 import com.windmeal.generic.domain.Money;
-import com.windmeal.order.domain.Order;
 import com.windmeal.order.dto.request.OrderCreateRequest;
 import com.windmeal.order.dto.request.OrderCreateRequest.OrderCreateRequestBuilder;
 import com.windmeal.order.dto.request.OrderCreateRequest.OrderGroupRequest;
@@ -12,6 +11,7 @@ import com.windmeal.order.dto.request.OrderCreateRequest.OrderMenuRequest.OrderM
 import com.windmeal.order.dto.request.OrderCreateRequest.OrderSpecRequest;
 import com.windmeal.order.dto.request.OrderCreateRequest.OrderSpecRequest.OrderSpecRequestBuilder;
 import com.windmeal.order.mapper.OrderRequestMapper;
+import com.windmeal.order.repository.order.OrderRepository;
 import com.windmeal.store.domain.Menu;
 import com.windmeal.store.domain.Menu.MenuBuilder;
 import com.windmeal.store.domain.OptionGroup;
@@ -21,8 +21,6 @@ import com.windmeal.store.domain.OptionSpecification.OptionSpecificationBuilder;
 import com.windmeal.store.domain.Store;
 import com.windmeal.store.domain.Store.StoreBuilder;
 import java.util.Arrays;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class OrderRepositoryTest extends IntegrationTestSupport {

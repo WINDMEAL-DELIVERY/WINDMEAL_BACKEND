@@ -21,7 +21,7 @@ import com.windmeal.order.exception.OrderAlreadyMatchedException;
 import com.windmeal.order.exception.OrderNotFoundException;
 import com.windmeal.order.exception.OrdererMissMatchException;
 import com.windmeal.order.mapper.OrderRequestMapper;
-import com.windmeal.order.repository.OrderRepository;
+import com.windmeal.order.repository.order.OrderRepository;
 import com.windmeal.order.validator.OrderValidator;
 import java.util.List;
 import java.util.stream.Collectors;

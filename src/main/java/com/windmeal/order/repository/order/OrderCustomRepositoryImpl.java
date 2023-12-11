@@ -1,4 +1,4 @@
-package com.windmeal.order.repository;
+package com.windmeal.order.repository.order;
 
 import static com.windmeal.member.domain.QBlackList.blackList;
 import static com.windmeal.order.domain.QOrder.order;

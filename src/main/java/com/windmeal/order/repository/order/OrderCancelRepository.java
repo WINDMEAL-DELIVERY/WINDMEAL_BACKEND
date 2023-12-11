@@ -1,4 +1,4 @@
-package com.windmeal.order.repository;
+package com.windmeal.order.repository.order;
 
 import com.windmeal.order.domain.OrderCancel;
 import java.util.Optional;
