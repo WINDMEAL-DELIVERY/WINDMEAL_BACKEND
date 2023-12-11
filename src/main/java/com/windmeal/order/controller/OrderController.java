@@ -44,7 +44,8 @@ public class OrderController {
   })
   @PostMapping("/order")
   public void createOrder(@RequestBody OrderCreateRequest request){
-    orderService.createOrder(request);
+    Long memberId = SecurityUtil.getCurrentMemberId();
+    orderService.createOrder(request.toServiceDto(memberId));
   }
 
   @Operation(summary = "주문 요청 삭제 요청", description = "주문 요청이 삭제됩니다.")

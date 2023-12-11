@@ -18,6 +18,7 @@ import com.windmeal.order.exception.OrderDeliveryFeeException;
 import com.windmeal.order.exception.OrderEmptyException;
 import com.windmeal.order.exception.OrderGroupEmptyException;
 import com.windmeal.order.exception.OrderGroupIsNotMultipleException;
+import com.windmeal.order.exception.OrderGroupValidException;
 import com.windmeal.order.exception.OrderMenuCountException;
 import com.windmeal.order.exception.OrderSpecificationChangeException;
 import com.windmeal.store.domain.Menu;
@@ -33,6 +34,7 @@ import com.windmeal.store.repository.StoreRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -84,11 +86,26 @@ public class OrderValidator {
     if(!(menu.getName().equals(requestMenu.getName())&&menu.getPrice().wons()==requestMenu.getPrice().wons())){
       throw new MenuChangeException(ErrorCode.BAD_REQUEST, "메뉴가 변경되었습니다.");
     }
+
     Map<Long, List<OrderSpecRequest>> menuGroups = getMenuGroups(requestMenu);
-    for (OptionGroup optionGroup : menu.getOptionGroups()) {
+    List<OptionGroup> optionGroups = menu.getOptionGroups();
+
+    isGroupValid(menuGroups.keySet(),optionGroups.stream().map(OptionGroup::getId).collect(toList()));
+
+    for (OptionGroup optionGroup : optionGroups) {
       isGroupSatisfied(optionGroup, menuGroups.getOrDefault(optionGroup.getId(), new ArrayList<>()));
     }
   }
+
+  private void isGroupValid(Set<Long> keySet, List<Long> collect) {
+    keySet.stream()
+        .filter(key -> !collect.contains(key))
+        .findFirst()
+        .ifPresent(key -> {
+          throw new OrderGroupValidException(ErrorCode.BAD_REQUEST,"옵션 선택이 잘못되었습니다.");
+        });
+  }
+
 
   private static Map<Long, List<OrderSpecRequest>> getMenuGroups(OrderMenuRequest requestMenu) {
    return  requestMenu.getGroups().stream()

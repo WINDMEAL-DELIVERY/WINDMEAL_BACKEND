@@ -41,6 +41,7 @@ public class OptionCreateRequest {
   @Getter
   @Builder
   @AllArgsConstructor
+  @NoArgsConstructor
   @Schema(title = "옵션 상세 내용")
   public static class OptionSpecRequest {
 
