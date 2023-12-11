@@ -5,24 +5,29 @@ import static com.windmeal.global.constants.JwtConstants.PREFIX_REFRESHTOKEN;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.windmeal.chat.exception.NotMatchingIpAddressException;
+import com.windmeal.global.exception.AesException;
 import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.global.exception.GeneralException;
 import com.windmeal.global.token.dao.RefreshTokenDAO;
 import com.windmeal.global.token.dto.RefreshTokenResponse;
 import com.windmeal.global.token.util.TokenProvider;
 import com.windmeal.global.util.AES256Util;
-import com.windmeal.global.util.ClientIpUtil;
-import com.windmeal.member.dto.response.MemberInfoDTO;
-import com.windmeal.member.exception.*;
+import com.windmeal.member.domain.Member;
+import com.windmeal.member.exception.EmptyAccessTokenException;
+import com.windmeal.member.exception.EmptyRefreshTokenException;
+import com.windmeal.member.exception.EncryptionException;
+import com.windmeal.member.exception.InvalidRefreshTokenException;
+import com.windmeal.member.exception.InvalidRegistrationException;
+import com.windmeal.member.exception.MemberNotFoundException;
+import com.windmeal.member.repository.MemberRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.servlet.http.Cookie;
-import java.util.Optional;
+import org.springframework.util.StringUtils;
 
 @Slf4j
 @Service
@@ -34,6 +39,7 @@ public class AuthService {
   private final ObjectMapper objectMapper;
   private final TokenProvider tokenProvider;
   private final RefreshTokenDAO refreshTokenDAO;
+  private final MemberRepository memberRepository;
 
   public String reissue(Optional<String> code, String clientIpAddress) {
 
@@ -47,6 +53,13 @@ public class AuthService {
       UserDetails principal = (UserDetails) authenticationForReissue.getPrincipal();
       Long id = Long.parseLong(principal.getUsername());
       String email = principal.getPassword();
+
+      Member member = memberRepository.findById(id).orElseThrow(
+          () -> new MemberNotFoundException(ErrorCode.NOT_FOUND, "해당되는 사용자가 존재하지 않습니다."));
+
+      if(!StringUtils.hasText(member.getNickname())) {
+        throw new InvalidRegistrationException(ErrorCode.VALIDATION_ERROR, "닉네임이 등록되지 않은 사용자입니다.");
+      }
 
       // 사용자의 정보로 구성된 key로 refresh token을 조회할 수 있는지 검증 (리프레쉬 토큰이 존재하는가?)
       String key = aes256Util.encrypt(PREFIX_REFRESHTOKEN + id + email);
@@ -72,14 +85,15 @@ public class AuthService {
       }
 
       // 위의 검증 절차를 모두 통과하였으면 토큰을 새로 발급한다.
-      String rowToken = tokenProvider.createAccessToken(authenticationForReissue);
+      String rowToken = tokenProvider.createAccessToken(authenticationForReissue, member.getNickname());
       return aes256Util.encrypt(rowToken);
 
     } catch (JsonProcessingException e) {
       e.printStackTrace();
       throw new GeneralException(ErrorCode.INTERNAL_ERROR, "JSON 파싱 에러");
-    } catch (Exception e) {
-      throw new EncryptionException(ErrorCode.INTERNAL_ERROR, "암호화 과정에서 오류가 발생했습니다.");
+    } catch (AesException e) {
+      e.printStackTrace();
+      throw new EncryptionException(e.getErrorCode(), "암호화 과정에서 오류가 발생했습니다.");
     }
   }
 }

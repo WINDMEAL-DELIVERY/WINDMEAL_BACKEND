@@ -2,7 +2,9 @@ package com.windmeal.member.controller;
 
 import com.windmeal.global.exception.ResultDataResponseDTO;
 import com.windmeal.global.util.SecurityUtil;
+import com.windmeal.member.dto.request.MemberInfoRequest;
 import com.windmeal.member.dto.request.NicknameRequest;
+import com.windmeal.member.dto.response.MemberInfoDTO;
 import com.windmeal.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -28,7 +30,7 @@ public class MemberController {
             @ApiResponse(responseCode = "200", description = "닉네임 설정 성공"),
             @ApiResponse(responseCode = "400", description = "이미 사용 중인 닉네임입니다."),
             @ApiResponse(responseCode = "400", description = "닉네임에는 특수문자가 포함될 수 없습니다."),
-            @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없습니다.")
+            @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없습니다."),
     })
     @PostMapping(value = "/nickname")
     public ResultDataResponseDTO<String> registerNickname(@Valid @RequestBody NicknameRequest request) {
@@ -46,5 +48,20 @@ public class MemberController {
         Boolean result = memberService.checkNickname(nickname);
         return ResultDataResponseDTO.of(result);
     }
+
+    @Operation(summary = "알람 토큰과 사용자 정보 교환", description = "로그인 후 리다이렉트 하기 전 호출될 api")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "성공적으로 교환 완료"),
+        @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자"),
+        @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음"),
+        @ApiResponse(responseCode = "600", description = "암호화 실패"),
+    })
+    @PostMapping(value = "/info")
+    public ResultDataResponseDTO<MemberInfoDTO> tokenExchange(@RequestBody MemberInfoRequest memberInfoRequest) {
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        MemberInfoDTO memberInfo = memberService.findMemberInfo(memberInfoRequest, currentMemberId);
+        return ResultDataResponseDTO.of(memberInfo);
+    }
+
 
 }
