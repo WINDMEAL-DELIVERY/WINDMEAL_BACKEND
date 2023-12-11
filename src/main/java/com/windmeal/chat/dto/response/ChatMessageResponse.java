@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Slice;
 
 @Getter
 @Builder
@@ -17,9 +18,9 @@ import org.springframework.data.domain.Page;
 @Schema(title = "채팅 메시지")
 public class ChatMessageResponse {
 
-  private Page<ChatMessageSpecResponse> chatMessageSpecResponses;
+  private Slice<ChatMessageSpecResponse> chatMessageSpecResponses;
 
-  public static ChatMessageResponse of(Page<ChatMessageSpecResponse> chatMessageSpecResponses) {
+  public static ChatMessageResponse of(Slice<ChatMessageSpecResponse> chatMessageSpecResponses) {
     return ChatMessageResponse.builder()
         .chatMessageSpecResponses(chatMessageSpecResponses)
         .build();

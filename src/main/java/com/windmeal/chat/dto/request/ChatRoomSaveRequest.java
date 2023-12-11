@@ -1,6 +1,6 @@
 package com.windmeal.chat.dto.request;
 
-import com.windmeal.chat.domain.ChatRoom;
+import com.windmeal.chat.domain.ChatroomDocument;
 import com.windmeal.member.domain.Member;
 import com.windmeal.order.domain.Order;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -22,11 +22,19 @@ public class ChatRoomSaveRequest {
                 .build();
     }
 
-    public ChatRoom toEntity(Member owner, Member guest, Order order) {
-        return ChatRoom.builder()
-                .owner(owner)
-                .guest(guest)
-                .order(order)
-                .build();
+//    public ChatRoom toEntity(Member owner, Member guest, Order order) {
+//        return ChatRoom.builder()
+//                .owner(owner)
+//                .guest(guest)
+//                .order(order)
+//                .build();
+//    }
+
+    public ChatroomDocument toDocument(Member owner, Member guest, Order order) {
+        return ChatroomDocument.builder()
+            .ownerId(owner.getId())
+            .guestId(guest.getId())
+            .orderId(order.getId())
+            .build();
     }
 }

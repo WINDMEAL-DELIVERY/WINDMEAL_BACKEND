@@ -41,29 +41,29 @@ public class ChatRoomController {
         return ResultDataResponseDTO.of(chatRoomService.createChatRoom(requestDTO, currentMemberId));
     }
 
-    @GetMapping
-    @Operation(summary = "채팅방 조회 요청", description = "사용자가 속한 채팅방 목록을 조회합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "채팅방 조회 성공"),
-            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
-    })
-    public ResultDataResponseDTO<ChatRoomListResponse> getChatRoomList(Pageable pageable) {
-        Long currentMemberId = SecurityUtil.getCurrentMemberId();
-        return ResultDataResponseDTO.of(chatRoomService.getChatRoomsByMemberId(currentMemberId, pageable));
-    }
-
-    @DeleteMapping
-    @Operation(summary = "채팅방 삭제 요청", description = "채팅방을 삭제합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "채팅방 삭제 성공"),
-            @ApiResponse(responseCode = "400", description = "삭제 요청자가 채팅방에 속해있지 않음"),
-            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자"),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 채팅방")
-    })
-    public ResultDataResponseDTO deleteChatRoom(@RequestBody ChatRoomDeleteRequest deleteRequest) {
-        Long currentMemberId = SecurityUtil.getCurrentMemberId();
-        chatRoomService.deleteChatRoom(deleteRequest, currentMemberId);
-        return ResultDataResponseDTO.empty();
-    }
+//    @GetMapping
+//    @Operation(summary = "채팅방 조회 요청", description = "사용자가 속한 채팅방 목록을 조회합니다.")
+//    @ApiResponses({
+//            @ApiResponse(responseCode = "200", description = "채팅방 조회 성공"),
+//            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
+//    })
+//    public ResultDataResponseDTO<ChatRoomListResponse> getChatRoomList(Pageable pageable) {
+//        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+//        return ResultDataResponseDTO.of(chatRoomService.getChatRoomsByMemberId(currentMemberId, pageable));
+//    }
+//
+//    @DeleteMapping
+//    @Operation(summary = "채팅방 삭제 요청", description = "채팅방을 삭제합니다.")
+//    @ApiResponses({
+//            @ApiResponse(responseCode = "200", description = "채팅방 삭제 성공"),
+//            @ApiResponse(responseCode = "400", description = "삭제 요청자가 채팅방에 속해있지 않음"),
+//            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자"),
+//            @ApiResponse(responseCode = "404", description = "존재하지 않는 채팅방")
+//    })
+//    public ResultDataResponseDTO deleteChatRoom(@RequestBody ChatRoomDeleteRequest deleteRequest) {
+//        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+//        chatRoomService.deleteChatRoom(deleteRequest, currentMemberId);
+//        return ResultDataResponseDTO.empty();
+//    }
 
 }

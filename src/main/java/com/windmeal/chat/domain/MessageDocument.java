@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
@@ -13,8 +14,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class MessageDocument {
 
   @Id
-  private String messageId;
+  private String id;
 
+  @Indexed
   private Long chatroomId;
 
   private MessageType messageType;

@@ -9,12 +9,12 @@ import lombok.*;
 @AllArgsConstructor
 @Schema(title = "채팅방 단일 조회")
 public class ChatRoomResponse {
-    private Long roomId;
+    private String roomId;
     private Long ownerId;
     private Long guestId;
     private Long orderId;
 
-    public static ChatRoomResponse of(Long roomId, Long ownerId, Long guestId, Long orderId) {
+    public static ChatRoomResponse of(String roomId, Long ownerId, Long guestId, Long orderId) {
         return ChatRoomResponse.builder()
                 .roomId(roomId)
                 .ownerId(ownerId)
