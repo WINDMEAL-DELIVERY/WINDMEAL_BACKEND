@@ -17,6 +17,10 @@ public class ResultDataResponseDTO<T> extends ResponseDTO  {
         super(true, ErrorCode.OK.getCode(), message);
         this.data = data;
     }
+    private ResultDataResponseDTO(T data, ErrorCode errorCode) {
+        super(true, errorCode.getCode());
+        this.data = data;
+    }
 
     private ResultDataResponseDTO(T data, HttpStatus httpStatus) {
         super(true, httpStatus.value());
@@ -28,12 +32,19 @@ public class ResultDataResponseDTO<T> extends ResponseDTO  {
         return new ResultDataResponseDTO<>(data);
     }
 
+    public static <T> ResultDataResponseDTO<T> of(T data,ErrorCode errorCode) {
+        return new ResultDataResponseDTO<>(data,errorCode);
+    }
     public static <T> ResultDataResponseDTO<T> of(T data, String message) {
         return new ResultDataResponseDTO<>(data, message);
     }
 
     public static <T> ResultDataResponseDTO<T> empty() {
         return new ResultDataResponseDTO<>(null);
+    }
+
+    public static <T> ResultDataResponseDTO<T> empty(ErrorCode errorCode) {
+        return new ResultDataResponseDTO<>(null, errorCode);
     }
 }
 

@@ -1,6 +1,7 @@
 package com.windmeal.store.controller;
 
 import com.windmeal.global.S3.S3Util;
+import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.global.exception.ExceptionResponseDTO;
 import com.windmeal.global.exception.ResultDataResponseDTO;
 import com.windmeal.store.dto.request.MenuCreateRequest;
@@ -47,7 +48,7 @@ public class MenuController {
           content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE)
       ))
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "OK"),
+      @ApiResponse(responseCode = "201", description = "CREATED"),
       @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근",
           content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class)))})
   @PostMapping("/menu")
@@ -59,6 +60,6 @@ public class MenuController {
 
     String imgUrl = s3Util.imgUpload(file);
     menuService.createMenu(request, imgUrl);
-    return ResultDataResponseDTO.empty();
+    return ResultDataResponseDTO.empty(ErrorCode.CREATED);
   }
 }

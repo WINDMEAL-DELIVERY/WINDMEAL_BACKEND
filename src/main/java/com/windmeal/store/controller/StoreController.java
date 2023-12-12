@@ -1,6 +1,7 @@
 package com.windmeal.store.controller;
 
 import com.windmeal.global.S3.S3Util;
+import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.global.exception.ExceptionResponseDTO;
 import com.windmeal.global.exception.ResultDataResponseDTO;
 import com.windmeal.store.dto.request.StoreCategoryCreateRequest;
@@ -47,7 +48,7 @@ public class StoreController {
    */
   @Operation(summary = "가게 생성", description = "가게가 생성됩니다.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "OK",
+      @ApiResponse(responseCode = "201", description = "CREATED",
           content = @Content(schema = @Schema(implementation = StoreResponse.class))),
       @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근",
           content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class)))})
@@ -59,7 +60,7 @@ public class StoreController {
       MultipartFile file) {
     String imgUrl = s3Util.imgUpload(file);
     StoreResponse response = storeService.createStore(request, imgUrl);
-    return ResultDataResponseDTO.of(response);
+    return ResultDataResponseDTO.of(response,ErrorCode.CREATED);
   }
 
   /**
@@ -160,7 +161,7 @@ public class StoreController {
 
   @Operation(summary = "가게 카테고리 생성", description = "가게 카테고리가 생성됩니다.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "OK"),
+      @ApiResponse(responseCode = "201", description = "CREATED"),
       @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근",
           content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class)))})
   @PostMapping("/cms/store/{storeId}/storeCategory")
@@ -169,6 +170,6 @@ public class StoreController {
 
     storeService.createStoreCategory(request.toServiceDto(storeId));
 
-    return ResultDataResponseDTO.empty();
+    return ResultDataResponseDTO.empty(ErrorCode.CREATED);
   }
 }

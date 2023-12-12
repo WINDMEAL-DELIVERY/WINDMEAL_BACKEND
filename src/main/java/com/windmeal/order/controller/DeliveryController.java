@@ -1,5 +1,6 @@
 package com.windmeal.order.controller;
 
+import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.global.exception.ExceptionResponseDTO;
 import com.windmeal.global.exception.ResultDataResponseDTO;
 import com.windmeal.global.util.SecurityUtil;
@@ -18,8 +19,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,15 +37,17 @@ public class DeliveryController {
   @PostMapping("/delivery")
   @Operation(summary = "배달 요청 생성 요청", description = "배달 요청이 생성됩니다.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "OK"),
+      @ApiResponse(responseCode = "201", description = "CREATED"),
       @ApiResponse(responseCode = "400", description = "이미 매칭된 주문",
           content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class))),
       @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근",
           content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class)))
   })
-  public void createDelivery(@RequestBody DeliveryCreateRequest request) {
+  public ResultDataResponseDTO createDelivery(@RequestBody DeliveryCreateRequest request) {
     Long currentMemberId = SecurityUtil.getCurrentMemberId();
     deliveryService.createDelivery(request.toServiceDto(currentMemberId));
+
+    return ResultDataResponseDTO.empty(ErrorCode.CREATED);
   }
 
 
@@ -59,9 +60,11 @@ public class DeliveryController {
       @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근",
           content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class)))
   })
-  public void cancelDelivery(@RequestBody DeliveryCancelRequest request) {
+  public ResultDataResponseDTO cancelDelivery(@RequestBody DeliveryCancelRequest request) {
     Long currentMemberId = SecurityUtil.getCurrentMemberId();
     deliveryService.cancelDelivery(request.toServiceDto(currentMemberId));
+
+    return ResultDataResponseDTO.empty();
   }
 
 

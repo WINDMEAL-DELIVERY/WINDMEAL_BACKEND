@@ -1,6 +1,7 @@
 package com.windmeal.store.controller;
 
 
+import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.global.exception.ExceptionResponseDTO;
 import com.windmeal.global.exception.ResultDataResponseDTO;
 import com.windmeal.store.dto.request.OptionCreateRequest;
@@ -28,7 +29,7 @@ public class OptionController {
 
   @Operation(summary = "옵션 생성 요청", description = "옵션이 생성됩니다.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "OK"),
+      @ApiResponse(responseCode = "201", description = "CREATED"),
       @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근",
           content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class)))})
   @PostMapping("/menu/{menuId}/option")
@@ -36,7 +37,7 @@ public class OptionController {
       @Valid @RequestBody OptionCreateRequest request,
       @PathVariable Long menuId){
     optionService.createOption(request,menuId);
-    return ResultDataResponseDTO.empty();
+    return ResultDataResponseDTO.empty(ErrorCode.CREATED);
   }
   @Operation(summary = "메뉴의 옵션 조회 요청", description = "메뉴의 옵션이 조회됩니다.")
   @ApiResponses({
