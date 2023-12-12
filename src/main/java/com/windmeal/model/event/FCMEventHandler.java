@@ -23,7 +23,7 @@ public class FCMEventHandler {
   public void handle(DeliveryCancelEvent event){
     FcmNotificationRequest message = FcmNotificationRequest.of(
         "배달 요청이 취소되었습니다.",
-        String.format("%s 주문에 대한 배달 요청이 %s 한 이유로 취소되었습니다.", event.getSummary(),event.getContent()));
+        String.format("\"%s\" 주문에 대한 배달 요청이 취소되었습니다.\n 사유 : \"%s\"", event.getSummary(),event.getContent()));
     fcmNotificationService.sendNotification(message,aes256Util.decrypt(event.getToken()));
   }
 
@@ -32,7 +32,7 @@ public class FCMEventHandler {
   public void handle(DeliveryMatchEvent event){
     FcmNotificationRequest message = FcmNotificationRequest.of(
         "배달 주문이 성사되었습니다.",
-        String.format("%s 주문에 대한 배달 요청이 성사되었습니다.", event.getSummary()));
+        String.format("\"%s\" 주문에 대한 배달 요청이 성사되었습니다.", event.getSummary()));
     fcmNotificationService.sendNotification(message,aes256Util.decrypt(event.getToken()));
   }
 }

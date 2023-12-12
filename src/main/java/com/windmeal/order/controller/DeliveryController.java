@@ -60,7 +60,8 @@ public class DeliveryController {
           content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class)))
   })
   public void cancelDelivery(@RequestBody DeliveryCancelRequest request) {
-    deliveryService.cancelDelivery(request);
+    Long currentMemberId = SecurityUtil.getCurrentMemberId();
+    deliveryService.cancelDelivery(request.toServiceDto(currentMemberId));
   }
 
 

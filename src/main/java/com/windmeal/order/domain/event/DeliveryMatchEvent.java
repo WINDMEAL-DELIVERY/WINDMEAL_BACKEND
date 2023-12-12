@@ -7,7 +7,7 @@ import lombok.Getter;
 public class DeliveryMatchEvent extends FCMEvent {
 
   private final String summary;
-  public DeliveryMatchEvent(String token, String summary) {
+  public DeliveryMatchEvent(String summary,String token) {
     super(token);
     this.summary = summary;
   }

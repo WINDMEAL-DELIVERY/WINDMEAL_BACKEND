@@ -59,7 +59,6 @@ public class DeliveryService {
       throw new DeliverOrdererSameException();
     }
     deliverySave(deliver, order);
-
     //TODO orderer 의 토큰값으로 배달 성사 알람
     EventPublisher.publish(new DeliveryMatchEvent(order.getSummary(),orderer.getToken()));
   }
