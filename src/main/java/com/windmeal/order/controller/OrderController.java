@@ -17,10 +17,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -130,10 +132,32 @@ public class OrderController {
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "OK")
   })
-  public ResultDataResponseDTO getOwnOrdered(Pageable pageable){
+  public ResultDataResponseDTO getOwnOrdered(
+      Pageable pageable,
+      @Parameter(description = "날짜 필터링 시작", required = false, schema = @Schema(example = "2023-12-10"))
+      @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+      @Parameter(description = "날짜 필터링 종료", required = false, schema = @Schema(example = "2023-12-10"))
+      @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+      @Parameter(description = "카테고리 필터링", required = false, schema = @Schema(example = "커피"))
+      @RequestParam(required = false) String storeCategory
+
+  ){
+    Long memberId = SecurityUtil.getCurrentMemberId();
+
+    ;
+    return ResultDataResponseDTO.of(orderService.getOwnOrdered(memberId,pageable,startDate,endDate,storeCategory));
+  }
+
+  @GetMapping("/ordered/price")
+  @Operation(summary = "내가 주문 시 이득 본 총 금액 조회", description = "마이 페이지")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "OK")
+  })
+  public ResultDataResponseDTO getOwnOrderedTotalPrice(){
     Long memberId = SecurityUtil.getCurrentMemberId();
 
 
-    return ResultDataResponseDTO.of(null);
+    return ResultDataResponseDTO.of(orderService.getOwnOrderedTotalPrice(memberId));
   }
+
 }

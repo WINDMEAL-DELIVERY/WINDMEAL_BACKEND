@@ -2,7 +2,6 @@ package com.windmeal.order.service;
 
 
 import com.windmeal.global.aop.annotation.DistributedLock;
-import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.member.domain.Member;
 import com.windmeal.member.exception.MemberNotFoundException;
 import com.windmeal.member.repository.MemberRepository;
@@ -16,6 +15,7 @@ import com.windmeal.order.dto.request.DeliveryCreateRequest;
 import com.windmeal.order.dto.request.DeliveryCancelRequest;
 import com.windmeal.order.dto.response.DeliveryListResponse;
 import com.windmeal.order.dto.response.OrderingListResponse;
+import com.windmeal.order.dto.response.OwnDeliveryListResponse;
 import com.windmeal.order.exception.DeliverOrdererSameException;
 import com.windmeal.order.exception.DeliveryNotFoundException;
 import com.windmeal.order.exception.OrderAlreadyMatchedException;
@@ -124,5 +124,17 @@ public class DeliveryService {
 
   public Slice<OrderingListResponse> getOwnOrdering(Long memberId,Pageable pageable){
     return deliveryRepository.getOwnOrdering(memberId, LocalDate.now(), pageable);
+  }
+
+
+
+  public int getOwnDeliveredTotalPrice(Long memberId) {
+    return deliveryRepository.getOwnDeliveredTotalPrice(memberId);
+  }
+
+
+  public Slice<OwnDeliveryListResponse> getOwnDelivered(Long memberId, Pageable pageable, LocalDate startDate,
+      LocalDate endDate, String storeCategory) {
+    return deliveryRepository.getOwnDelivered(memberId,pageable,startDate,endDate,storeCategory);
   }
 }

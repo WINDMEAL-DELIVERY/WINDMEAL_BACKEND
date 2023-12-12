@@ -5,6 +5,7 @@ import static com.windmeal.order.domain.QOrder.order;
 import static com.windmeal.store.domain.QCategory.category;
 import static com.windmeal.store.domain.QStore.*;
 
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -13,6 +14,7 @@ import com.windmeal.member.domain.QMember;
 import com.windmeal.order.domain.OrderStatus;
 import com.windmeal.order.dto.response.OrderListResponse;
 import com.windmeal.order.dto.response.OrderMapListResponse;
+import com.windmeal.order.dto.response.OwnOrderListResponse;
 import com.windmeal.store.domain.QStoreCategory;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -20,6 +22,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 
 @RequiredArgsConstructor
@@ -76,6 +79,71 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
       hasNext = true;
     }
     return new RestSlice(new SliceImpl(content, pageable, hasNext));
+  }
+  @Override
+  public Integer getOwnOrderedTotalPrice(Long memberId) {
+
+    return jpaQueryFactory.select(order.deliveryFee.price.subtract(3000).abs().sum())
+        .from(order)
+        .where(
+            order.orderer_id.eq(memberId),
+            order.orderStatus.eq(OrderStatus.DELIVERED)
+        ).fetchFirst();
+  }
+
+  @Override
+  public Slice<OwnOrderListResponse> getOwnOrdered(Long memberId, Pageable pageable, LocalDate startDate,LocalDate endDate, String storeCategory) {
+    List<OwnOrderListResponse> content = jpaQueryFactory.select(
+            Projections.constructor(OwnOrderListResponse.class,
+                order.id,
+                store.id,
+                store.name,
+                order.summary,
+                order.orderStatus,
+                order.orderTime
+            )
+        )
+        .from(order)
+        .leftJoin(store).on(order.store_id.eq(store.id))
+        .where(
+            order.orderer_id.eq(memberId),
+            eqOrderStatus(),
+            eqStoreCategory(storeCategory), //카테고리 필터링
+            eqOrderDate(startDate,endDate) //날짜 필터링
+
+        ).orderBy(order.createdDate.desc())
+        .offset(pageable.getOffset())
+        .limit(pageable.getPageSize() + 1).fetch();
+
+    boolean hasNext = false;
+    if (content.size() > pageable.getPageSize()) {
+      content.remove(pageable.getPageSize());
+      hasNext = true;
+    }
+    return new RestSlice(new SliceImpl(content, pageable, hasNext));
+  }
+
+  private BooleanExpression eqOrderDate(LocalDate startDate, LocalDate endDate) {
+    if(startDate==null&&endDate==null) //조건 X
+    {
+      return null;
+    }
+
+    if(startDate==null){ //시작날짜만 조건이 있는 경우
+      return order.orderTime.lt(endDate.plusDays(1).atStartOfDay());
+    }
+
+    if(endDate==null){ //마지막 날짜 조건만 있는 경우
+      return order.orderTime.goe(startDate.atStartOfDay());
+    }
+
+    return order.orderTime.goe(startDate.atStartOfDay())
+        .and(order.orderTime.lt(endDate.plusDays(1).atStartOfDay()));
+  }
+
+  private static BooleanExpression eqOrderStatus() {
+    return order.orderStatus.eq(OrderStatus.DELIVERED)
+        .or(order.orderStatus.eq(OrderStatus.CANCELED));
   }
 
   private BooleanExpression eqPlace(Long placeId) {
