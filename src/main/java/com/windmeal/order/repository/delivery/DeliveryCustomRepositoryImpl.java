@@ -73,13 +73,14 @@ public class DeliveryCustomRepositoryImpl implements DeliveryCustomRepository {
                 order.summary,
                 order.description,
                 place.name,
-                member.nickname
+                jpaQueryFactory.select(member.nickname).from(member)
+                    .where(member.id.eq(delivery.deliver.id))
             ))
         .from(delivery)
-//        .leftJoin(order,delivery.order)
+//        .leftJoin(delivery).on(order.id.eq(delivery.order.id))
         .rightJoin(delivery.order,order)
         .innerJoin(order.place,place)
-        .innerJoin(delivery.deliver,member)
+//        .innerJoin(delivery.deliver,member)
 
 //        .innerJoin(delivery.deliver,member)
 
@@ -155,7 +156,7 @@ public class DeliveryCustomRepositoryImpl implements DeliveryCustomRepository {
     return delivery.order.eta.between(now.atTime(start), now.atTime(end));
   }
 
-  private static BooleanExpression eqDeliveryStatus() {
+  private BooleanExpression eqDeliveryStatus() {
     return delivery.deliveryStatus.eq(DeliveryStatus.DELIVERED)
         .or(delivery.deliveryStatus.eq(DeliveryStatus.CANCELED));
   }
