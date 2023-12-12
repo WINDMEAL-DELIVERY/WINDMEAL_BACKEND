@@ -25,6 +25,8 @@ public class OwnDeliveryListResponse {
   @Schema(description = "가게 이름", example = "컴포즈")
   private String storeName;
 
+  @Schema(description = "가게 사진", example = "사진 주소")
+  private String storePhoto;
   @Schema(description = "주문 요약", example = "황금올리브 외 1개 24000원")
   private String summary;
 

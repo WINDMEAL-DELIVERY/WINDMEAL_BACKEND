@@ -15,7 +15,6 @@ import com.windmeal.order.domain.OrderStatus;
 import com.windmeal.order.dto.response.DeliveryListResponse;
 import com.windmeal.order.dto.response.OrderingListResponse;
 import com.windmeal.order.dto.response.OwnDeliveryListResponse;
-import com.windmeal.order.dto.response.OwnOrderListResponse;
 import com.windmeal.store.domain.QStore;
 import com.windmeal.store.domain.QStoreCategory;
 import java.time.LocalDate;
@@ -111,6 +110,7 @@ public class DeliveryCustomRepositoryImpl implements DeliveryCustomRepository {
                 order.id,
                 QStore.store.id,
                 QStore.store.name,
+                QStore.store.photo,
                 order.summary,
                 delivery.deliveryStatus,
                 delivery.createdDate)

@@ -15,6 +15,7 @@ import com.windmeal.order.domain.OrderStatus;
 import com.windmeal.order.dto.response.OrderListResponse;
 import com.windmeal.order.dto.response.OrderMapListResponse;
 import com.windmeal.order.dto.response.OwnOrderListResponse;
+import com.windmeal.store.domain.QStore;
 import com.windmeal.store.domain.QStoreCategory;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -98,6 +99,7 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
                 order.id,
                 store.id,
                 store.name,
+                store.photo,
                 order.summary,
                 order.orderStatus,
                 order.orderTime
