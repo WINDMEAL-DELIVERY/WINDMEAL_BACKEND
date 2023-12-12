@@ -36,9 +36,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class DeliveryService {
 
-  /**
-   * 고려사항 1. 동시성 이슈 해결
-   */
 
   private final MemberRepository memberRepository;
 
@@ -64,7 +61,7 @@ public class DeliveryService {
     deliverySave(deliver, order);
 
     //TODO orderer 의 토큰값으로 배달 성사 알람
-    EventPublisher.publish(new DeliveryMatchEvent("test"));
+    EventPublisher.publish(new DeliveryMatchEvent(order.getSummary(),orderer.getToken()));
   }
 
   @DistributedLock(key = "#order.getId()")
@@ -108,13 +105,27 @@ public class DeliveryService {
             DeliveryStatus.DELIVERING)
         .orElseThrow(() -> new DeliveryNotFoundException());
 
+    String token = getToken(order, cancelMember, delivery);
 
     OrderCancel orderCancel = OrderCancel.builder()
         .cancelMember(cancelMember)
         .order(order)
         .delivery(delivery)
-        .content(request.getContent()).build();
+        .content(request.getContent())
+        .token(token).build();
     orderCancelRepository.save(orderCancel);
+  }
+
+  private String getToken(Order order, Member cancelMember, Delivery delivery) {
+
+    if(cancelMember.equals(delivery.getDeliver())){
+      return cancelMember.getToken();
+    }else{
+      Member orderer = memberRepository.findById(order.getOrderer_id())
+          .orElseThrow(() -> new MemberNotFoundException());
+
+      return orderer.getToken();
+    }
   }
 
 

@@ -35,7 +35,7 @@ public class OrderCancel extends BaseEntity {
     private String content;
 
     @Builder
-    public OrderCancel(Order order, Delivery delivery, Member cancelMember, String content) {
+    public OrderCancel(Order order, Delivery delivery, Member cancelMember, String content,String token) {
         this.order = order;
         this.delivery = delivery;
         this.cancelMember = cancelMember;
@@ -43,6 +43,6 @@ public class OrderCancel extends BaseEntity {
         order.canceled();
         delivery.canceled();
         //TODO 취소한 사람이 아닌 사람에게 알람을 위한 event
-        EventPublisher.publish(new DeliveryCancelEvent(content));
+        EventPublisher.publish(new DeliveryCancelEvent(token,content,order.getSummary()));
     }
 }
