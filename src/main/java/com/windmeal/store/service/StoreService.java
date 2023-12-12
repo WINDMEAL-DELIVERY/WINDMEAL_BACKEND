@@ -10,12 +10,18 @@ import com.windmeal.model.place.PlaceRepository;
 import com.windmeal.store.domain.Category;
 import com.windmeal.store.domain.MenuCategory;
 import com.windmeal.store.domain.Store;
+import com.windmeal.store.domain.StoreCategory;
+import com.windmeal.store.dto.request.CategoryCreateRequest;
+import com.windmeal.store.dto.request.StoreCategoryCreateRequest;
 import com.windmeal.store.dto.request.StoreCreateRequest;
 import com.windmeal.store.dto.request.StoreUpdateRequest;
 import com.windmeal.store.dto.response.AllStoreResponse;
+import com.windmeal.store.dto.response.CategoryStoreMenuResponse;
 import com.windmeal.store.dto.response.MenuResponse;
+import com.windmeal.store.dto.response.StoreCategoryResponse;
 import com.windmeal.store.dto.response.StoreMenuResponse;
 import com.windmeal.store.dto.response.StoreResponse;
+import com.windmeal.store.exception.StoreCategoryNotFoundException;
 import com.windmeal.store.exception.StoreNotFoundException;
 import com.windmeal.store.repository.CategoryRepository;
 import com.windmeal.store.repository.MenuCategoryRepository;
@@ -23,6 +29,7 @@ import com.windmeal.store.repository.MenuRepository;
 import com.windmeal.store.repository.StoreCategoryRepository;
 import com.windmeal.store.repository.StoreRepository;
 import com.windmeal.store.validator.StoreValidator;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -99,5 +106,36 @@ public class StoreService {
 
   public Slice<AllStoreResponse> getAllStoreInfo(Pageable pageable){
     return storeRepository.getAllStoreInfo(pageable);
+  }
+
+  public CategoryStoreMenuResponse getStoreInfoForCms(Long storeId) {
+    StoreMenuResponse storeInfo = getStoreInfo(storeId);
+
+    List<StoreCategoryResponse> storeCategories = storeCategoryRepository.getStoreCategories(
+        storeId);
+    return CategoryStoreMenuResponse.of(storeCategories,storeInfo);
+  }
+
+  @Transactional
+  public void deleteStoreCategory(Long storeCategoryId) {
+    StoreCategory storeCategory = storeCategoryRepository.findById(storeCategoryId)
+        .orElseThrow(() -> new StoreCategoryNotFoundException());
+
+    storeCategoryRepository.delete(storeCategory);
+  }
+
+  @Transactional
+  public void createStoreCategory(StoreCategoryCreateRequest request) {
+
+    categoryRepository.createCategories(
+        Collections.singletonList(request.getName()));
+
+    List<Long> categoryIdList = categoryRepository.findAllByNameIn(
+            Collections.singletonList(request.getName()))
+        .stream()
+        .map(Category::getId).collect(
+            Collectors.toList());
+    storeCategoryRepository.createStoreCategoriesNotExist(categoryIdList, request.getStoreId());
+
   }
 }
