@@ -19,4 +19,9 @@ public class DeliveryCreateRequest {
   @Schema(description = "배달원 ID", example = "1")
   private Long memberId;
 
+
+  public DeliveryCreateRequest toServiceDto(Long currentMemberId) {
+    this.memberId=currentMemberId;
+    return this;
+  }
 }
