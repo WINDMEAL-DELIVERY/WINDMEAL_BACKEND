@@ -38,7 +38,7 @@ public class AuthController {
 
     @Operation(summary = "토큰 리이슈 요청", description = "토큰을 재발급합니다.")
     @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "토큰 재발급 성공"),
+        @ApiResponse(responseCode = "200", description = "토큰 재발급 성공"),
         @ApiResponse(responseCode = "401", description = "유효하지 않은 리프레쉬 토큰, 재로그인 요망"),
         @ApiResponse(responseCode = "404", description = "엑세스 토큰이 존재하지 않음"),
         @ApiResponse(responseCode = "404", description = "리프레쉬 토큰이 존재하지 않음"),
