@@ -1,6 +1,7 @@
 package com.windmeal.member.controller;
 
 import com.windmeal.global.exception.ResultDataResponseDTO;
+import com.windmeal.global.token.dto.ReissueResponse;
 import com.windmeal.global.util.ClientIpUtil;
 import com.windmeal.global.util.CookieUtil;
 import com.windmeal.global.util.SecurityUtil;
@@ -47,12 +48,12 @@ public class AuthController {
         @ApiResponse(responseCode = "600", description = "서버 내부 암호화 에러")
     })
     @PostMapping("/reissue")
-    public ResultDataResponseDTO reissue(HttpServletRequest request, HttpServletResponse response) {
+    public ResultDataResponseDTO<ReissueResponse> reissue(HttpServletRequest request, HttpServletResponse response) {
         String code = request.getHeader(AUTHORIZATION_HEADER);
         String clientIpAddress = ClientIpUtil.getClientIpAddress(request);
         String accessToken = authService.reissue(Optional.ofNullable(code), clientIpAddress);
-        response.setHeader(AUTHORIZATION_HEADER, accessToken);
-        return ResultDataResponseDTO.empty();
+//        response.setHeader(AUTHORIZATION_HEADER, accessToken);
+        return ResultDataResponseDTO.of(ReissueResponse.of(accessToken));
     }
 
 }
