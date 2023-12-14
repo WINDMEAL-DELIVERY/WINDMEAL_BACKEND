@@ -1,7 +1,6 @@
 package com.windmeal.order.service;
 
 import com.windmeal.generic.domain.Money;
-import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.global.wrapper.RestSlice;
 import com.windmeal.member.exception.MemberNotFoundException;
 import com.windmeal.member.repository.BlackListRepository;
@@ -17,18 +16,21 @@ import com.windmeal.order.dto.response.OrderCreateResponse;
 import com.windmeal.order.dto.response.OrderDetailResponse;
 import com.windmeal.order.dto.response.OrderListResponse;
 import com.windmeal.order.dto.response.OrderMapListResponse;
+import com.windmeal.order.dto.response.OwnOrderListResponse;
 import com.windmeal.order.exception.OrderAlreadyMatchedException;
 import com.windmeal.order.exception.OrderNotFoundException;
 import com.windmeal.order.exception.OrdererMissMatchException;
 import com.windmeal.order.mapper.OrderRequestMapper;
 import com.windmeal.order.repository.order.OrderRepository;
 import com.windmeal.order.validator.OrderValidator;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -154,5 +156,14 @@ public class OrderService {
             Collectors.toList());
 
     return new RestSlice(result, allOrder.getNumber(), allOrder.getSize());
+  }
+
+  public int getOwnOrderedTotalPrice(Long memberId) {
+    return orderRepository.getOwnOrderedTotalPrice(memberId);
+  }
+
+  public Slice<OwnOrderListResponse> getOwnOrdered(Long memberId, Pageable pageable, LocalDate startDate,
+      LocalDate endDate, String storeCategory) {
+    return orderRepository.getOwnOrdered(memberId,pageable,startDate,endDate,storeCategory);
   }
 }

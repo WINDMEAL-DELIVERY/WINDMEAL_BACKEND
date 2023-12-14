@@ -1,6 +1,9 @@
 package com.windmeal.order.repository;
 
+import static com.windmeal.Fixtures.aOrder;
+
 import com.windmeal.IntegrationTestSupport;
+import com.windmeal.generic.domain.Money;
 import com.windmeal.member.domain.Member;
 import com.windmeal.member.repository.MemberRepository;
 import com.windmeal.model.place.PlaceRepository;
@@ -58,5 +61,38 @@ class DeliveryRepositoryTest extends IntegrationTestSupport {
     Assertions.assertThat(deliveryRepository.findByOrderIdAndDeliveryStatus(order.getId(),DeliveryStatus.DELIVERED)
         .isPresent()).isFalse();
     //then
+  }
+
+  @DisplayName("내가 배달한 총 금액 조회")
+  @Test
+  void getOwnDeliveredTotalPrice(){
+      //given
+    Member member = memberRepository.save(Member.builder().build());
+    Order savedOrder1 = orderRepository.save(aOrder().deliveryFee(Money.wons(1000)).build());
+    Order savedOrder2 = orderRepository.save(aOrder().deliveryFee(Money.wons(2000)).build());
+    Order savedOrder3 = orderRepository.save(aOrder().deliveryFee(Money.wons(3000)).build());
+
+    deliveryRepository.save(
+        Delivery.builder()
+            .deliver(member)
+            .order(savedOrder1)
+            .deliveryStatus(DeliveryStatus.DELIVERING)
+            .build());
+    deliveryRepository.save(
+        Delivery.builder()
+            .deliver(member)
+            .order(savedOrder2)
+            .deliveryStatus(DeliveryStatus.DELIVERED)
+            .build());
+    deliveryRepository.save(
+        Delivery.builder()
+            .deliver(member)
+            .order(savedOrder3)
+            .deliveryStatus(DeliveryStatus.DELIVERED)
+            .build());
+    //when
+    Integer totalPrice = deliveryRepository.getOwnDeliveredTotalPrice(member.getId());
+    //then
+    Assertions.assertThat(totalPrice).isEqualTo(5000);
   }
 }

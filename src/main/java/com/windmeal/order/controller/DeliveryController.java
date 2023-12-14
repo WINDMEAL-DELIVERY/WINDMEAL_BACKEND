@@ -7,20 +7,24 @@ import com.windmeal.order.dto.request.DeliveryCancelRequest;
 import com.windmeal.order.dto.request.DeliveryCreateRequest;
 import com.windmeal.order.service.DeliveryService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "배달 요청 카테고리", description = "배달 관련 api 입니다.")
@@ -41,7 +45,8 @@ public class DeliveryController {
           content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class)))
   })
   public void createDelivery(@RequestBody DeliveryCreateRequest request) {
-    deliveryService.createDelivery(request);
+    Long currentMemberId = SecurityUtil.getCurrentMemberId();
+    deliveryService.createDelivery(request.toServiceDto(currentMemberId));
   }
 
 
@@ -93,11 +98,30 @@ public class DeliveryController {
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "OK")
   })
-  public ResultDataResponseDTO getOwnDelivered(Pageable pageable){
+  public ResultDataResponseDTO getOwnDelivered(
+      Pageable pageable,
+      @Parameter(description = "날짜 필터링 시작", required = false, schema = @Schema(example = "2023-12-10"))
+      @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+      @Parameter(description = "날짜 필터링 종료", required = false, schema = @Schema(example = "2023-12-10"))
+      @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+      @Parameter(description = "카테고리 필터링", required = false, schema = @Schema(example = "커피"))
+      @RequestParam(required = false) String storeCategory
+  ){
     Long memberId = SecurityUtil.getCurrentMemberId();
 
-
-    return ResultDataResponseDTO.of(null);
+    ;
+    return ResultDataResponseDTO.of(deliveryService.getOwnDelivered(memberId,pageable,startDate,endDate,storeCategory));
   }
 
+
+  @GetMapping("/delivered/price")
+  @Operation(summary = "내가 배달했던 총 금액 조회", description = "마이 페이지")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "OK")
+  })
+  public ResultDataResponseDTO getOwnDeliveredTotalPrice(){
+    Long memberId = SecurityUtil.getCurrentMemberId();
+
+    return ResultDataResponseDTO.of(deliveryService.getOwnDeliveredTotalPrice(memberId));
+  }
 }
