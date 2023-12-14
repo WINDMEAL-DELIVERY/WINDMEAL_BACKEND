@@ -13,6 +13,6 @@ public class JwtConstants {
 
     // 7일
 //    public static final long REFRESH_TOKEN_EXPIRES_IN = 1000 * 60 * 60 * 24 * 7;
-    public static final long REFRESH_TOKEN_EXPIRES_IN = 1000 * 60 * 2;
+    public static final long REFRESH_TOKEN_EXPIRES_IN = 1000 * 60 * 10;
     public static final String ACCESSTOKEN = "token";
 }
