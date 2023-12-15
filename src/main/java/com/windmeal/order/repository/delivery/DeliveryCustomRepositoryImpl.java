@@ -103,6 +103,63 @@ public class DeliveryCustomRepositoryImpl implements DeliveryCustomRepository {
   }
 
   @Override
+  public List<DeliveryListResponse> getOwnDeliveringWithoutPaging(Long memberId, LocalDate today,
+      Pageable pageable) {
+    return jpaQueryFactory.select(
+            Projections.constructor(DeliveryListResponse.class,
+                delivery.id,
+                order.id,
+                delivery.deliveryStatus,
+                order.summary,
+                order.description,
+                place.name,
+                jpaQueryFactory.select(member.nickname).from(member)
+                    .where(member.id.eq(order.orderer_id))
+            ))
+        .from(delivery)
+        .innerJoin(delivery.order, order)
+        .innerJoin(order.place, place)
+        .where(
+            delivery.deliver.id.eq(memberId),
+            delivery.deliveryStatus.eq(DeliveryStatus.DELIVERING),
+            eqEta(today)
+        )
+        .orderBy(delivery.createdDate.desc())
+        .fetch();
+  }
+
+  @Override
+  public List<OrderingListResponse> getOwnOrderingWithoutPaging(Long memberId, LocalDate today,
+      Pageable pageable) {
+    return jpaQueryFactory.select(
+            Projections.constructor(OrderingListResponse.class,
+                order.id,
+                order.orderStatus,
+                order.summary,
+                order.description,
+                place.name,
+                jpaQueryFactory.select(member.nickname).from(member)
+                    .where(member.id.eq(delivery.deliver.id))
+            ))
+        .from(delivery)
+//        .leftJoin(delivery).on(order.id.eq(delivery.order.id))
+        .rightJoin(delivery.order,order)
+        .innerJoin(order.place,place)
+//        .innerJoin(delivery.deliver,member)
+
+//        .innerJoin(delivery.deliver,member)
+
+        .where(
+            order.orderer_id.eq(memberId),
+            order.orderStatus.eq(OrderStatus.ORDERED)
+                .or(order.orderStatus.eq(OrderStatus.DELIVERING)),
+//            delivery.deliveryStatus.eq(DeliveryStatus.DELIVERING),
+            eqEta(today)
+        )
+        .orderBy(order.createdDate.desc()).fetch();
+  }
+
+  @Override
   public Slice<OwnDeliveryListResponse> getOwnDelivered(Long memberId, Pageable pageable,
       LocalDate startDate, LocalDate endDate, String storeCategory) {
 
@@ -126,7 +183,8 @@ public class DeliveryCustomRepositoryImpl implements DeliveryCustomRepository {
             eqDeliveryDate(startDate, endDate) //날짜 필터링
         ).orderBy(delivery.createdDate.desc())
         .offset(pageable.getOffset())
-        .limit(pageable.getPageSize() + 1).fetch();
+        .limit(pageable.getPageSize() + 1)
+        .fetch();
 
     boolean hasNext = false;
     if (content.size() > pageable.getPageSize()) {

@@ -24,6 +24,7 @@ import com.windmeal.order.repository.delivery.DeliveryRepository;
 import com.windmeal.order.repository.order.OrderCancelRepository;
 import com.windmeal.order.repository.order.OrderRepository;
 import java.time.LocalDate;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -128,12 +129,12 @@ public class DeliveryService {
   }
 
 
-  public Slice<DeliveryListResponse> getOwnDelivering(Long memberId,Pageable pageable){
-    return deliveryRepository.getOwnDelivering(memberId, LocalDate.now(), pageable);
+  public List<DeliveryListResponse> getOwnDelivering(Long memberId,Pageable pageable){
+    return deliveryRepository.getOwnDeliveringWithoutPaging(memberId, LocalDate.now(), pageable);
   }
 
-  public Slice<OrderingListResponse> getOwnOrdering(Long memberId,Pageable pageable){
-    return deliveryRepository.getOwnOrdering(memberId, LocalDate.now(), pageable);
+  public List<OrderingListResponse> getOwnOrdering(Long memberId,Pageable pageable){
+    return deliveryRepository.getOwnOrderingWithoutPaging(memberId, LocalDate.now(), pageable);
   }
 
 
