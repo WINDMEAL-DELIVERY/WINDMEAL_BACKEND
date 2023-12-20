@@ -1,6 +1,7 @@
 package com.windmeal.member.controller;
 
 import com.windmeal.global.exception.ResultDataResponseDTO;
+import com.windmeal.global.token.dto.ReissueResponse;
 import com.windmeal.global.util.ClientIpUtil;
 import com.windmeal.global.util.CookieUtil;
 import com.windmeal.global.util.SecurityUtil;
@@ -38,7 +39,7 @@ public class AuthController {
 
     @Operation(summary = "토큰 리이슈 요청", description = "토큰을 재발급합니다.")
     @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "토큰 재발급 성공"),
+        @ApiResponse(responseCode = "200", description = "토큰 재발급 성공"),
         @ApiResponse(responseCode = "401", description = "유효하지 않은 리프레쉬 토큰, 재로그인 요망"),
         @ApiResponse(responseCode = "404", description = "엑세스 토큰이 존재하지 않음"),
         @ApiResponse(responseCode = "404", description = "리프레쉬 토큰이 존재하지 않음"),
@@ -47,12 +48,12 @@ public class AuthController {
         @ApiResponse(responseCode = "600", description = "서버 내부 암호화 에러")
     })
     @PostMapping("/reissue")
-    public ResultDataResponseDTO reissue(HttpServletRequest request, HttpServletResponse response) {
+    public ResultDataResponseDTO<ReissueResponse> reissue(HttpServletRequest request, HttpServletResponse response) {
         String code = request.getHeader(AUTHORIZATION_HEADER);
         String clientIpAddress = ClientIpUtil.getClientIpAddress(request);
         String accessToken = authService.reissue(Optional.ofNullable(code), clientIpAddress);
-        response.setHeader(AUTHORIZATION_HEADER, accessToken);
-        return ResultDataResponseDTO.empty();
+//        response.setHeader(AUTHORIZATION_HEADER, accessToken);
+        return ResultDataResponseDTO.of(ReissueResponse.of(accessToken));
     }
 
 }
