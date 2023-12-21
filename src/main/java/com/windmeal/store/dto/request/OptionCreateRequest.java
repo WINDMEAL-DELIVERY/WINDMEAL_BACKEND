@@ -36,7 +36,7 @@ public class OptionCreateRequest {
   private Boolean isMultipleOption; //다중 선택 여부
 
 
-  private List<OptionSpecRequest> optionSpec;
+  private List<OptionSpecRequest> optionSpecs;
 
   @Getter
   @Builder

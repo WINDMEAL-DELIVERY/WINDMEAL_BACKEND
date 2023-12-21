@@ -100,6 +100,10 @@ public class OrderController {
   }
 
 
+  @Operation(summary = "주문 내역 조회 - 지도", description = "주문 내역 리스트를 조회합니다.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "OK")
+  })
   @GetMapping("/order/map")
   public ResultDataResponseDTO<List<OrderMapListResponse>> getAllOrdersForMap(
       @Parameter(description = "가게 id", required = false, schema = @Schema(example = "1"))
@@ -131,11 +135,12 @@ public class OrderController {
   }
 
 
-  @GetMapping("/ordered")
+
   @Operation(summary = "내가 주문했던 목록 조회", description = "마이 페이지")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "OK")
   })
+  @GetMapping("/ordered")
   public ResultDataResponseDTO getOwnOrdered(
       Pageable pageable,
       @Parameter(description = "날짜 필터링 시작", required = false, schema = @Schema(example = "2023-12-10"))
@@ -152,11 +157,12 @@ public class OrderController {
     return ResultDataResponseDTO.of(orderService.getOwnOrdered(memberId,pageable,startDate,endDate,storeCategory));
   }
 
-  @GetMapping("/ordered/price")
+
   @Operation(summary = "내가 주문 시 이득 본 총 금액 조회", description = "마이 페이지")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "OK")
   })
+  @GetMapping("/ordered/price")
   public ResultDataResponseDTO getOwnOrderedTotalPrice(){
     Long memberId = SecurityUtil.getCurrentMemberId();
 

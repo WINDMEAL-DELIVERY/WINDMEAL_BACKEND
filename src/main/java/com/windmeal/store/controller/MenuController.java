@@ -6,6 +6,7 @@ import com.windmeal.global.exception.ExceptionResponseDTO;
 import com.windmeal.global.exception.ResultDataResponseDTO;
 import com.windmeal.store.dto.request.MenuCreateRequest;
 import com.windmeal.store.dto.request.StoreCreateRequest;
+import com.windmeal.store.dto.response.MenuResponse;
 import com.windmeal.store.dto.response.StoreResponse;
 import com.windmeal.store.service.MenuService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -59,7 +60,7 @@ public class MenuController {
       @RequestPart(value = "file", required = false) MultipartFile file) {
 
     String imgUrl = s3Util.imgUpload(file);
-    menuService.createMenu(request, imgUrl);
-    return ResultDataResponseDTO.empty(ErrorCode.CREATED);
+    MenuResponse menu = menuService.createMenu(request, imgUrl);
+    return ResultDataResponseDTO.of(menu,ErrorCode.CREATED);
   }
 }
