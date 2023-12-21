@@ -43,12 +43,14 @@ jobs:
         # application.yml 파일 생성
         touch ./application.yml
         touch ./key.yml
-        touch ./firebase/windmeal-firebase-adminsdk.json
         
         # GitHub-Actions 에서 설정한 값을 application.yml 파일에 쓰기
         echo "${{ secrets.WAS1_APPLICATION }}" >> ./application.yml
         echo "${{ secrets.WAS1_KEY }}" >> ./key.yml
-        echo "${{ secrets.FIREBASE_KEY }}" >> ./firebase/windmeal-firebase-adminsdk.json
+        
+        cd firebase
+        touch ./windmeal-firebase-adminsdk.json
+        echo "${{ secrets.FIREBASE_KEY }}" >> ./windmeal-firebase-adminsdk.json
 
       shell: bash
 
