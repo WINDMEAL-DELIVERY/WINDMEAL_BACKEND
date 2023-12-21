@@ -13,6 +13,8 @@ import javax.persistence.GenerationType;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends MemberBase{
 
+
+    private String token;
     private String name;
     private String nickname;
     private String department; //학과
@@ -34,4 +36,7 @@ public class Member extends MemberBase{
         this.nickname = nickname;
     }
 
+    public void updateToken(String token) {
+        this.token = token;
+    }
 }

@@ -19,4 +19,9 @@ public class DeliveryCancelRequest {
   private Long memberId;
   @Schema(description = "취소 사유", example = "~한 이유로 취소해야할 것 같습니다..")
   private String content;
+
+  public DeliveryCancelRequest toServiceDto(Long memberId) {
+    this.memberId = memberId;
+    return this;
+  }
 }

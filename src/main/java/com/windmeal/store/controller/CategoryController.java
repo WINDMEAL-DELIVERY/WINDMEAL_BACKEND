@@ -1,5 +1,6 @@
 package com.windmeal.store.controller;
 
+import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.global.exception.ExceptionResponseDTO;
 import com.windmeal.global.exception.ResultDataResponseDTO;
 import com.windmeal.store.dto.request.CategoryCreateRequest;
@@ -36,7 +37,7 @@ public class CategoryController {
    */
   @Operation(summary = "가게 카테고리 생성 요청", description = "가게 카테고리가 생성됩니다.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "OK")
+      @ApiResponse(responseCode = "201", description = "CREATED")
   })
   @PostMapping("/category")
   public ResultDataResponseDTO<CategoryResponse> createCategory(
@@ -44,7 +45,7 @@ public class CategoryController {
 
     CategoryResponse response = categoryService.createCategory(request);
 
-    return ResultDataResponseDTO.of(response);
+    return ResultDataResponseDTO.of(response, ErrorCode.CREATED);
   }
 
   /**

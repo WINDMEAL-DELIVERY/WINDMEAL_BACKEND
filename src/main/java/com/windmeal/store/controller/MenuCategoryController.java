@@ -1,6 +1,7 @@
 package com.windmeal.store.controller;
 
 
+import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.global.exception.ExceptionResponseDTO;
 import com.windmeal.global.exception.ResultDataResponseDTO;
 import com.windmeal.store.dto.request.MenuCategoryCreateRequest;
@@ -34,13 +35,13 @@ public class MenuCategoryController {
 
   @Operation(summary = "메뉴 카테고리 생성 요청", description = "메뉴 카테고리가 생성됩니다.")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "OK"),
+      @ApiResponse(responseCode = "201", description = "CREATED"),
       @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근",
           content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class)))})
   @PostMapping("/store/{storeId}/menuCategory")
   public ResultDataResponseDTO<MenuCategoryResponse> createMenuCategory(
       @Valid @RequestBody MenuCategoryCreateRequest request, @PathVariable Long storeId) {
-    return ResultDataResponseDTO.of(menuCategoryService.createMenuCategory(request, storeId));
+    return ResultDataResponseDTO.of(menuCategoryService.createMenuCategory(request, storeId), ErrorCode.CREATED);
   }
   @Operation(summary = "메뉴 카테고리 수정 요청", description = "메뉴 카테고리가 수정됩니다.")
   @ApiResponses({

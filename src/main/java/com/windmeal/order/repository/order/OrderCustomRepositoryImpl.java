@@ -84,7 +84,7 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
   @Override
   public Integer getOwnOrderedTotalPrice(Long memberId) {
 
-    return jpaQueryFactory.select(order.deliveryFee.price.subtract(3000).abs().sum())
+    return jpaQueryFactory.select(order.deliveryFee.price.subtract(3000).sum())
         .from(order)
         .where(
             order.orderer_id.eq(memberId),

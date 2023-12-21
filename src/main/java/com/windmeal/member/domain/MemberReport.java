@@ -26,9 +26,6 @@ public class MemberReport extends BaseTimeEntity {
     @JoinColumn(name = "reported_member_id", updatable = false, referencedColumnName = "member_id")
     private Member reported;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", updatable = false)
-    private Order order;
-
+    private String title;
     private String content;
 }

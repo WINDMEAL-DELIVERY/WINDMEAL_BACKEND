@@ -24,6 +24,7 @@ import com.windmeal.order.repository.delivery.DeliveryRepository;
 import com.windmeal.order.repository.order.OrderCancelRepository;
 import com.windmeal.order.repository.order.OrderRepository;
 import java.time.LocalDate;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -36,9 +37,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class DeliveryService {
 
-  /**
-   * 고려사항 1. 동시성 이슈 해결
-   */
 
   private final MemberRepository memberRepository;
 
@@ -62,9 +60,8 @@ public class DeliveryService {
       throw new DeliverOrdererSameException();
     }
     deliverySave(deliver, order);
-
     //TODO orderer 의 토큰값으로 배달 성사 알람
-    EventPublisher.publish(new DeliveryMatchEvent("test"));
+    EventPublisher.publish(new DeliveryMatchEvent(order.getSummary(),orderer.getToken()));
   }
 
   @DistributedLock(key = "#order.getId()")
@@ -108,21 +105,35 @@ public class DeliveryService {
             DeliveryStatus.DELIVERING)
         .orElseThrow(() -> new DeliveryNotFoundException());
 
+    String token = getToken(order, cancelMember, delivery);
 
     OrderCancel orderCancel = OrderCancel.builder()
         .cancelMember(cancelMember)
         .order(order)
         .delivery(delivery)
-        .content(request.getContent()).build();
+        .content(request.getContent())
+        .token(token).build();
     orderCancelRepository.save(orderCancel);
   }
 
+  private String getToken(Order order, Member cancelMember, Delivery delivery) {
 
-  public Slice<DeliveryListResponse> getOwnDelivering(Long memberId,Pageable pageable){
+    if(cancelMember.equals(delivery.getDeliver())){
+      return cancelMember.getToken();
+    }else{
+      Member orderer = memberRepository.findById(order.getOrderer_id())
+          .orElseThrow(() -> new MemberNotFoundException());
+
+      return orderer.getToken();
+    }
+  }
+
+
+  public List<DeliveryListResponse> getOwnDelivering(Long memberId,Pageable pageable){
     return deliveryRepository.getOwnDelivering(memberId, LocalDate.now(), pageable);
   }
 
-  public Slice<OrderingListResponse> getOwnOrdering(Long memberId,Pageable pageable){
+  public List<OrderingListResponse> getOwnOrdering(Long memberId,Pageable pageable){
     return deliveryRepository.getOwnOrdering(memberId, LocalDate.now(), pageable);
   }
 

@@ -31,9 +31,10 @@ public class DeliveryCustomRepositoryImpl implements DeliveryCustomRepository {
   private final JPAQueryFactory jpaQueryFactory;
 
   @Override
-  public Slice<DeliveryListResponse> getOwnDelivering(Long memberId, LocalDate today,
+  public List<DeliveryListResponse> getOwnDelivering(Long memberId, LocalDate today,
       Pageable pageable) {
-    List<DeliveryListResponse> content = jpaQueryFactory.select(
+//    List<DeliveryListResponse> content =
+        return jpaQueryFactory.select(
             Projections.constructor(DeliveryListResponse.class,
                 delivery.id,
                 order.id,
@@ -52,34 +53,36 @@ public class DeliveryCustomRepositoryImpl implements DeliveryCustomRepository {
             delivery.deliveryStatus.eq(DeliveryStatus.DELIVERING),
             eqEta(today)
         )
-        .orderBy(delivery.createdDate.desc())
-        .offset(pageable.getOffset())
-        .limit(pageable.getPageSize() + 1).fetch();
-    boolean hasNext = false;
-    if (content.size() > pageable.getPageSize()) {
-      content.remove(pageable.getPageSize());
-      hasNext = true;
-    }
-    return new SliceImpl(content, pageable, hasNext);
+        .orderBy(delivery.createdDate.desc()).fetch();
+//        .offset(pageable.getOffset())
+//        .limit(pageable.getPageSize() + 1).fetch();
+//    boolean hasNext = false;
+//    if (content.size() > pageable.getPageSize()) {
+//      content.remove(pageable.getPageSize());
+//      hasNext = true;
+//    }
+//    return new SliceImpl(content, pageable, hasNext);
   }
 
   @Override
-  public Slice<OrderingListResponse> getOwnOrdering(Long memberId, LocalDate today,
+  public List<OrderingListResponse> getOwnOrdering(Long memberId, LocalDate today,
       Pageable pageable) {
-    List<OrderingListResponse> content = jpaQueryFactory.select(
+//    List<OrderingListResponse> content =
+        return jpaQueryFactory.select(
             Projections.constructor(OrderingListResponse.class,
                 order.id,
                 order.orderStatus,
                 order.summary,
                 order.description,
                 place.name,
-                member.nickname
+                jpaQueryFactory.select(member.nickname).from(member)
+                    .where(member.id.eq(delivery.deliver.id))
             ))
         .from(delivery)
-//        .leftJoin(order,delivery.order)
+//        .leftJoin(delivery).on(order.id.eq(delivery.order.id))
         .rightJoin(delivery.order,order)
         .innerJoin(order.place,place)
-        .innerJoin(delivery.deliver,member)
+//        .innerJoin(delivery.deliver,member)
 
 //        .innerJoin(delivery.deliver,member)
 
@@ -90,15 +93,15 @@ public class DeliveryCustomRepositoryImpl implements DeliveryCustomRepository {
 //            delivery.deliveryStatus.eq(DeliveryStatus.DELIVERING),
             eqEta(today)
         )
-        .orderBy(order.createdDate.desc())
-        .offset(pageable.getOffset())
-        .limit(pageable.getPageSize() + 1).fetch();
-    boolean hasNext = false;
-    if (content.size() > pageable.getPageSize()) {
-      content.remove(pageable.getPageSize());
-      hasNext = true;
-    }
-    return new SliceImpl(content, pageable, hasNext);
+        .orderBy(order.createdDate.desc()).fetch();
+//        .offset(pageable.getOffset())
+//        .limit(pageable.getPageSize() + 1).fetch();
+//    boolean hasNext = false;
+//    if (content.size() > pageable.getPageSize()) {
+//      content.remove(pageable.getPageSize());
+//      hasNext = true;
+//    }
+//    return new SliceImpl(content, pageable, hasNext);
   }
 
   @Override
@@ -155,7 +158,7 @@ public class DeliveryCustomRepositoryImpl implements DeliveryCustomRepository {
     return delivery.order.eta.between(now.atTime(start), now.atTime(end));
   }
 
-  private static BooleanExpression eqDeliveryStatus() {
+  private BooleanExpression eqDeliveryStatus() {
     return delivery.deliveryStatus.eq(DeliveryStatus.DELIVERED)
         .or(delivery.deliveryStatus.eq(DeliveryStatus.CANCELED));
   }

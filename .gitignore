@@ -28,7 +28,7 @@ out/
 
 /src/main/resources/application.yml
 /src/main/resources/key.yml
-
+/src/main/resources/firebase/windmeal-firebase-adminsdk.json
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/

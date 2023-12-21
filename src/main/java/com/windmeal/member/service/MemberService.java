@@ -43,9 +43,10 @@ public class MemberService {
   @Transactional
   public MemberInfoDTO findMemberInfo(MemberInfoRequest memberInfoRequest, Long currentMemberId) {
     // TODO 토큰 암호화 후 저장
-    String decrypt = aes256Util.encrypt(memberInfoRequest.getAlarmToken());
+    String encryptToken = aes256Util.encrypt(memberInfoRequest.getAlarmToken());
     Member member = memberRepository.findById(currentMemberId)
         .orElseThrow(() -> new MemberNotFoundException());
+    member.updateToken(encryptToken);
     return MemberInfoDTO.of(member.getId(), member.getEmail(), member.getNickname());
   }
 

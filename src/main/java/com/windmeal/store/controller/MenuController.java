@@ -1,10 +1,12 @@
 package com.windmeal.store.controller;
 
 import com.windmeal.global.S3.S3Util;
+import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.global.exception.ExceptionResponseDTO;
 import com.windmeal.global.exception.ResultDataResponseDTO;
 import com.windmeal.store.dto.request.MenuCreateRequest;
 import com.windmeal.store.dto.request.StoreCreateRequest;
+import com.windmeal.store.dto.response.MenuResponse;
 import com.windmeal.store.dto.response.StoreResponse;
 import com.windmeal.store.service.MenuService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -47,7 +49,7 @@ public class MenuController {
           content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE)
       ))
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "OK"),
+      @ApiResponse(responseCode = "201", description = "CREATED"),
       @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근",
           content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class)))})
   @PostMapping("/menu")
@@ -58,7 +60,7 @@ public class MenuController {
       @RequestPart(value = "file", required = false) MultipartFile file) {
 
     String imgUrl = s3Util.imgUpload(file);
-    menuService.createMenu(request, imgUrl);
-    return ResultDataResponseDTO.empty();
+    MenuResponse menu = menuService.createMenu(request, imgUrl);
+    return ResultDataResponseDTO.of(menu,ErrorCode.CREATED);
   }
 }
