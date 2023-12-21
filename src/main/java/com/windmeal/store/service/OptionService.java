@@ -34,7 +34,7 @@ public class OptionService {
     Menu menu = menuRepository.findById(menuId)
         .orElseThrow(() -> new MenuNotFoundException());
     OptionGroup savedOptionGroup = optionGroupRepository.save(request.toOptionGroupEntity(menu));
-    optionSpecificationRepository.createOptionSpecs(request.getOptionSpec(),
+    optionSpecificationRepository.createOptionSpecs(request.getOptionSpecs(),
         savedOptionGroup.getId());
   }
 
