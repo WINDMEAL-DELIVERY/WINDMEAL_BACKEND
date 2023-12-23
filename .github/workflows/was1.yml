@@ -44,6 +44,7 @@ jobs:
     - name: make application.yml
       run: |
         # create application.yml
+        ls
         cp windmeal-firebase-adminsdk.json ./src/main/resources/firebase/windmeal-firebase-adminsdk.json
         
         cd ./src/main/resources
