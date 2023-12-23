@@ -33,6 +33,13 @@ jobs:
     #     mysql database: 'windmeal'
     #     mysql user: ${{ secrets.TEST_DATABASE_USER }}
     #     mysql password: ${{ secrets.TEST_DATABASE_PASSWORD }}
+    - uses: actions/checkout@v3
+    - name: make application.yml
+      run: |
+        cd ./src/main/resources/firebase
+        
+        touch ./windmeal-firebase-adminsdk.json
+      
     - name: create-json
       id: create-json
       uses: jsdaniell/create-json@1.1.2
