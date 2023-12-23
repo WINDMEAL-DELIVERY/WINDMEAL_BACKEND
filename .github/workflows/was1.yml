@@ -39,13 +39,12 @@ jobs:
       with:
         name: "windmeal-firebase-adminsdk.json"
         json: ${{ secrets.FIREBASE_KEY }}
-        
+        dir: 'src/resources/firebase'
     - uses: actions/checkout@v3
     - name: make application.yml
       run: |
         # create application.yml
         ls
-        cp windmeal-firebase-adminsdk.json ./src/main/resources/firebase/windmeal-firebase-adminsdk.json
         
         cd ./src/main/resources
         
@@ -58,6 +57,7 @@ jobs:
         echo "${{ secrets.WAS1_KEY }}" >> ./key.yml
         
         cd firebase
+        ls
         cat windmeal-firebase-adminsdk.json
         
       shell: bash
