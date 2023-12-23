@@ -39,7 +39,7 @@ jobs:
         cd ./src/main/resources/firebase
         
         touch ./windmeal-firebase-adminsdk.json
-      
+        ls
     - name: create-json
       id: create-json
       uses: jsdaniell/create-json@1.1.2
