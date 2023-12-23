@@ -50,15 +50,9 @@ jobs:
         
         cd firebase
         touch ./windmeal-firebase-adminsdk.json
-
-        run: echo "FIREBASE_KEY=${{ secrets.FIREBASE_KEY }}" >> $GITHUB_ENV
-
-        echo $FIREBASE_KEY > ./windmeal-firebase-adminsdk.json
-          
         ls
         cat windmeal-firebase-adminsdk.json
         echo "${{ secrets.FIREBASE_KEY }}" >> ./windmeal-firebase-adminsdk.json
-
       shell: bash
 
     - name: Build with Gradle
