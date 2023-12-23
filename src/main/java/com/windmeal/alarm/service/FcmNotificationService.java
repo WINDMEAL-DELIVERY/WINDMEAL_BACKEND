@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class FcmNotificationService {
 
-  private final FirebaseMessaging firebaseMessaging;
+//  private final FirebaseMessaging firebaseMessaging;
 
   public void sendNotification(FcmNotificationRequest request, String token) {
 
@@ -28,7 +28,7 @@ public class FcmNotificationService {
           .setNotification(notification)
           .build();
 
-      firebaseMessaging.send(message);
+//      firebaseMessaging.send(message);
       log.info("알람 전송 성공 : " + request.getBody());
     } catch (Exception e) {
       log.error("알람 전송 실패 : ");
