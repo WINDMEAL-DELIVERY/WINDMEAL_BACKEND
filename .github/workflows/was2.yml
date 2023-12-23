@@ -50,6 +50,7 @@ jobs:
         
         cd firebase
         touch ./windmeal-firebase-adminsdk.json
+        ls
         echo "${{ secrets.FIREBASE_KEY }}" >> ./windmeal-firebase-adminsdk.json
 
       shell: bash
