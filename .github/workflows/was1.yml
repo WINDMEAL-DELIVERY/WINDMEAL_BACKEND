@@ -47,7 +47,6 @@ jobs:
       with:
         name: "windmeal-firebase-adminsdk.json"
         json: ${{ secrets.FIREBASE_KEY }}
-        dir: './src/main/resources/firebase'
     - uses: actions/checkout@v3
     - name: make application.yml
       run: |
