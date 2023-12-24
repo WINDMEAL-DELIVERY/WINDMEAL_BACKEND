@@ -45,6 +45,7 @@ jobs:
       with:
         name: "windmeal-firebase-adminsdk.json"
         json: ${{ secrets.FIREBASE_KEY }}
+        dir: 'src/main/resources/firebase'
     
     - name: make application.yml
       run: |
@@ -60,6 +61,7 @@ jobs:
 
         # 확인용.
         cd firebase
+        ls
         cat windmeal-firebase-adminsdk.json
         
       shell: bash
