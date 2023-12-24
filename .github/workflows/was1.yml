@@ -34,9 +34,9 @@ jobs:
     #     mysql user: ${{ secrets.TEST_DATABASE_USER }}
     #     mysql password: ${{ secrets.TEST_DATABASE_PASSWORD }}
     - uses: actions/checkout@v3
-    - name: make application.yml
+    - name: make firebase.json
       run: |
-        cd ./src/main/resources/firebase
+        cd /home/runner/work/WINDMEAL_BACKEND/WINDMEAL_BACKEND/src/main/resources/firebase
         
         touch ./windmeal-firebase-adminsdk.json
         ls
@@ -47,7 +47,8 @@ jobs:
       with:
         name: "windmeal-firebase-adminsdk.json"
         json: ${{ secrets.FIREBASE_KEY }}
-        dir: './src/main/resources/firebase'
+        # dir: './src/main/resources/firebase'
+        dir: '/home/runner/work/WINDMEAL_BACKEND/WINDMEAL_BACKEND/src/main/resources/firebase'
     - uses: actions/checkout@v3
     - name: make application.yml
       run: |
