@@ -34,7 +34,18 @@ jobs:
     #     mysql user: ${{ secrets.TEST_DATABASE_USER }}
     #     mysql password: ${{ secrets.TEST_DATABASE_PASSWORD }}
     
-    - uses: actions/checkout@v3
+    - name: make firebase.json
+      run: |
+        cd ./src/main/resources/firebase
+        touch ./windmeal-firebase-adminsdk.json
+        
+    - name: create-json
+      id: create-json
+      uses: jsdaniell/create-json@1.1.2
+      with:
+        name: "windmeal-firebase-adminsdk.json"
+        json: ${{ secrets.FIREBASE_KEY }}
+    
     - name: make application.yml
       run: |
         # create application.yml
@@ -48,10 +59,9 @@ jobs:
         echo "${{ secrets.WAS1_APPLICATION }}" >> ./application.yml
         echo "${{ secrets.WAS1_KEY }}" >> ./key.yml
         
+        # 확인용.
         cd firebase
-        touch ./windmeal-firebase-adminsdk.json
-        ls
-        echo "${{ secrets.FIREBASE_KEY }}" >> ./windmeal-firebase-adminsdk.json
+        cat windmeal-firebase-adminsdk.json
 
       shell: bash
 
