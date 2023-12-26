@@ -8,10 +8,14 @@ import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.windmeal.global.wrapper.RestSlice;
 import com.windmeal.report.dto.response.ReportListResponse;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 
 @RequiredArgsConstructor
 public class ReportCustomRepositoryImpl implements ReportCustomRepository{
@@ -19,15 +23,16 @@ public class ReportCustomRepositoryImpl implements ReportCustomRepository{
   private final JPAQueryFactory jpaQueryFactory;
 
   @Override
-  public Page<ReportListResponse> getReportList(Pageable pageable, String nickName, String email) {
-    jpaQueryFactory.select(Projections.constructor(ReportListResponse.class,
-            report.id,
-            member.id,
-            member.email,
-            member.nickname,
-            report.title,
-            report.content
-        ))
+  public Slice<ReportListResponse> getReportList(Pageable pageable, String nickName, String email) {
+    List<ReportListResponse> content = jpaQueryFactory.select(
+            Projections.constructor(ReportListResponse.class,
+                report.id,
+                member.id,
+                member.email,
+                member.nickname,
+                report.title,
+                report.content
+            ))
         .from(report)
         .leftJoin(member).on(member.id.eq(report.reporter.id))
         .where(
@@ -38,8 +43,12 @@ public class ReportCustomRepositoryImpl implements ReportCustomRepository{
         .offset(pageable.getOffset())
         .limit(pageable.getPageSize() + 1).fetch();
 
-
-    return null;
+    boolean hasNext = false;
+    if (content.size() > pageable.getPageSize()) {
+      content.remove(pageable.getPageSize());
+      hasNext = true;
+    }
+    return new RestSlice(new SliceImpl(content, pageable, hasNext));
   }
 
   private BooleanExpression eqEmail(String email) {

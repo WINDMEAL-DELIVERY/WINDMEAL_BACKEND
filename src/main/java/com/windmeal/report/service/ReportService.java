@@ -10,6 +10,7 @@ import com.windmeal.report.repository.ReportRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +32,7 @@ public class ReportService {
     reportRepository.save(Report.place(reporter,request));
   }
 
-  public Page<ReportListResponse> getReportList(Pageable pageable, String nickName, String email) {
+  public Slice<ReportListResponse> getReportList(Pageable pageable, String nickName, String email) {
 
     return reportRepository.getReportList(pageable,nickName,email);
   }
