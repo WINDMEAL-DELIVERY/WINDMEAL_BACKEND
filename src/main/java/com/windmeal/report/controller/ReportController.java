@@ -1,13 +1,17 @@
 package com.windmeal.report.controller;
 
 import com.windmeal.global.exception.ErrorCode;
+import com.windmeal.global.exception.ExceptionResponseDTO;
 import com.windmeal.global.exception.ResultDataResponseDTO;
 import com.windmeal.global.util.SecurityUtil;
 import com.windmeal.order.dto.request.DeliveryCancelRequest;
 import com.windmeal.report.dto.request.ReportCreateRequest;
 import com.windmeal.report.service.ReportService;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -31,7 +35,11 @@ public class ReportController {
 
   private final ReportService reportService;
 
-
+  @ApiResponses({
+      @ApiResponse(responseCode = "201", description = "CREATED"),
+      @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근",
+          content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class)))
+  })
   @PostMapping("/report")
   public ResultDataResponseDTO createReport(@RequestBody ReportCreateRequest request){
     Long currentMemberId = SecurityUtil.getCurrentMemberId();
@@ -40,6 +48,10 @@ public class ReportController {
 
     return ResultDataResponseDTO.empty(ErrorCode.CREATED);
   }
+
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "OK")
+  })
   @GetMapping("/report")
   public ResultDataResponseDTO getReportList(Pageable pageable,
       @Parameter(description = "닉네임 검색", required = false, schema = @Schema(example = "임동"))

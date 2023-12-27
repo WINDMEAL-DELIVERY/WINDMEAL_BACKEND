@@ -1,5 +1,6 @@
 package com.windmeal.member.domain;
 
+import com.windmeal.member.dto.request.MemberReportCreateRequest;
 import com.windmeal.model.BaseTimeEntity;
 import com.windmeal.order.domain.Order;
 import lombok.AccessLevel;
@@ -28,4 +29,15 @@ public class MemberReport extends BaseTimeEntity {
 
     private String title;
     private String content;
+
+
+    public static MemberReport place(MemberReportCreateRequest request, Member reported, Member reporter){
+        return new MemberReport(reporter,reported,request.getTitle(), request.getContent());
+    }
+    private MemberReport(Member reporter, Member reported, String title, String content) {
+        this.reporter = reporter;
+        this.reported = reported;
+        this.title = title;
+        this.content = content;
+    }
 }
