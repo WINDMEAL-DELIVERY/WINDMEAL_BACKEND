@@ -5,6 +5,7 @@ import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.global.exception.ResultDataResponseDTO;
 import com.windmeal.global.util.SecurityUtil;
 import com.windmeal.member.dto.request.MemberReportCreateRequest;
+import com.windmeal.member.dto.response.MemberReportListResponse;
 import com.windmeal.member.service.MemberReportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -14,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,7 +48,7 @@ public class MemberReportController {
       @ApiResponse(responseCode = "200", description = "OK")
   })
   @GetMapping("/report")
-  public ResultDataResponseDTO getReportList(Pageable pageable,
+  public ResultDataResponseDTO<Slice<MemberReportListResponse>> getReportList(Pageable pageable,
       @Parameter(description = "검색의 대상(신고한 사람을 검색하는지 신고 당한 사람을 검색하는지)", required = false, schema = @Schema(example = "임동"))
       @RequestParam(required = false) Boolean isReported,
       @Parameter(description = "닉네임 검색", required = false, schema = @Schema(example = "임동"))
