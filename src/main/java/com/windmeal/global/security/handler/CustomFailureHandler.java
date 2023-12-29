@@ -34,6 +34,7 @@ public class CustomFailureHandler extends SimpleUrlAuthenticationFailureHandler 
 //                .orElse(("/"));
         log.info("CustomFailureHandler, onAuthenticationFailure");
         String encode = Base64Utils.encodeToString(exception.getLocalizedMessage().getBytes());
+//        byte[] encode = Base64Utils.encode(exception.getLocalizedMessage().getBytes());
         log.error(exception.getLocalizedMessage());
         String targetUrl = ERROR_REDIRECT;
         targetUrl = UriComponentsBuilder.fromUriString(targetUrl)
