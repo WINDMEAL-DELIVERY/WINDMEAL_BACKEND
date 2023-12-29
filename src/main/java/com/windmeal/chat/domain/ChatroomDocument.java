@@ -24,7 +24,6 @@ public class ChatroomDocument {
 
   private boolean isDeletedByGuest = false;
 
-  private String lastMessage;
 
   @CreatedDate
   private LocalDateTime createdTime;
@@ -36,8 +35,6 @@ public class ChatroomDocument {
     this.orderId = orderId;
     this.isDeletedByOwner = false;
     this.isDeletedByGuest = false;
-    // 처음 채팅방을 만들때는 일단 마지막 메시지를 비워두겠다.
-    this.lastMessage = "";
   }
 
 

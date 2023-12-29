@@ -33,7 +33,8 @@ public class CustomFailureHandler extends SimpleUrlAuthenticationFailureHandler 
 //                .map(Cookie::getValue)
 //                .orElse(("/"));
         log.info("CustomFailureHandler, onAuthenticationFailure");
-        byte[] encode = Base64Utils.encode(exception.getLocalizedMessage().getBytes());
+        String encode = Base64Utils.encodeToString(exception.getLocalizedMessage().getBytes());
+        log.error(exception.getLocalizedMessage());
         String targetUrl = ERROR_REDIRECT;
         targetUrl = UriComponentsBuilder.fromUriString(targetUrl)
                 .queryParam("msg", encode)
