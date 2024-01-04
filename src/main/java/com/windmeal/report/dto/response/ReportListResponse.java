@@ -20,10 +20,10 @@ public class ReportListResponse {
   private Long memberId;
 
   @Schema(description = "건의 요청자 email", example = "idh1007@naver.com")
-  private Long email;
+  private String email;
 
   @Schema(description = "건의 요청자 nickname", example = "임동동")
-  private Long nickName;
+  private String nickName;
 
   @Schema(description = "신고 제목", example = "신고 제목")
   private String title;

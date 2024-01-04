@@ -19,19 +19,19 @@ public class MemberReportListResponse {
   private Long reporterId;
 
   @Schema(description = "신고 요청자 email", example = "idh1007@naver.com")
-  private Long reporterEmail;
+  private String reporterEmail;
 
   @Schema(description = "신고 요청자 nickname", example = "임동동")
-  private Long reporterNickName;
+  private String reporterNickName;
 
   @Schema(description = "피신고인 ID", example = "1")
   private Long reportedId;
 
   @Schema(description = "피신고인자 email", example = "idh1007@naver.com")
-  private Long reportedEmail;
+  private String reportedEmail;
 
   @Schema(description = "피신고인 nickname", example = "임동동")
-  private Long reportedNickName;
+  private String reportedNickName;
 
   @Schema(description = "신고 제목", example = "신고 제목")
   private String title;

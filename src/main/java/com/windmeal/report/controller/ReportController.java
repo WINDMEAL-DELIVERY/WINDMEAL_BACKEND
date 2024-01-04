@@ -6,6 +6,7 @@ import com.windmeal.global.exception.ResultDataResponseDTO;
 import com.windmeal.global.util.SecurityUtil;
 import com.windmeal.order.dto.request.DeliveryCancelRequest;
 import com.windmeal.report.dto.request.ReportCreateRequest;
+import com.windmeal.report.dto.response.ReportListResponse;
 import com.windmeal.report.service.ReportService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -53,7 +55,7 @@ public class ReportController {
       @ApiResponse(responseCode = "200", description = "OK")
   })
   @GetMapping("/report")
-  public ResultDataResponseDTO getReportList(Pageable pageable,
+  public ResultDataResponseDTO<Slice<ReportListResponse>> getReportList(Pageable pageable,
       @Parameter(description = "닉네임 검색", required = false, schema = @Schema(example = "임동"))
       @RequestParam(required = false) String nickName,
       @Parameter(description = "이메일 검색", required = false, schema = @Schema(example = "idh1007@naver.com"))

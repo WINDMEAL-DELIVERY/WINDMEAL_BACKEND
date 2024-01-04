@@ -38,7 +38,7 @@ public class OptionService {
         savedOptionGroup.getId());
   }
 
-  @Cacheable(value = "Menu", key = "#menuId", cacheManager = "contentCacheManager")
+//  @Cacheable(value = "Menu", key = "#menuId", cacheManager = "contentCacheManager")
   public MenuOptionResponse getMenuGroups(Long menuId) {
     Menu menu = menuRepository.findById(menuId)
         .orElseThrow(() -> new MenuNotFoundException());
