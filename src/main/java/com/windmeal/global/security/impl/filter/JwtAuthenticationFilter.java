@@ -21,13 +21,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-/**
- * JwtAuthenticationFilter는 HTTP 요청을 가로채서, 헤더를 조사하여 토큰값을 얻어 AuthenticationToken, 즉 인증용 객체를 생성한다.
- */
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-  // OncePerRequestFilter는 요청당 한번만 동작하는 필터
   private final AES256Util aes256Util;
   private final ObjectMapper objectMapper;
   private final TokenProvider tokenProvider;
@@ -43,7 +39,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
-    // 먼저 해더를 조사한다. 그리고 유효한 토큰 문자열이 있다면 가져온다.
 
     try {
       String accessToken = resolveToken(request);
@@ -55,7 +50,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
       }
     } catch (Exception e) {
-      // 암호화 관련 에러가 발생하면 이 곳에서 걸린다.
       log.error(e.getClass().getName());
       sendResponse(response, e);
       return;

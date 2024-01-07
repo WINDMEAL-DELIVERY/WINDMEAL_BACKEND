@@ -57,7 +57,7 @@ public class AuthService {
       Member member = memberRepository.findById(id).orElseThrow(
           () -> new MemberNotFoundException());
 
-      if(!StringUtils.hasText(member.getNickname())) {
+      if (!StringUtils.hasText(member.getNickname())) {
         throw new InvalidRegistrationException();
       }
 
@@ -83,7 +83,8 @@ public class AuthService {
       }
 
       // 위의 검증 절차를 모두 통과하였으면 토큰을 새로 발급한다.
-      String rowToken = tokenProvider.createAccessToken(authenticationForReissue, member.getNickname());
+      String rowToken = tokenProvider.createAccessToken(authenticationForReissue,
+          member.getNickname());
       return aes256Util.encrypt(rowToken);
 
     } catch (JsonProcessingException e) {
