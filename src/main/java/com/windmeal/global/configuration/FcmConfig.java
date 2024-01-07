@@ -19,10 +19,9 @@ public class FcmConfig {
 
   @Bean
   FirebaseMessaging firebaseMessaging() throws IOException {
-    // 절대경롤 작성할 경우 인스턴스가 위치를 찾을 수 없기 때문에, ClassPathResource를 활용한다.
+    // 인스턴스는 절대경로를 읽을 수 없다. ClassPathResource를 활용해야한다.
     ClassPathResource resourceClassPath = new ClassPathResource(path);
 
-    // 받아온 resource를 inputStream으로 변경해준다.
     InputStream resource = resourceClassPath.getInputStream();
 
     FirebaseOptions options = new FirebaseOptions.Builder()

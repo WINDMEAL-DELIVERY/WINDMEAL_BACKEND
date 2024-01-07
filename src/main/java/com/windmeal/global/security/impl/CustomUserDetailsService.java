@@ -20,21 +20,23 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final MemberRepository memberRepository;
-    @Override
-    @Transactional(readOnly = true)
-    public UserDetails loadUserByUsername(String username) {
-        return memberRepository.findByEmail(username)
-                .map(member -> createUser(member))
-                .orElseThrow(() -> new UsernameNotFoundException(username + " 은 존재하지 않는 유저입니다."));
-    }
+  private final MemberRepository memberRepository;
 
-    private User createUser(Member member) {
-        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(member.getAuthority().toString());
-        return new User(
-                member.getId().toString(),
-                member.getEmail(),
-                Collections.singletonList(grantedAuthority)
-        );
-    }
+  @Override
+  @Transactional(readOnly = true)
+  public UserDetails loadUserByUsername(String username) {
+    return memberRepository.findByEmail(username)
+        .map(member -> createUser(member))
+        .orElseThrow(() -> new UsernameNotFoundException(username + " 은 존재하지 않는 유저입니다."));
+  }
+
+  private User createUser(Member member) {
+    GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(
+        member.getAuthority().toString());
+    return new User(
+        member.getId().toString(),
+        member.getEmail(),
+        Collections.singletonList(grantedAuthority)
+    );
+  }
 }

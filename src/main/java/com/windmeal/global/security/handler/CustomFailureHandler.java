@@ -24,24 +24,20 @@ import static com.windmeal.global.constants.SecurityConstants.ERROR_REDIRECT;
 @RequiredArgsConstructor
 public class CustomFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
-    private final OAuth2AuthorizationRequestBasedOnCookieRepository authorizationRequestRepository;
+  private final OAuth2AuthorizationRequestBasedOnCookieRepository authorizationRequestRepository;
 
-    @Override
-    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-        // 에러시 라다이렉트하는 URL의 경우는 프론트에서 정할 수 없다. 서버에서 정해줘야겠다.
-//        String targetUrl = CookieUtil.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
-//                .map(Cookie::getValue)
-//                .orElse(("/"));
-        log.info("CustomFailureHandler, onAuthenticationFailure");
-        String encode = Base64Utils.encodeToString(exception.getLocalizedMessage().getBytes());
-//        byte[] encode = Base64Utils.encode(exception.getLocalizedMessage().getBytes());
-        log.error(exception.getLocalizedMessage());
-        String targetUrl = ERROR_REDIRECT;
-        targetUrl = UriComponentsBuilder.fromUriString(targetUrl)
-                .queryParam("msg", encode)
-                .build().toUriString();
+  @Override
+  public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
+      AuthenticationException exception) throws IOException, ServletException {
+    log.info("CustomFailureHandler, onAuthenticationFailure");
+    String encode = Base64Utils.encodeToString(exception.getLocalizedMessage().getBytes());
+    log.error(exception.getLocalizedMessage());
+    String targetUrl = ERROR_REDIRECT;
+    targetUrl = UriComponentsBuilder.fromUriString(targetUrl)
+        .queryParam("msg", encode)
+        .build().toUriString();
 
-        authorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
-        getRedirectStrategy().sendRedirect(request, response, targetUrl);
-    }
+    authorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
+    getRedirectStrategy().sendRedirect(request, response, targetUrl);
+  }
 }

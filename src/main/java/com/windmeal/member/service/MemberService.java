@@ -1,7 +1,6 @@
 package com.windmeal.member.service;
 
 
-import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.global.util.AES256Util;
 import com.windmeal.member.domain.Member;
 import com.windmeal.member.domain.event.AlarmTestEvent;
@@ -12,7 +11,6 @@ import com.windmeal.member.exception.DuplicatedNicknameException;
 import com.windmeal.member.exception.MemberNotFoundException;
 import com.windmeal.member.repository.MemberRepository;
 import com.windmeal.model.event.EventPublisher;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -44,7 +42,6 @@ public class MemberService {
 
   @Transactional
   public MemberInfoDTO findMemberInfo(MemberInfoRequest memberInfoRequest, Long currentMemberId) {
-    // TODO 토큰 암호화 후 저장
     String encryptToken = aes256Util.encrypt(memberInfoRequest.getAlarmToken());
     Member member = memberRepository.findById(currentMemberId)
         .orElseThrow(() -> new MemberNotFoundException());
