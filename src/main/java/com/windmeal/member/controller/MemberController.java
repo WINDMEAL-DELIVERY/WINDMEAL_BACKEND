@@ -63,5 +63,12 @@ public class MemberController {
         return ResultDataResponseDTO.of(memberInfo);
     }
 
+    @Operation(summary = "알람 테스트용 API", description = "프론트엔드 알람 테스트 전용 API")
+    @GetMapping(value = "/alarm/test")
+    public ResultDataResponseDTO alarmTest(@RequestParam(value = "mgs")String msg) {
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        memberService.alarmTest(msg, currentMemberId);
+        return ResultDataResponseDTO.empty();
+    }
 
 }

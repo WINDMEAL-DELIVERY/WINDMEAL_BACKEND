@@ -1,30 +1,25 @@
 package com.windmeal.global.security.impl.filter;
 
 
+import static com.windmeal.global.constants.JwtConstants.AUTHORIZATION_HEADER;
+import static com.windmeal.global.constants.JwtConstants.BEARER_PREFIX;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.global.exception.ExceptionResponseDTO;
 import com.windmeal.global.token.util.TokenProvider;
 import com.windmeal.global.util.AES256Util;
-import com.windmeal.global.util.CookieUtil;
-import java.util.Optional;
+import java.io.IOException;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import java.io.IOException;
-import java.util.Enumeration;
-
-import static com.windmeal.global.constants.JwtConstants.*;
 
 /**
  * JwtAuthenticationFilter는 HTTP 요청을 가로채서, 헤더를 조사하여 토큰값을 얻어 AuthenticationToken, 즉 인증용 객체를 생성한다.
