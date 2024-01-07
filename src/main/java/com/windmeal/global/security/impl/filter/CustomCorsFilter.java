@@ -17,10 +17,8 @@ import java.util.Enumeration;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class CustomCorsFilter implements Filter {
 
-  @Value("${domain.url.local}")
-  private String local;
-  @Value("${domain.url.ws_host}")
-  private String ws_host;
+  private String local = "http://localhost:3000";
+  private String ws_host = "https://windmeal.co.kr";
   @Override
   public void init(FilterConfig filterConfig) throws ServletException {
     Filter.super.init(filterConfig);
