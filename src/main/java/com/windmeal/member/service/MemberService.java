@@ -4,12 +4,14 @@ package com.windmeal.member.service;
 import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.global.util.AES256Util;
 import com.windmeal.member.domain.Member;
+import com.windmeal.member.domain.event.AlarmTestEvent;
 import com.windmeal.member.dto.request.MemberInfoRequest;
 import com.windmeal.member.dto.request.NicknameRequest;
 import com.windmeal.member.dto.response.MemberInfoDTO;
 import com.windmeal.member.exception.DuplicatedNicknameException;
 import com.windmeal.member.exception.MemberNotFoundException;
 import com.windmeal.member.repository.MemberRepository;
+import com.windmeal.model.event.EventPublisher;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +50,12 @@ public class MemberService {
         .orElseThrow(() -> new MemberNotFoundException());
     member.updateToken(encryptToken);
     return MemberInfoDTO.of(member.getId(), member.getEmail(), member.getNickname());
+  }
+
+  public void alarmTest(String msg, Long currentMemberId) {
+    Member member = memberRepository.findById(currentMemberId)
+        .orElseThrow(MemberNotFoundException::new);
+    EventPublisher.publish(new AlarmTestEvent(msg, member.getToken()));
   }
 
 }
