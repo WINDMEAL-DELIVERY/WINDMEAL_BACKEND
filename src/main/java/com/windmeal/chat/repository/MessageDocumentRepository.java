@@ -8,7 +8,5 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 
 public interface MessageDocumentRepository extends MongoRepository<MessageDocument, String>,
     MessageDocumentCustomRepository, QuerydslPredicateExecutor<MessageDocument> {
-
-
   Slice<MessageDocument> findByChatroomId(Long chatroomId, Pageable pageable);
 }
