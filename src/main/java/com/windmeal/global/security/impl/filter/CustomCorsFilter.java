@@ -34,7 +34,7 @@ public class CustomCorsFilter implements Filter {
       throws IOException, ServletException {
     HttpServletResponse response = (HttpServletResponse) res;
     HttpServletRequest request = (HttpServletRequest) req;
-    response.setHeader("Access-Control-Allow-Origin", local);
+    response.setHeader("Access-Control-Allow-Origin", ws_host);
     response.setHeader("Access-Control-Allow-Credentials", "true");
     response.setHeader("Access-Control-Allow-Methods",
         "HEAD, GET, POST, PUT, DELETE, PATCH, OPTIONS");
