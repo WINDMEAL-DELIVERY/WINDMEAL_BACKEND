@@ -22,19 +22,14 @@ public class ChatRoomSaveRequest {
                 .build();
     }
 
-//    public ChatRoom toEntity(Member owner, Member guest, Order order) {
-//        return ChatRoom.builder()
-//                .owner(owner)
-//                .guest(guest)
-//                .order(order)
-//                .build();
-//    }
 
-    public ChatroomDocument toDocument(Member owner, Member guest, Order order) {
+    public ChatroomDocument toDocument(Member owner, Member guest, Order order, String ownerAlarmToken, String guestAlarmToken) {
         return ChatroomDocument.builder()
             .ownerId(owner.getId())
             .guestId(guest.getId())
             .orderId(order.getId())
+            .ownerAlarmToken(ownerAlarmToken)
+            .guestAlarmToken(guestAlarmToken)
             .build();
     }
 }
