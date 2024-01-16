@@ -28,11 +28,11 @@ public class ChatRoomService {
     private final OrderRepository orderRepository;
 
     /**
-     * 채팅방 생성을 관장하는 메서드
+     * 채팅방 생성을 관장하는 메서드 <br/>
      * 생성 시에는 고려해줄 것들이 많기 때문에, 불가피하게 api 서버에서 이를 담당하게 되었다.
      * 하지만 생성 이외의 기능들은 모두 채팅 서버에서 담당한다.
      * @param requestDTO
-     * @return ChatRoomResponse
+     * @return {@link com.windmeal.chat.dto.response.ChatRoomResponse}
      */
     @Transactional
     public ChatRoomResponse createChatRoom(ChatRoomSaveRequest requestDTO, Long currentMemberId) {
@@ -49,9 +49,9 @@ public class ChatRoomService {
             throw new OrderAlreadyMatchedException();
         }
         ChatroomDocument chatRoom = chatroomDocumentRepository.save(
-            requestDTO.toDocument(owner, guest, order));
+            requestDTO.toDocument(owner, guest, order, owner.getToken(), guest.getToken()));
         return ChatRoomResponse.of(chatRoom.getId(), chatRoom.getOwnerId(), chatRoom.getGuestId(),
-            chatRoom.getOrderId());
+            chatRoom.getOrderId(), owner.getToken());
     }
 
 
