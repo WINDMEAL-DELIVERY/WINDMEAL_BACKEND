@@ -67,6 +67,15 @@ public class AuthController {
 
 
   @Operation(summary = "로그아웃", description = "로그아웃합니다.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "로그아웃 성공"),
+      @ApiResponse(responseCode = "401", description = "이미 로그아웃 된 사용자 (인증 정보 없음)",
+          content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class))),
+      @ApiResponse(responseCode = "600", description = "서버 내부 JSON 파싱 에러",
+          content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class))),
+      @ApiResponse(responseCode = "600", description = "서버 내부 암호화 에러",
+          content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class)))
+  })
   @GetMapping("/logout")
   public ResultDataResponseDTO logout() {
     Long currentMemberId = SecurityUtil.getCurrentMemberId();

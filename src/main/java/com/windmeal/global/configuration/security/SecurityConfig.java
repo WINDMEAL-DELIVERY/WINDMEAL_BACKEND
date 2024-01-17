@@ -109,6 +109,7 @@ public class SecurityConfig {
         .antMatchers(PERMIT_URL_ARRAY).permitAll()
         .antMatchers("/auth/**").permitAll()
         .antMatchers("/oauth2/**").permitAll()
+        .antMatchers("/auth/logout").authenticated()
         .anyRequest().authenticated()
         .and()
         .apply(new JwtSecurityConfig(aes256Util, objectMapper, tokenProvider))
