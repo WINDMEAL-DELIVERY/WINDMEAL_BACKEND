@@ -1,6 +1,7 @@
 package com.windmeal.member.service;
 
 
+import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.global.util.AES256Util;
 import com.windmeal.member.domain.Member;
 import com.windmeal.member.domain.event.AlarmTestEvent;
@@ -41,11 +42,18 @@ public class MemberService {
   }
 
   @Transactional
-  public MemberInfoDTO findMemberInfo(MemberInfoRequest memberInfoRequest, Long currentMemberId) {
+  public MemberInfoDTO memberInfoDetails(MemberInfoRequest memberInfoRequest,
+      Long currentMemberId) {
     String encryptToken = aes256Util.encrypt(memberInfoRequest.getAlarmToken());
     Member member = memberRepository.findById(currentMemberId)
         .orElseThrow(() -> new MemberNotFoundException());
     member.updateToken(encryptToken);
+    return MemberInfoDTO.of(member.getId(), member.getEmail(), member.getNickname());
+  }
+
+  public MemberInfoDTO myInfoDetails(Long currentMemberId) {
+    Member member = memberRepository.findById(currentMemberId)
+        .orElseThrow(MemberNotFoundException::new);
     return MemberInfoDTO.of(member.getId(), member.getEmail(), member.getNickname());
   }
 
