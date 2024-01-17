@@ -72,11 +72,6 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
       );
       token = aes256Util.encrypt(tokenDTO.getAccessToken());
     } catch (Exception e) {
-      if (e.getClass().equals(JsonProcessingException.class)) {
-        log.error("리프레쉬 토큰 직렬화 에러");
-      } else {
-        log.error(e.getMessage());
-      }
       CookieUtil.deleteCookie(request, response, ACCESSTOKEN);
       response.sendRedirect(ERROR_REDIRECT);
       token = null;

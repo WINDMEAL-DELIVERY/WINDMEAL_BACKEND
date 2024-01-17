@@ -45,8 +45,8 @@ public class RefreshTokenDAOImpl implements RefreshTokenDAO {
   }
 
   @Override
-  public void removeRefreshToken(Long memberId, String email) {
-    redisTemplate.delete(PREFIX_REFRESHTOKEN + memberId + email);
+  public void removeRefreshToken(String key) {
+    redisTemplate.delete(key);
   }
 }
 

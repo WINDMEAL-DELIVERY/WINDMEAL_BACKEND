@@ -86,7 +86,6 @@ public class AuthService {
       String rowToken = tokenProvider.createAccessToken(authenticationForReissue,
           member.getNickname());
       return aes256Util.encrypt(rowToken);
-
     } catch (JsonProcessingException e) {
       e.printStackTrace();
       throw new GeneralException(ErrorCode.INTERNAL_ERROR, "JSON 파싱 에러");
@@ -94,6 +93,15 @@ public class AuthService {
       e.printStackTrace();
       throw new EncryptionException(e.getErrorCode());
     }
+  }
+
+  public void logout(Long currentMemberId) {
+    // 리프레쉬 토큰 삭제
+    Member member = memberRepository.findById(currentMemberId)
+        .orElseThrow(MemberNotFoundException::new);
+    StringBuffer key = new StringBuffer(PREFIX_REFRESHTOKEN + member.getId() + member.getEmail());
+    String encrypt = aes256Util.encrypt(key.toString());
+    refreshTokenDAO.removeRefreshToken(encrypt);
   }
 }
 
