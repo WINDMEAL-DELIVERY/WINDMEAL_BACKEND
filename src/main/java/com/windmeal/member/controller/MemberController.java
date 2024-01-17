@@ -61,8 +61,14 @@ public class MemberController {
   public ResultDataResponseDTO<MemberInfoDTO> tokenExchange(
       @RequestBody MemberInfoRequest memberInfoRequest) {
     Long currentMemberId = SecurityUtil.getCurrentMemberId();
-    MemberInfoDTO memberInfo = memberService.findMemberInfo(memberInfoRequest, currentMemberId);
+    MemberInfoDTO memberInfo = memberService.memberInfoDetails(memberInfoRequest, currentMemberId);
     return ResultDataResponseDTO.of(memberInfo);
+  }
+
+  @GetMapping
+  public ResultDataResponseDTO<MemberInfoDTO> myInfo() {
+    Long currentMemberId = SecurityUtil.getCurrentMemberId();
+    return ResultDataResponseDTO.of(memberService.myInfoDetails(currentMemberId));
   }
 
   @Operation(summary = "알람 테스트용 API", description = "프론트엔드 알람 테스트 전용 API")
