@@ -29,7 +29,7 @@ public class MemberService {
   @Transactional
   public String registerNickname(NicknameRequest request, Long currentMemberId) {
     Member member = memberRepository.findById(currentMemberId)
-        .orElseThrow(() -> new MemberNotFoundException());
+        .orElseThrow(MemberNotFoundException::new);
     if (memberRepository.existsByNickname(request.getNickname())) {
       throw new DuplicatedNicknameException();
     }
@@ -46,7 +46,7 @@ public class MemberService {
       Long currentMemberId) {
     String encryptToken = aes256Util.encrypt(memberInfoRequest.getAlarmToken());
     Member member = memberRepository.findById(currentMemberId)
-        .orElseThrow(() -> new MemberNotFoundException());
+        .orElseThrow(MemberNotFoundException::new);
     member.updateToken(encryptToken);
     return MemberInfoDTO.of(member.getId(), member.getEmail(), member.getNickname());
   }

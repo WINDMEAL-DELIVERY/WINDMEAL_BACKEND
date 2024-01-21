@@ -69,7 +69,7 @@ public class MemberController {
   })
   @PostMapping(value = "/info")
   public ResultDataResponseDTO<MemberInfoDTO> tokenExchange(
-      @RequestBody MemberInfoRequest memberInfoRequest) {
+      @Valid @RequestBody MemberInfoRequest memberInfoRequest) {
     Long currentMemberId = SecurityUtil.getCurrentMemberId();
     MemberInfoDTO memberInfo = memberService.memberInfoDetails(memberInfoRequest, currentMemberId);
     return ResultDataResponseDTO.of(memberInfo);
