@@ -24,10 +24,10 @@ public class BlackListService {
   @Transactional
   public void addBlackList(Long requestMemberId, BlackListCreateRequest request){
     Member requestMember = memberRepository.findById(requestMemberId)
-        .orElseThrow(() -> new MemberNotFoundException());
+        .orElseThrow(MemberNotFoundException::new);
 
     Member blackMember = memberRepository.findByEmail(request.getEmail())
-        .orElseThrow(() -> new MemberNotFoundException());
+        .orElseThrow(MemberNotFoundException::new);
 
     BlackList blackList = BlackList.place(requestMember, blackMember);
     blackListRepository.save(blackList);
@@ -36,10 +36,10 @@ public class BlackListService {
   @Transactional
   public void deleteBlackList(Long requestMemberId, BlackListDeleteRequest request){
     Member requestMember = memberRepository.findById(requestMemberId)
-        .orElseThrow(() -> new MemberNotFoundException());
+        .orElseThrow(MemberNotFoundException::new);
 
     BlackList blackList = blackListRepository.findById(request.getBlackListId())
-        .orElseThrow(() -> new BlackListNotFoundException());
+        .orElseThrow(MemberNotFoundException::new);
 
     blackListRepository.delete(blackList);
   }

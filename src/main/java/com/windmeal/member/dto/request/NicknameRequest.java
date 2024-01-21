@@ -20,7 +20,7 @@ public class NicknameRequest {
     @Pattern(regexp = NICKNAME_PATTERN, message = "닉네임에는 특수문자가 포함될 수 없습니다.")
     private String nickname;
 
-    public NicknameRequest of(String nickname) {
+    public static NicknameRequest of(String nickname) {
         return NicknameRequest.builder()
                 .nickname(nickname)
                 .build();
