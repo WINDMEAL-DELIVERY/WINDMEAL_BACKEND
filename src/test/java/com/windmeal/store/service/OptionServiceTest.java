@@ -198,8 +198,7 @@ class OptionServiceTest extends IntegrationTestSupport {
     return OptionCreateRequest.builder()
         .name(name)
         .isEssentialOption(isEssentialOption)
-        .isMultipleOption(isMultipleOption)
-        .optionSpec(optionSpecs).build();
+        .isMultipleOption(isMultipleOption).build();
   }
 
   private static List<OptionSpecRequest> getOptionSpecs() {
