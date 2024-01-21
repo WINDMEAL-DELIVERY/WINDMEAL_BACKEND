@@ -51,6 +51,8 @@ public class AuthService {
       Long id = Long.parseLong(principal.getUsername());
       String email = principal.getPassword();
 
+      log.error("사용자 : " + id);
+      log.error("이메일 : " + email);
       Member member = memberRepository.findById(id).orElseThrow(MemberNotFoundException::new);
 
       if (!StringUtils.hasText(member.getNickname())) {
