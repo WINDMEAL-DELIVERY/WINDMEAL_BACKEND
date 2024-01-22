@@ -4,7 +4,7 @@ package com.windmeal.member.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.windmeal.IntegrationTest;
+import com.windmeal.annotation.IntegrationTest;
 import com.windmeal.member.domain.Member;
 import com.windmeal.member.dto.request.MemberInfoRequest;
 import com.windmeal.member.dto.request.NicknameRequest;
@@ -157,5 +157,32 @@ public class MemberServiceTest {
         .hasMessage("존재하지 않는 사용자입니다.");
   }
 
+  @Test
+  @DisplayName("사용자 정보 반환 - 성공")
+  public void memberDetails() {
+    //given
+    Member preMember = createMember("최배달", null, "배달학과");
+    Member member = memberRepository.save(preMember);
+
+    //when
+    MemberInfoDTO memberInfoDTO = memberService.myInfoDetails(member.getId());
+
+    //then
+    assertThat(memberInfoDTO).extracting("id", "nickname")
+        .containsExactly(member.getId(), member.getNickname());
+  }
+
+  @Test
+  @DisplayName("사용자 정보 반환 - 실패 : 존재하지 않는 사용자")
+  public void emptyMemberDetails() {
+    //given
+    Member preMember = createMember("최배달", null, "배달학과");
+    Member member = memberRepository.save(preMember);
+
+    //when & then
+    assertThatThrownBy(() -> memberService.myInfoDetails(2L))
+        .isInstanceOf(MemberNotFoundException.class)
+        .hasMessage("존재하지 않는 사용자입니다.");
+  }
 
 }

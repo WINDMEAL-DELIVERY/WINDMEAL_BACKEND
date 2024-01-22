@@ -4,7 +4,6 @@ import com.windmeal.chat.domain.ChatroomDocument;
 import com.windmeal.chat.dto.request.ChatRoomSaveRequest;
 import com.windmeal.chat.dto.response.ChatRoomResponse;
 import com.windmeal.chat.repository.ChatroomDocumentRepository;
-import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.member.domain.Member;
 import com.windmeal.member.exception.MemberNotFoundException;
 import com.windmeal.member.repository.MemberRepository;
