@@ -28,11 +28,13 @@ public class OrderingListResponse {
   private String destinationName;
   @Schema(description = "닉네임", example = "임동동")
   private String nickName;
+  @Schema(description = "음식점 이름", example = "신의한컵")
+  private String storeName;
 
   public OrderingListResponse(
 //      Long deliveryId,
       Long orderId, OrderStatus orderStatus, String summary,
-      String description, String destinationName, String ordererNickName) {
+      String description, String destinationName, String ordererNickName, String storeName) {
 //    this.deliveryId = deliveryId;
     this.orderId = orderId;
     this.orderStatus = orderStatus.getStatus();
@@ -40,5 +42,6 @@ public class OrderingListResponse {
     this.description = description;
     this.destinationName = destinationName;
     this.nickName = ordererNickName;
+    this.storeName = storeName;
   }
 }

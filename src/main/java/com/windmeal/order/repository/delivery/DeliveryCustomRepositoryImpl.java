@@ -5,6 +5,7 @@ import static com.windmeal.model.place.QPlace.place;
 import static com.windmeal.order.domain.QDelivery.delivery;
 import static com.windmeal.order.domain.QOrder.order;
 import static com.windmeal.store.domain.QCategory.category;
+import static com.windmeal.store.domain.QStore.*;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -44,12 +45,12 @@ public class DeliveryCustomRepositoryImpl implements DeliveryCustomRepository {
                 place.name,
                 jpaQueryFactory.select(member.nickname).from(member)
                     .where(member.id.eq(order.orderer_id)),
-                QStore.store.name
+                store.name
             ))
         .from(delivery)
         .innerJoin(delivery.order, order)
         .innerJoin(order.place, place)
-        .leftJoin(QStore.store).on(order.store_id.eq(QStore.store.id))
+        .leftJoin(store).on(order.store_id.eq(store.id))
         .where(
             delivery.deliver.id.eq(memberId),
             delivery.deliveryStatus.eq(DeliveryStatus.DELIVERING),
@@ -78,12 +79,14 @@ public class DeliveryCustomRepositoryImpl implements DeliveryCustomRepository {
                 order.description,
                 place.name,
                 jpaQueryFactory.select(member.nickname).from(member)
-                    .where(member.id.eq(delivery.deliver.id))
+                    .where(member.id.eq(delivery.deliver.id)),
+                store.name
             ))
         .from(delivery)
 //        .leftJoin(delivery).on(order.id.eq(delivery.order.id))
         .rightJoin(delivery.order, order)
         .innerJoin(order.place, place)
+        .leftJoin(store).on(order.store_id.eq(store.id))
 //        .innerJoin(delivery.deliver,member)
 
 //        .innerJoin(delivery.deliver,member)
@@ -113,16 +116,16 @@ public class DeliveryCustomRepositoryImpl implements DeliveryCustomRepository {
     List<OwnDeliveryListResponse> content = jpaQueryFactory.select(
             Projections.constructor(OwnDeliveryListResponse.class,
                 order.id,
-                QStore.store.id,
-                QStore.store.name,
-                QStore.store.photo,
+                store.id,
+                store.name,
+                store.photo,
                 order.summary,
                 delivery.deliveryStatus,
                 delivery.createdDate)
         ).
         from(delivery)
         .leftJoin(order).on(delivery.order.id.eq(order.id))
-        .leftJoin(QStore.store).on(order.store_id.eq(QStore.store.id))
+        .leftJoin(store).on(order.store_id.eq(store.id))
         .where(
             delivery.deliver.id.eq(memberId),
             eqDeliveryStatus(),
