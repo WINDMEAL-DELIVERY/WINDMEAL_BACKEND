@@ -53,7 +53,7 @@ public class MenuController {
       @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근",
           content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class)))})
   @PostMapping("/menu")
-  public ResultDataResponseDTO createMenu(
+  public ResultDataResponseDTO<MenuResponse> createMenu(
       @Parameter(description = "메뉴 생성 요청 데이터", required = true, schema = @Schema(implementation = MenuCreateRequest.class))
       @Valid @RequestPart MenuCreateRequest request,
       @Parameter(description = "이미지 파일", required = false, schema = @Schema(type = "string", format = "binary"))

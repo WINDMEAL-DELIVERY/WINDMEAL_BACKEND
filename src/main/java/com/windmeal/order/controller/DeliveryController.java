@@ -6,6 +6,9 @@ import com.windmeal.global.exception.ResultDataResponseDTO;
 import com.windmeal.global.util.SecurityUtil;
 import com.windmeal.order.dto.request.DeliveryCancelRequest;
 import com.windmeal.order.dto.request.DeliveryCreateRequest;
+import com.windmeal.order.dto.response.DeliveryListResponse;
+import com.windmeal.order.dto.response.OrderingListResponse;
+import com.windmeal.order.dto.response.OwnDeliveryListResponse;
 import com.windmeal.order.service.DeliveryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -15,9 +18,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDate;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -73,7 +78,7 @@ public class DeliveryController {
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "OK")
   })
-  public ResultDataResponseDTO getOwnDelivering(Pageable pageable){
+  public ResultDataResponseDTO<List<DeliveryListResponse>> getOwnDelivering(Pageable pageable){
     Long memberId = SecurityUtil.getCurrentNullableMemberId();
 
     if(memberId==null) return ResultDataResponseDTO.empty();
@@ -86,7 +91,7 @@ public class DeliveryController {
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "OK")
   })
-  public ResultDataResponseDTO getOwnOrdering(Pageable pageable){
+  public ResultDataResponseDTO<List<OrderingListResponse>> getOwnOrdering(Pageable pageable){
     Long memberId = SecurityUtil.getCurrentNullableMemberId();
 
     if(memberId==null) return ResultDataResponseDTO.empty();
@@ -102,7 +107,7 @@ public class DeliveryController {
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "OK")
   })
-  public ResultDataResponseDTO getOwnDelivered(
+  public ResultDataResponseDTO<Slice<OwnDeliveryListResponse>> getOwnDelivered(
       Pageable pageable,
       @Parameter(description = "날짜 필터링 시작", required = false, schema = @Schema(example = "2023-12-10"))
       @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
@@ -123,7 +128,7 @@ public class DeliveryController {
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "OK")
   })
-  public ResultDataResponseDTO getOwnDeliveredTotalPrice(){
+  public ResultDataResponseDTO<Integer> getOwnDeliveredTotalPrice(){
     Long memberId = SecurityUtil.getCurrentMemberId();
 
     return ResultDataResponseDTO.of(deliveryService.getOwnDeliveredTotalPrice(memberId));

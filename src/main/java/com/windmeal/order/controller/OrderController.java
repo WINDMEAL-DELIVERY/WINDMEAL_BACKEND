@@ -10,6 +10,7 @@ import com.windmeal.order.dto.request.OrderDeleteRequest;
 import com.windmeal.order.dto.response.OrderDetailResponse;
 import com.windmeal.order.dto.response.OrderListResponse;
 import com.windmeal.order.dto.response.OrderMapListResponse;
+import com.windmeal.order.dto.response.OwnOrderListResponse;
 import com.windmeal.order.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -141,7 +142,7 @@ public class OrderController {
       @ApiResponse(responseCode = "200", description = "OK")
   })
   @GetMapping("/ordered")
-  public ResultDataResponseDTO getOwnOrdered(
+  public ResultDataResponseDTO<Slice<OwnOrderListResponse>> getOwnOrdered(
       Pageable pageable,
       @Parameter(description = "날짜 필터링 시작", required = false, schema = @Schema(example = "2023-12-10"))
       @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
@@ -163,7 +164,7 @@ public class OrderController {
       @ApiResponse(responseCode = "200", description = "OK")
   })
   @GetMapping("/ordered/price")
-  public ResultDataResponseDTO getOwnOrderedTotalPrice(){
+  public ResultDataResponseDTO<Integer> getOwnOrderedTotalPrice(){
     Long memberId = SecurityUtil.getCurrentMemberId();
 
 
