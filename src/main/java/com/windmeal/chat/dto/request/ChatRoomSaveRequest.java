@@ -32,6 +32,8 @@ public class ChatRoomSaveRequest {
             .guestEmail(guest.getEmail())
             .ownerAlarmToken(ownerAlarmToken)
             .guestAlarmToken(guestAlarmToken)
+            .ownerNickname(owner.getNickname())
+            .guestNickname(guest.getNickname())
             .build();
     }
 }
