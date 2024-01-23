@@ -36,6 +36,8 @@ public class MemberController {
           content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class))),
       @ApiResponse(responseCode = "400", description = "닉네임에는 특수문자가 포함될 수 없습니다.",
           content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class))),
+      @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자",
+          content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class))),
       @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없습니다.",
           content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class)))
   })
@@ -60,6 +62,8 @@ public class MemberController {
   @Operation(summary = "알람 토큰과 사용자 정보 교환", description = "로그인 후 리다이렉트 하기 전 호출될 api")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "성공적으로 교환 완료"),
+      @ApiResponse(responseCode = "400", description = "토큰값은 반드시 존재해야 합니다.",
+          content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class))),
       @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자",
           content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class))),
       @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음",
