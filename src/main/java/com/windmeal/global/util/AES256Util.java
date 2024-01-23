@@ -32,7 +32,7 @@ public class AES256Util {
       return Base64.getEncoder().encodeToString(encrypted);
     } catch (Exception e) {
       // 암/복호화 과정에서 발생하는 모든 예외를 AesException으로 치환하여 상위 클래스로 전달한다.
-      throw new AesException(ErrorCode.INTERNAL_ERROR);
+      throw new AesException(ErrorCode.ENCRYPT_ERROR);
     }
   }
 
@@ -47,7 +47,7 @@ public class AES256Util {
       byte[] decrypted = cipher.doFinal(decodedBytes);
       return new String(decrypted, "UTF-8");
     } catch (Exception e) {
-      throw new AesException(ErrorCode.INTERNAL_ERROR);
+      throw new AesException(ErrorCode.ENCRYPT_ERROR);
     }
   }
 }
