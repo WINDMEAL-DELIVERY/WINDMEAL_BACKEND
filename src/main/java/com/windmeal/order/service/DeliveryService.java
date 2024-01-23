@@ -26,12 +26,14 @@ import com.windmeal.order.repository.order.OrderRepository;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -45,6 +47,7 @@ public class DeliveryService {
   private final DeliveryRepository deliveryRepository;
 
   private final OrderCancelRepository orderCancelRepository;
+
   @Transactional
   public void createDelivery(DeliveryCreateRequest request) {
     Member deliver = memberRepository.findById(request.getMemberId())
@@ -56,23 +59,23 @@ public class DeliveryService {
     Member orderer = memberRepository.findById(order.getOrderer_id())
         .orElseThrow(() -> new MemberNotFoundException());
 
-    if(order.getOrderer_id().equals(deliver.getId())){
+    if (order.getOrderer_id().equals(deliver.getId())) {
       throw new DeliverOrdererSameException();
     }
     deliverySave(deliver, order);
     //TODO orderer 의 토큰값으로 배달 성사 알람
-    EventPublisher.publish(new DeliveryMatchEvent(order.getSummary(),orderer.getToken()));
+    EventPublisher.publish(new DeliveryMatchEvent(order.getSummary(), orderer.getToken()));
   }
 
   @DistributedLock(key = "#order.getId()")
   public void deliverySave(Member deliver, Order order) {
-    deliveryRepository.findByOrderIdAndDeliveryStatusNot(order.getId(),DeliveryStatus.CANCELED)
+    deliveryRepository.findByOrderIdAndDeliveryStatusNot(order.getId(), DeliveryStatus.CANCELED)
         .ifPresent(
             delivery -> {
               throw new OrderAlreadyMatchedException();
             });
 
-    Delivery delivery = new Delivery(deliver, order,DeliveryStatus.DELIVERING);
+    Delivery delivery = new Delivery(deliver, order, DeliveryStatus.DELIVERING);
     deliveryRepository.save(delivery);
     order.delivering();
   }
@@ -85,14 +88,14 @@ public class DeliveryService {
               throw new OrderAlreadyMatchedException();
             });
 
-    Delivery delivery = new Delivery(deliver, order,DeliveryStatus.DELIVERING);
+    Delivery delivery = new Delivery(deliver, order, DeliveryStatus.DELIVERING);
     deliveryRepository.save(delivery);
     order.delivering();
   }
 
   /**
-   * 배달 취소 시 유의 점
-   * "배달 중" 상태에서만 취소 가능.
+   * 배달 취소 시 유의 점 "배달 중" 상태에서만 취소 가능.
+   *
    * @param request
    */
   @Transactional
@@ -118,9 +121,9 @@ public class DeliveryService {
 
   private String getToken(Order order, Member cancelMember, Delivery delivery) {
 
-    if(cancelMember.equals(delivery.getDeliver())){
+    if (cancelMember.equals(delivery.getDeliver())) {
       return cancelMember.getToken();
-    }else{
+    } else {
       Member orderer = memberRepository.findById(order.getOrderer_id())
           .orElseThrow(() -> new MemberNotFoundException());
 
@@ -129,14 +132,13 @@ public class DeliveryService {
   }
 
 
-  public List<DeliveryListResponse> getOwnDelivering(Long memberId,Pageable pageable){
+  public List<DeliveryListResponse> getOwnDelivering(Long memberId, Pageable pageable) {
     return deliveryRepository.getOwnDelivering(memberId, LocalDate.now(), pageable);
   }
 
-  public List<OrderingListResponse> getOwnOrdering(Long memberId,Pageable pageable){
+  public List<OrderingListResponse> getOwnOrdering(Long memberId, Pageable pageable) {
     return deliveryRepository.getOwnOrdering(memberId, LocalDate.now(), pageable);
   }
-
 
 
   public int getOwnDeliveredTotalPrice(Long memberId) {
@@ -144,8 +146,9 @@ public class DeliveryService {
   }
 
 
-  public Slice<OwnDeliveryListResponse> getOwnDelivered(Long memberId, Pageable pageable, LocalDate startDate,
-      LocalDate endDate, String storeCategory) {
-    return deliveryRepository.getOwnDelivered(memberId,pageable,startDate,endDate,storeCategory);
+  public Slice<OwnDeliveryListResponse> getOwnDelivered(Long memberId, Pageable pageable,
+      LocalDate startDate, LocalDate endDate, String storeCategory) {
+    return deliveryRepository.getOwnDelivered(memberId, pageable, startDate, endDate,
+        storeCategory);
   }
 }

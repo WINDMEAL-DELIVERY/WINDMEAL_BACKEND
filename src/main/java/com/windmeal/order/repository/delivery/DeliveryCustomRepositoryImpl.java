@@ -34,7 +34,7 @@ public class DeliveryCustomRepositoryImpl implements DeliveryCustomRepository {
   public List<DeliveryListResponse> getOwnDelivering(Long memberId, LocalDate today,
       Pageable pageable) {
 //    List<DeliveryListResponse> content =
-        return jpaQueryFactory.select(
+    return jpaQueryFactory.select(
             Projections.constructor(DeliveryListResponse.class,
                 delivery.id,
                 order.id,
@@ -43,11 +43,13 @@ public class DeliveryCustomRepositoryImpl implements DeliveryCustomRepository {
                 order.description,
                 place.name,
                 jpaQueryFactory.select(member.nickname).from(member)
-                    .where(member.id.eq(order.orderer_id))
+                    .where(member.id.eq(order.orderer_id)),
+                QStore.store.name
             ))
         .from(delivery)
         .innerJoin(delivery.order, order)
         .innerJoin(order.place, place)
+        .leftJoin(QStore.store).on(order.store_id.eq(QStore.store.id))
         .where(
             delivery.deliver.id.eq(memberId),
             delivery.deliveryStatus.eq(DeliveryStatus.DELIVERING),
@@ -68,7 +70,7 @@ public class DeliveryCustomRepositoryImpl implements DeliveryCustomRepository {
   public List<OrderingListResponse> getOwnOrdering(Long memberId, LocalDate today,
       Pageable pageable) {
 //    List<OrderingListResponse> content =
-        return jpaQueryFactory.select(
+    return jpaQueryFactory.select(
             Projections.constructor(OrderingListResponse.class,
                 order.id,
                 order.orderStatus,
@@ -80,8 +82,8 @@ public class DeliveryCustomRepositoryImpl implements DeliveryCustomRepository {
             ))
         .from(delivery)
 //        .leftJoin(delivery).on(order.id.eq(delivery.order.id))
-        .rightJoin(delivery.order,order)
-        .innerJoin(order.place,place)
+        .rightJoin(delivery.order, order)
+        .innerJoin(order.place, place)
 //        .innerJoin(delivery.deliver,member)
 
 //        .innerJoin(delivery.deliver,member)
@@ -148,7 +150,7 @@ public class DeliveryCustomRepositoryImpl implements DeliveryCustomRepository {
         .where(
             delivery.deliver.id.eq(memberId),
             delivery.deliveryStatus.eq(DeliveryStatus.DELIVERED)
-            ).fetchFirst();
+        ).fetchFirst();
   }
 
 
@@ -185,16 +187,16 @@ public class DeliveryCustomRepositoryImpl implements DeliveryCustomRepository {
   }
 
   private BooleanExpression eqDeliveryDate(LocalDate startDate, LocalDate endDate) {
-    if(startDate==null&&endDate==null) //조건 X
+    if (startDate == null && endDate == null) //조건 X
     {
       return null;
     }
 
-    if(startDate==null){ //시작날짜만 조건이 있는 경우
+    if (startDate == null) { //시작날짜만 조건이 있는 경우
       return delivery.createdDate.lt(endDate.plusDays(1).atStartOfDay());
     }
 
-    if(endDate==null){ //마지막 날짜 조건만 있는 경우
+    if (endDate == null) { //마지막 날짜 조건만 있는 경우
       return delivery.createdDate.goe(startDate.atStartOfDay());
     }
 
