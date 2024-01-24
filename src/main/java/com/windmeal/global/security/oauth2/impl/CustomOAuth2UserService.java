@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.windmeal.global.constants.S3Constant.WINDMEAL_DEFAULT_PROFILE_URL;
 import static com.windmeal.global.constants.SecurityConstants.*;
 
 
@@ -131,6 +132,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         .name((String) attributes.get("family_name"))
         .email((String) attributes.get("email"))
         .department((String) attributes.get("given_name"))
+        .profileImage(WINDMEAL_DEFAULT_PROFILE_URL)
         .authority(Authority.ROLE_USER)
         .build();
     return member;
