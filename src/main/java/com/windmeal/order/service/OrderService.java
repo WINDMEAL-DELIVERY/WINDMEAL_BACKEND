@@ -23,6 +23,9 @@ import com.windmeal.order.exception.OrdererMissMatchException;
 import com.windmeal.order.mapper.OrderRequestMapper;
 import com.windmeal.order.repository.order.OrderRepository;
 import com.windmeal.order.validator.OrderValidator;
+import com.windmeal.store.domain.Store;
+import com.windmeal.store.exception.StoreNotFoundException;
+import com.windmeal.store.repository.StoreRepository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,6 +47,7 @@ public class OrderService {
   private final OrderRepository orderRepository;
   private final OrderRequestMapper orderRequestMapper;
   private final PlaceRepository placeRepository;
+  private final StoreRepository storeRepository;
 
   private final BlackListRepository blackListRepository;
   @CacheEvict(value = "Orders", allEntries = true, cacheManager = "contentCacheManager") //데이터 삭제
@@ -112,9 +116,11 @@ public class OrderService {
    */
   public OrderDetailResponse getOrderDetail(Long orderId) {
     Order order = orderRepository.findById(orderId)
-        .orElseThrow(() -> new OrderNotFoundException());
+        .orElseThrow(OrderNotFoundException::new);
+    Store store = storeRepository.findById(order.getStore_id())
+        .orElseThrow(StoreNotFoundException::new);
 
-    return OrderDetailResponse.from(order);
+    return OrderDetailResponse.from(order, store);
   }
 
 
