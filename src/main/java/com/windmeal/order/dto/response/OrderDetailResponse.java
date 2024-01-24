@@ -6,6 +6,7 @@ import com.windmeal.order.domain.Order;
 import com.windmeal.order.domain.OrderMenu;
 import com.windmeal.order.domain.OrderMenuOptionGroup;
 import com.windmeal.order.domain.OrderMenuOptionSpecification;
+import com.windmeal.store.domain.Store;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -25,7 +26,8 @@ public class OrderDetailResponse {
 
   @Schema(description = "주문 ID", example = "1")
   private Long id;
-
+  @Schema(description = "음식점 (출발지) 이름", example = "신의한컵")
+  private String storeName;
   @Schema(description = "장소 이름", example = "가천대학교")
   private String placeName;
   @Schema(description = "경도", example = "1.2345")
@@ -50,20 +52,21 @@ public class OrderDetailResponse {
 
 
 
-  public OrderDetailResponse(Order order, List<OrderMenu> orderMenus, Place place) {
+  public OrderDetailResponse(Order order, List<OrderMenu> orderMenus, Place place, Store store) {
     this.id = order.getId();
     this.placeName=place.getName();
+    this.storeName = store.getName();
     this.latitude=place.getLatitude();
     this.longitude=place.getLongitude();
-    this.orderStatus=order.getOrderStatus().getStatus();
     this.eta=order.getEta().toLocalTime();
     this.totalPrice=order.getTotalPrice();
     this.deliveryFee=order.getDeliveryFee();
+    this.orderStatus=order.getOrderStatus().getStatus();
     this.orderMenu = orderMenus.stream().map(OrderMenuRequest::from).collect(Collectors.toList());
   }
 
-  public static OrderDetailResponse from(Order order) {
-    return new OrderDetailResponse(order, order.getOrderMenus(),order.getPlace());
+  public static OrderDetailResponse from(Order order, Store store) {
+    return new OrderDetailResponse(order, order.getOrderMenus(),order.getPlace(), store);
   }
 
 
