@@ -23,17 +23,11 @@ public class ChatRoomSaveRequest {
     }
 
 
-    public ChatroomDocument toDocument(Member owner, Member guest, Order order, String ownerAlarmToken, String guestAlarmToken) {
+    public ChatroomDocument toDocument(Member owner, Member guest, Order order) {
         return ChatroomDocument.builder()
             .ownerId(owner.getId())
             .guestId(guest.getId())
             .orderId(order.getId())
-            .ownerEmail(owner.getEmail())
-            .guestEmail(guest.getEmail())
-            .ownerAlarmToken(ownerAlarmToken)
-            .guestAlarmToken(guestAlarmToken)
-            .ownerNickname(owner.getNickname())
-            .guestNickname(guest.getNickname())
             .build();
     }
 }
