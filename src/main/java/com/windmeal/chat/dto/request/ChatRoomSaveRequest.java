@@ -28,6 +28,8 @@ public class ChatRoomSaveRequest {
             .ownerId(owner.getId())
             .guestId(guest.getId())
             .orderId(order.getId())
+            .ownerEmail(owner.getEmail())
+            .guestEmail(guest.getEmail())
             .build();
     }
 }
