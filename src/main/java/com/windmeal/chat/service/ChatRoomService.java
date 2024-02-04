@@ -38,7 +38,7 @@ public class ChatRoomService {
   public ChatRoomResponse createChatRoom(ChatRoomSaveRequest requestDTO, Long currentMemberId) {
 
     Order order = orderRepository.findById(requestDTO.getOrderId())
-        .orElseThrow(() -> new OrderNotFoundException());
+        .orElseThrow(OrderNotFoundException::new);
     Member owner = memberRepository.findById(order.getOrderer_id())
         .orElseThrow(() -> new MemberNotFoundException("주문 작성자를 찾을 수 없습니다."));
     Member guest = memberRepository.findById(currentMemberId)
@@ -50,7 +50,7 @@ public class ChatRoomService {
       throw new OrderAlreadyMatchedException();
     }
     ChatroomDocument chatRoom = chatroomDocumentRepository.save(
-        requestDTO.toDocument(owner, guest, order, owner.getToken(), guest.getToken()));
+        requestDTO.toDocument(owner, guest, order));
     return ChatRoomResponse.of(chatRoom.getId(), chatRoom.getOwnerId(), chatRoom.getGuestId(),
         chatRoom.getOrderId(), owner.getToken());
   }
