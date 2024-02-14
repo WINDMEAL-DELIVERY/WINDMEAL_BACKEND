@@ -5,6 +5,7 @@ import com.windmeal.global.exception.ExceptionResponseDTO;
 import com.windmeal.global.exception.ResultDataResponseDTO;
 import com.windmeal.global.util.SecurityUtil;
 import com.windmeal.global.wrapper.RestSlice;
+import com.windmeal.order.domain.OrderStatus;
 import com.windmeal.order.dto.request.OrderCreateRequest;
 import com.windmeal.order.dto.request.OrderDeleteRequest;
 import com.windmeal.order.dto.response.OrderDetailResponse;
@@ -22,6 +23,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -33,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @Tag(name = "주문 카테고리", description = "주문 관련 api 입니다.")
 @RestController
 @RequiredArgsConstructor
@@ -114,11 +117,12 @@ public class OrderController {
       @Parameter(description = "도착 예정 시간", required = false, schema = @Schema(example = "23:10:00"))
       @RequestParam(required = false) String eta,
       @Parameter(description = "검색 키워드", required = false, schema = @Schema(example = "카페"))
-      @RequestParam(required = false) String storeCategory
+      @RequestParam(required = false) String storeCategory,
+      @Parameter(description = "주문 상태", required = false, schema = @Schema(example = "ORDERED (대소문자 모두 가능)"))
+      @RequestParam(required = false, defaultValue = "ORDERED")OrderStatus orderStatus
   ){
     List<OrderMapListResponse> orders = orderService.getAllOrdersForMap(storeId, eta,
-        storeCategory, placeId);
-
+        storeCategory, placeId, orderStatus);
     return ResultDataResponseDTO.of(orders);
   }
 

@@ -1,8 +1,10 @@
 
 package com.windmeal.global.configuration;
 
+import com.windmeal.global.converter.OrderStatusConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -20,6 +22,10 @@ public class WebConfig implements WebMvcConfigurer {
   @Value("${domain.url.ws_host}")
   private String ws_host;
 
+  @Override
+  public void addFormatters(FormatterRegistry registry) {
+    registry.addConverter(new OrderStatusConverter());
+  }
 
   @Override
   public void addCorsMappings(CorsRegistry registry) {
