@@ -16,4 +16,22 @@ public enum OrderStatus {
      public String getStatus() {
           return this.status;
      }
+
+     public static OrderStatus of(String source) {
+          if (source == null) {
+               return null;
+          }
+          switch (source.toUpperCase()) {
+               case "ORDERED":
+                    return OrderStatus.ORDERED;
+               case "DELIVERING":
+                    return OrderStatus.DELIVERING;
+               case "DELIVERED":
+                    return OrderStatus.DELIVERED;
+               case "CANCELED":
+                    return OrderStatus.CANCELED;
+               default:
+                    throw new IllegalArgumentException("일치하는 주문 상태가 존재하지 않습니다.");
+          }
+     }
 }

@@ -22,6 +22,7 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -34,7 +35,7 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
 
   @Override
   public List<OrderMapListResponse> getOrderMapList(Long storeId, String eta,
-      String storeCategory, Long placeId){
+      String storeCategory, Long placeId, OrderStatus orderStatus){
 
     return jpaQueryFactory.select(Projections.constructor(
         OrderMapListResponse.class,
@@ -46,7 +47,7 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
         ))
         .from(order)
         .leftJoin(store).on(store.id.eq(order.store_id))
-        .where(eqStoreId(storeId), eqEta(eta), eqStoreCategory(storeCategory), eqPlace(placeId),eqOrderStatus(OrderStatus.ORDERED))
+        .where(eqStoreId(storeId), eqEta(eta), eqStoreCategory(storeCategory), eqPlace(placeId),eqOrderStatus(orderStatus))
         .groupBy(order.store_id).fetch();
   }
 
@@ -199,7 +200,10 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
   }
 
   private BooleanExpression eqOrderStatus(OrderStatus orderStatus) {
-    return order.orderStatus.eq(orderStatus);
+    if(orderStatus != null) {
+      return order.orderStatus.eq(orderStatus);
+    }
+    return null;
   }
 
   private BooleanExpression eqBlackList(Long memberId) {

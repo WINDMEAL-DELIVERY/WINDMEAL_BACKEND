@@ -106,8 +106,8 @@ public class OrderService {
   @Cacheable(value = "Orders", key = "0",cacheManager = "contentCacheManager",
             condition = "#storeId == null&&#eta==null&&#storeCategory==null&&#placeId==null")
   public List<OrderMapListResponse> getAllOrdersForMap(Long storeId, String eta, String storeCategory,
-      Long placeId) {
-    return orderRepository.getOrderMapList(storeId,eta,storeCategory,placeId);
+      Long placeId, OrderStatus orderStatus) {
+    return orderRepository.getOrderMapList(storeId,eta,storeCategory,placeId,orderStatus);
   }
   /**
    * 주문 상세 내용 조회

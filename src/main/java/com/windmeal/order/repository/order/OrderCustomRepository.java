@@ -1,6 +1,7 @@
 package com.windmeal.order.repository.order;
 
 import com.windmeal.global.wrapper.RestSlice;
+import com.windmeal.order.domain.OrderStatus;
 import com.windmeal.order.dto.response.OrderListResponse;
 import com.windmeal.order.dto.response.OrderMapListResponse;
 import com.windmeal.order.dto.response.OwnOrderListResponse;
@@ -12,7 +13,7 @@ import org.springframework.data.domain.Slice;
 public interface OrderCustomRepository {
 
   List<OrderMapListResponse> getOrderMapList(Long storeId, String eta,
-      String storeCategory, Long placeId);
+      String storeCategory, Long placeId, OrderStatus orderStatus);
 
   RestSlice<OrderListResponse> getOrderList(Pageable pageable, Long storeId, String eta, String storeCategory,
       Long point, Long memberId);
