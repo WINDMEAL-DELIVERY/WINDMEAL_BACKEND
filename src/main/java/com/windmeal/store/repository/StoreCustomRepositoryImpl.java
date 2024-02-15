@@ -65,12 +65,12 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
     }
 
     private BooleanExpression eqEta(String eta) {
-        LocalDate now = TimeUtil.getCurrentKoreanTime();
+        LocalDate now = LocalDate.now();
         LocalTime start = LocalTime.MIN;
         LocalTime end = LocalTime.MAX;
         if (eta != null) {
-            start = LocalTime.parse(eta, DateTimeFormatter.ofPattern("HH:mm:ss"));
-            end = LocalTime.parse(eta, DateTimeFormatter.ofPattern("HH:mm:ss")).plus(10, ChronoUnit.MINUTES);
+            start = LocalTime.parse(eta);
+            end = LocalTime.parse(eta).plus(10, ChronoUnit.MINUTES);
         }
         return order.eta.between(now.atTime(start),now.atTime(end));
     }
