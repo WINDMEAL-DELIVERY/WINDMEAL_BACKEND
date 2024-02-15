@@ -4,6 +4,8 @@ import com.windmeal.global.S3.S3Util;
 import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.global.exception.ExceptionResponseDTO;
 import com.windmeal.global.exception.ResultDataResponseDTO;
+import com.windmeal.order.domain.OrderStatus;
+import com.windmeal.order.dto.response.OrderMapListResponse;
 import com.windmeal.store.dto.request.StoreCategoryCreateRequest;
 import com.windmeal.store.dto.request.StoreCreateRequest;
 import com.windmeal.store.dto.request.StoreUpdateRequest;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 가게 생성 가게 정보 수정(이미지 제외) 가게 이미지 수정 가게 삭제 가게 정보 조회
@@ -133,8 +136,26 @@ public class StoreController {
     return ResultDataResponseDTO.of(storeService.getAllStoreInfo(pageable));
   }
 
-
-
+  @Operation(summary = "지도 상에서 보여줄 가게와 해당 가게의 주문수 조회", description = "지도 상에서 보여줄 가게와 해당 가게의 주문수를 조회합니다.")
+  @ApiResponses({
+          @ApiResponse(responseCode = "200", description = "OK"),
+          @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근",
+                  content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class)))})
+  @GetMapping("/store/map")
+  public ResultDataResponseDTO<List<OrderMapListResponse>> getAllStoresForMap(
+          @Parameter(description = "가게 id", required = false, schema = @Schema(example = "1"))
+          @RequestParam(required = false) Long storeId,
+          @Parameter(description = "도착지 id", required = false, schema = @Schema(example = "1"))
+          @RequestParam(required = false) Long placeId,
+          @Parameter(description = "도착 예정 시간", required = false, schema = @Schema(example = "23:10:00"))
+          @RequestParam(required = false) String eta,
+          @Parameter(description = "검색 키워드", required = false, schema = @Schema(example = "카페"))
+          @RequestParam(required = false) String storeCategory,
+          @Parameter(description = "주문 상태", required = false, schema = @Schema(example = "ORDERED (대소문자 모두 가능)"))
+          @RequestParam(required = false) OrderStatus orderStatus
+  ){
+    return ResultDataResponseDTO.of(storeService.getAllStoresForMap(storeId, eta, storeCategory, placeId, orderStatus));
+  }
 
   @Operation(summary = "가게 정보 조회(CMS)", description = "가게 정보가 조회됩니다.")
   @ApiResponses({

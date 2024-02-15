@@ -7,6 +7,8 @@ import com.windmeal.member.exception.MemberNotFoundException;
 import com.windmeal.member.repository.MemberRepository;
 import com.windmeal.model.place.Place;
 import com.windmeal.model.place.PlaceRepository;
+import com.windmeal.order.domain.OrderStatus;
+import com.windmeal.order.dto.response.OrderMapListResponse;
 import com.windmeal.store.domain.Category;
 import com.windmeal.store.domain.MenuCategory;
 import com.windmeal.store.domain.Store;
@@ -106,6 +108,10 @@ public class StoreService {
 
   public Slice<AllStoreResponse> getAllStoreInfo(Pageable pageable){
     return storeRepository.getAllStoreInfo(pageable);
+  }
+
+  public List<OrderMapListResponse> getAllStoresForMap(Long storeId, String eta, String storeCategory, Long placeId, OrderStatus orderStatus) {
+      return storeRepository.getStoreMapList(storeId, eta, storeCategory, placeId, orderStatus);
   }
 
   public CategoryStoreMenuResponse getStoreInfoForCms(Long storeId) {
