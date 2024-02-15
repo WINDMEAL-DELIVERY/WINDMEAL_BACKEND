@@ -69,7 +69,7 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
         LocalTime end = LocalTime.MAX;
         if (eta != null) {
             start = LocalTime.parse(eta);
-            end = LocalTime.parse(eta).plus(1, ChronoUnit.MINUTES);
+            end = LocalTime.parse(eta).plus(10, ChronoUnit.MINUTES);
         }
         return order.eta.between(now.atTime(start),now.atTime(end));
     }

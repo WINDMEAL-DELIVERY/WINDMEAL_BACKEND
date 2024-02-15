@@ -154,7 +154,7 @@ public class StoreController {
           @Parameter(description = "주문 상태", required = false, schema = @Schema(example = "ORDERED (대소문자 모두 가능)"))
           @RequestParam(required = false) OrderStatus orderStatus,
           @Parameter(description = "영업 중 여부", required = false, schema = @Schema(example = "true"))
-          @RequestParam(required = false) Boolean isOpen
+          @RequestParam(required = false, defaultValue = "false") Boolean isOpen
   ){
     return ResultDataResponseDTO.of(storeService.getAllStoresForMap(storeId, eta, storeCategory, placeId, orderStatus, isOpen));
   }
