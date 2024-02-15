@@ -13,5 +13,5 @@ public interface StoreCustomRepository {
     Slice<AllStoreResponse> getAllStoreInfo(Pageable pageable);
 
     List<OrderMapListResponse> getStoreMapList(Long storeId, String eta,
-                                               String storeCategory, Long placeId, OrderStatus orderStatus);
+                                               String storeCategory, Long placeId, OrderStatus orderStatus, Boolean isOpen);
 }

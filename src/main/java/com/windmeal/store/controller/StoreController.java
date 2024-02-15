@@ -152,9 +152,11 @@ public class StoreController {
           @Parameter(description = "검색 키워드", required = false, schema = @Schema(example = "카페"))
           @RequestParam(required = false) String storeCategory,
           @Parameter(description = "주문 상태", required = false, schema = @Schema(example = "ORDERED (대소문자 모두 가능)"))
-          @RequestParam(required = false) OrderStatus orderStatus
+          @RequestParam(required = false) OrderStatus orderStatus,
+          @Parameter(description = "영업 중 여부", required = false, schema = @Schema(example = "true"))
+          @RequestParam(required = false) Boolean isOpen
   ){
-    return ResultDataResponseDTO.of(storeService.getAllStoresForMap(storeId, eta, storeCategory, placeId, orderStatus));
+    return ResultDataResponseDTO.of(storeService.getAllStoresForMap(storeId, eta, storeCategory, placeId, orderStatus, isOpen));
   }
 
   @Operation(summary = "가게 정보 조회(CMS)", description = "가게 정보가 조회됩니다.")

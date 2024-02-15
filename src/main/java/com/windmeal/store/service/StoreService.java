@@ -110,8 +110,8 @@ public class StoreService {
     return storeRepository.getAllStoreInfo(pageable);
   }
 
-  public List<OrderMapListResponse> getAllStoresForMap(Long storeId, String eta, String storeCategory, Long placeId, OrderStatus orderStatus) {
-      return storeRepository.getStoreMapList(storeId, eta, storeCategory, placeId, orderStatus);
+  public List<OrderMapListResponse> getAllStoresForMap(Long storeId, String eta, String storeCategory, Long placeId, OrderStatus orderStatus, Boolean isOpen) {
+      return storeRepository.getStoreMapList(storeId, eta, storeCategory, placeId, orderStatus, isOpen);
   }
 
   public CategoryStoreMenuResponse getStoreInfoForCms(Long storeId) {

@@ -31,13 +31,13 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
     @Override
     public Slice<AllStoreResponse> getAllStoreInfo(Pageable pageable) {
         List<AllStoreResponse> content = jpaQueryFactory.select(
-                        Projections.constructor(AllStoreResponse.class,
-                                store.id,
-                                store.name)
-                )
-                .from(store)
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize() + 1).fetch();
+                Projections.constructor(AllStoreResponse.class,
+                    store.id,
+                    store.name)
+            )
+            .from(store)
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize() + 1).fetch();
         boolean hasNext = false;
         if (content.size() > pageable.getPageSize()) {
             content.remove(pageable.getPageSize());
@@ -47,20 +47,20 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
     }
 
     @Override
-    public List<OrderMapListResponse> getStoreMapList(Long storeId, String eta, String storeCategory, Long placeId, OrderStatus orderStatus) {
+    public List<OrderMapListResponse> getStoreMapList(Long storeId, String eta, String storeCategory, Long placeId, OrderStatus orderStatus, Boolean isOpen) {
         return jpaQueryFactory
-                .select(Projections.constructor(
-                        OrderMapListResponse.class,
-                        store.id,
-                        store.name,
-                        order.id.count(),
-                        store.place.longitude,
-                        store.place.latitude
-                ))
-                .from(store)
-                .leftJoin(order).on(store.id.eq(order.store_id))
-                .where(eqStoreId(storeId), eqEta(eta), eqStoreCategory(storeCategory), eqPlace(placeId), eqOrderStatus(orderStatus))
-                .groupBy(store.id).fetch();
+            .select(Projections.constructor(
+                OrderMapListResponse.class,
+                store.id,
+                store.name,
+                order.id.count(),
+                store.place.longitude,
+                store.place.latitude
+            ))
+            .from(store)
+            .leftJoin(order).on(store.id.eq(order.store_id))
+            .where(eqStoreId(storeId), eqEta(eta), eqStoreCategory(storeCategory), eqPlace(placeId), eqOrderStatus(orderStatus), eqOpen(isOpen))
+            .groupBy(store.id).fetch();
     }
 
     private BooleanExpression eqEta(String eta) {
@@ -83,16 +83,16 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
     }
 
     private BooleanExpression eqOrderStatus(OrderStatus orderStatus) {
-        if(orderStatus != null) {
+        if (orderStatus != null) {
             return order.orderStatus.eq(orderStatus);
         }
         return null;
     }
 
     private BooleanExpression eqPlace(Long placeId) {
-        if(placeId==null){
+        if (placeId == null) {
             return null;
-        }else{
+        } else {
             return order.place.id.eq(placeId);
         }
 
@@ -100,8 +100,8 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
 
     private List<Long> getCategoryIds(String storeCategory) {
         return jpaQueryFactory.select(category.id)
-                .from(category)
-                .where(category.name.contains(storeCategory)).fetch(); //storeCategory 가 포함되는 category_id 조회
+            .from(category)
+            .where(category.name.contains(storeCategory)).fetch(); //storeCategory 가 포함되는 category_id 조회
     }
 
     //음식 종류로 검색(text로 검색 예정)
@@ -110,11 +110,19 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
             return null;
         } else {
             return order.store_id.in(
-                    jpaQueryFactory
-                            .select(QStoreCategory.storeCategory.store.id)
-                            .from(QStoreCategory.storeCategory)
-                            .where(QStoreCategory.storeCategory.category.id.in(getCategoryIds(storeCategory)))
-                            .fetch());
+                jpaQueryFactory
+                    .select(QStoreCategory.storeCategory.store.id)
+                    .from(QStoreCategory.storeCategory)
+                    .where(QStoreCategory.storeCategory.category.id.in(getCategoryIds(storeCategory)))
+                    .fetch());
         }
+    }
+
+    private BooleanExpression eqOpen(Boolean isOpen) {
+        if(isOpen) {
+            LocalTime currentTime = LocalTime.now();
+            return store.closeTime.after(currentTime);
+        }
+        return null;
     }
 }
