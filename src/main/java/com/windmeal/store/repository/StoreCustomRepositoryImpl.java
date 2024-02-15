@@ -7,6 +7,7 @@ import static com.windmeal.store.domain.QStore.store;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.windmeal.global.util.TimeUtil;
 import com.windmeal.order.domain.OrderStatus;
 import com.windmeal.order.domain.QOrder;
 import com.windmeal.order.dto.response.OrderMapListResponse;
@@ -16,6 +17,7 @@ import com.windmeal.store.dto.response.AllStoreResponse;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
@@ -68,8 +70,10 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
         LocalTime start = LocalTime.MIN;
         LocalTime end = LocalTime.MAX;
         if (eta != null) {
-            start = LocalTime.parse(eta);
-            end = LocalTime.parse(eta).plus(10, ChronoUnit.MINUTES);
+//            start = LocalTime.parse(eta);
+//            end = LocalTime.parse(eta).plus(10, ChronoUnit.MINUTES);
+            start = TimeUtil.convertToKoreanTime(LocalTime.parse(eta));
+            end = TimeUtil.convertToKoreanTime(LocalTime.parse(eta).plus(10, ChronoUnit.MINUTES));
         }
         return order.eta.between(now.atTime(start),now.atTime(end));
     }
@@ -120,7 +124,7 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
 
     private BooleanExpression eqOpen(Boolean isOpen) {
         if(isOpen) {
-            LocalTime currentTime = LocalTime.now();
+            LocalTime currentTime = LocalTime.now(ZoneId.of("Asia/Seoul"));
             return store.closeTime.after(currentTime);
         }
         return null;
