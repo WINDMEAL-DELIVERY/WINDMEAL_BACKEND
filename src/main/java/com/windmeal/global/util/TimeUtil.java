@@ -12,4 +12,8 @@ public class TimeUtil {
             .withZoneSameInstant(KOREA_ZONE_ID)
             .toLocalTime();
     }
+
+    public static LocalDate getCurrentKoreanTime() {
+        return LocalDate.now(KOREA_ZONE_ID);
+    }
 }
