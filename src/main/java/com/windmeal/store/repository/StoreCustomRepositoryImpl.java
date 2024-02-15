@@ -9,9 +9,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.windmeal.global.util.TimeUtil;
 import com.windmeal.order.domain.OrderStatus;
-import com.windmeal.order.domain.QOrder;
 import com.windmeal.order.dto.response.OrderMapListResponse;
-import com.windmeal.store.domain.QStore;
 import com.windmeal.store.domain.QStoreCategory;
 import com.windmeal.store.dto.response.AllStoreResponse;
 
@@ -70,10 +68,8 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
         LocalTime start = LocalTime.MIN;
         LocalTime end = LocalTime.MAX;
         if (eta != null) {
-//            start = LocalTime.parse(eta);
-//            end = LocalTime.parse(eta).plus(10, ChronoUnit.MINUTES);
-            start = TimeUtil.convertToKoreanTime(LocalTime.parse(eta));
-            end = TimeUtil.convertToKoreanTime(LocalTime.parse(eta).plus(10, ChronoUnit.MINUTES));
+            start = LocalTime.parse(eta);
+            end = LocalTime.parse(eta).plus(10, ChronoUnit.MINUTES);
         }
         return order.eta.between(now.atTime(start),now.atTime(end));
     }
