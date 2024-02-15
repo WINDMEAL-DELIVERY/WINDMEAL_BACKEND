@@ -16,6 +16,7 @@ import com.windmeal.store.dto.response.AllStoreResponse;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
@@ -68,8 +69,8 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
         LocalTime start = LocalTime.MIN;
         LocalTime end = LocalTime.MAX;
         if (eta != null) {
-            start = LocalTime.parse(eta);
-            end = LocalTime.parse(eta).plus(10, ChronoUnit.MINUTES);
+            start = LocalTime.parse(eta, DateTimeFormatter.ofPattern("HH:mm:ss"));
+            end = LocalTime.parse(eta, DateTimeFormatter.ofPattern("HH:mm:ss")).plus(10, ChronoUnit.MINUTES);
         }
         return order.eta.between(now.atTime(start),now.atTime(end));
     }
