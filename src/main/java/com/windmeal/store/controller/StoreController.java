@@ -24,7 +24,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,9 +33,9 @@ import java.util.List;
 /**
  * 가게 생성 가게 정보 수정(이미지 제외) 가게 이미지 수정 가게 삭제 가게 정보 조회
  */
-@Tag(name = "가게", description = "가게 관련 api 입니다.")
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "가게", description = "가게 관련 api 입니다.")
 public class StoreController {
 
   private final StoreService storeService;
@@ -138,23 +137,23 @@ public class StoreController {
 
   @Operation(summary = "지도 상에서 보여줄 가게와 해당 가게의 주문수 조회", description = "지도 상에서 보여줄 가게와 해당 가게의 주문수를 조회합니다.")
   @ApiResponses({
-          @ApiResponse(responseCode = "200", description = "OK"),
-          @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근",
-                  content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class)))})
+      @ApiResponse(responseCode = "200", description = "OK"),
+      @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근",
+          content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class)))})
   @GetMapping("/store/map")
   public ResultDataResponseDTO<List<OrderMapListResponse>> getAllStoresForMap(
-          @Parameter(description = "가게 id", required = false, schema = @Schema(example = "1"))
-          @RequestParam(required = false) Long storeId,
-          @Parameter(description = "도착지 id", required = false, schema = @Schema(example = "1"))
-          @RequestParam(required = false) Long placeId,
-          @Parameter(description = "도착 예정 시간", required = false, schema = @Schema(example = "23:10:00"))
-          @RequestParam(required = false) String eta,
-          @Parameter(description = "검색 키워드", required = false, schema = @Schema(example = "카페"))
-          @RequestParam(required = false) String storeCategory,
-          @Parameter(description = "주문 상태", required = false, schema = @Schema(example = "ORDERED (대소문자 모두 가능)"))
-          @RequestParam(required = false) OrderStatus orderStatus,
-          @Parameter(description = "영업 중 여부", required = false, schema = @Schema(example = "true"))
-          @RequestParam(required = false, defaultValue = "false") Boolean isOpen
+      @Parameter(description = "가게 id", required = false, schema = @Schema(example = "1"))
+      @RequestParam(required = false) Long storeId,
+      @Parameter(description = "도착지 id", required = false, schema = @Schema(example = "1"))
+      @RequestParam(required = false) Long placeId,
+      @Parameter(description = "도착 예정 시간", required = false, schema = @Schema(example = "23:10:00"))
+      @RequestParam(required = false) String eta,
+      @Parameter(description = "검색 키워드", required = false, schema = @Schema(example = "카페"))
+      @RequestParam(required = false) String storeCategory,
+      @Parameter(description = "주문 상태", required = false, schema = @Schema(example = "ORDERED (대소문자 모두 가능)"))
+      @RequestParam(required = false) OrderStatus orderStatus,
+      @Parameter(description = "영업 중 여부", required = false, schema = @Schema(example = "true"))
+      @RequestParam(required = false, defaultValue = "false") Boolean isOpen
   ){
     return ResultDataResponseDTO.of(storeService.getAllStoresForMap(storeId, eta, storeCategory, placeId, orderStatus, isOpen));
   }
