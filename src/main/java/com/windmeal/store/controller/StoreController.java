@@ -151,7 +151,7 @@ public class StoreController {
       @Parameter(description = "검색 키워드", required = false, schema = @Schema(example = "카페"))
       @RequestParam(required = false) String storeCategory,
       @Parameter(description = "주문 상태", required = false, schema = @Schema(example = "ORDERED (대소문자 모두 가능)"))
-      @RequestParam(required = false) OrderStatus orderStatus,
+      @RequestParam(required = false, defaultValue = "ORDERED") OrderStatus orderStatus,
       @Parameter(description = "영업 중 여부", required = false, schema = @Schema(example = "true"))
       @RequestParam(required = false, defaultValue = "false") Boolean isOpen
   ){
