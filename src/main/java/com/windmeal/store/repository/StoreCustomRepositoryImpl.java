@@ -48,7 +48,8 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
     }
 
     @Override
-    public List<OrderMapListResponse> getStoreMapList(Long storeId, String eta, String storeCategory, Long placeId, OrderStatus orderStatus, Boolean isOpen) {
+    public List<OrderMapListResponse> getStoreMapList(Long storeId, String eta,
+        String storeCategory, Long placeId, OrderStatus orderStatus, Boolean isOpen) {
         return jpaQueryFactory
             .select(Projections.constructor(
                 OrderMapListResponse.class,
@@ -59,20 +60,22 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
                 store.place.latitude
             ))
             .from(store)
-            .leftJoin(order).on(store.id.eq(order.store_id))
-            .where(eqStoreId(storeId), eqEta(eta), eqStoreCategory(storeCategory), eqPlace(placeId), eqOrderStatus(orderStatus), eqOpen(isOpen))
+            .leftJoin(order).on(store.id.eq(order.store_id)).on(eqOrderStatus(orderStatus))
+            .where(eqStoreId(storeId), eqEta(eta), eqStoreCategory(storeCategory),
+                eqPlace(placeId), eqOpen(isOpen))
             .groupBy(store.id).fetch();
     }
 
     private BooleanExpression eqEta(String eta) {
-        LocalDate now = LocalDate.now();
-        LocalTime start = LocalTime.MIN;
-        LocalTime end = LocalTime.MAX;
+//        LocalTime start = LocalTime.MIN;
+//        LocalTime end = LocalTime.MAX;
         if (eta != null) {
-            start = LocalTime.parse(eta);
-            end = LocalTime.parse(eta).plus(10, ChronoUnit.MINUTES);
+            LocalDate now = LocalDate.now();
+            LocalTime start = LocalTime.parse(eta);
+            LocalTime end = LocalTime.parse(eta).plus(10, ChronoUnit.MINUTES);
+            return order.eta.between(now.atTime(start),now.atTime(end));
         }
-        return order.eta.between(now.atTime(start),now.atTime(end));
+        return null;
     }
 
 

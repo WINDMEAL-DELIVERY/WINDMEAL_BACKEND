@@ -112,8 +112,10 @@ public class StoreService {
 
   @Cacheable(value = "Orders", key = "0",cacheManager = "contentCacheManager",
       condition = "#storeId == null&&#eta==null&&#storeCategory==null&&#placeId==null&&#orderStatus==null&&#isOpen==false")
-  public List<OrderMapListResponse> getAllStoresForMap(Long storeId, String eta, String storeCategory, Long placeId, OrderStatus orderStatus, Boolean isOpen) {
-      return storeRepository.getStoreMapList(storeId, eta, storeCategory, placeId, orderStatus, isOpen);
+  public List<OrderMapListResponse> getAllStoresForMap(Long storeId, String eta,
+      String storeCategory, Long placeId, OrderStatus orderStatus, Boolean isOpen) {
+      return storeRepository.getStoreMapList(
+          storeId, eta, storeCategory, placeId, orderStatus, isOpen);
   }
 
   public CategoryStoreMenuResponse getStoreInfoForCms(Long storeId) {
