@@ -113,7 +113,7 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
         if (storeCategory == null) {
             return null;
         } else {
-            return order.store_id.in(
+            return store.id.in(
                 jpaQueryFactory
                     .select(QStoreCategory.storeCategory.store.id)
                     .from(QStoreCategory.storeCategory)
