@@ -31,10 +31,10 @@ public class OrderCreateRequest {
   private Long memberId;
   @Schema(description = "장소 이름", example = "가천대학교")
   private String placeName;
-  @Schema(description = "경도", example = "1.2345")
-  private Double longitude;
-  @Schema(description = "위도", example = "1.2345")
-  private Double latitude;
+//  @Schema(description = "경도", example = "1.2345")
+//  private Double longitude;
+//  @Schema(description = "위도", example = "1.2345")
+//  private Double latitude;
   @Schema(description = "추가 설명", example = "지하 1층 소웨 과실로 와주세요")
   private String description;
   @Schema(description = "도착 예상 시간", example = "23:10:20")
@@ -45,8 +45,6 @@ public class OrderCreateRequest {
   public Place toPlaceEntity(){
     return Place.builder()
         .name(this.placeName)
-        .latitude(this.latitude)
-        .longitude(this.longitude)
         .build();
   }
 

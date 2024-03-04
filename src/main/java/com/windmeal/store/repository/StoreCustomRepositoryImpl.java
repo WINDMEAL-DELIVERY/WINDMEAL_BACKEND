@@ -119,7 +119,7 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
         } else {
             List<Long> categoryIds = getCategoryIds(storeCategory);
             if (!categoryIds.isEmpty()) {
-                store.id.in(
+                return store.id.in(
                     // 없는 카테고리에 대해서는 바로 예외가 발생한다.
                     jpaQueryFactory
                         .select(QStoreCategory.storeCategory.store.id)
