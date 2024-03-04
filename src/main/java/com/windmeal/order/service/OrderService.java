@@ -17,6 +17,7 @@ import com.windmeal.order.dto.response.OrderDetailResponse;
 import com.windmeal.order.dto.response.OrderListResponse;
 import com.windmeal.order.dto.response.OrderMapListResponse;
 import com.windmeal.order.dto.response.OwnOrderListResponse;
+import com.windmeal.order.exception.InvalidPlaceNameException;
 import com.windmeal.order.exception.OrderAlreadyMatchedException;
 import com.windmeal.order.exception.OrderNotFoundException;
 import com.windmeal.order.exception.OrdererMissMatchException;
@@ -54,10 +55,16 @@ public class OrderService {
   @Transactional
   public OrderCreateResponse createOrder(OrderCreateRequest request) {
     memberRepository.findById(request.getMemberId())
-        .orElseThrow(() -> new MemberNotFoundException());
+        .orElseThrow(MemberNotFoundException::new);
 
     orderValidator.validate(request);
-    Place place = placeRepository.findByNameAndLongitudeAndLatitude(request.getPlaceName(),request.getLongitude(),request.getLatitude())
+    // 이름으로만 검색하도록 변경 : 도착지로만 쓰는거니까 상관이 없다.
+//    Place place = placeRepository.findByNameAndLongitudeAndLatitude(request.getPlaceName(),request.getLongitude(),request.getLatitude())
+//        .orElseGet(() -> placeRepository.save(request.toPlaceEntity()));
+    if(placeRepository.existsByName(request.getPlaceName())) {
+      throw new InvalidPlaceNameException();
+    }
+    Place place = placeRepository.findByName(request.getPlaceName())
         .orElseGet(() -> placeRepository.save(request.toPlaceEntity()));
     Order order = orderRequestMapper.mapFrom(request);
     Money totalPrice = calculateTotalPrice(request);

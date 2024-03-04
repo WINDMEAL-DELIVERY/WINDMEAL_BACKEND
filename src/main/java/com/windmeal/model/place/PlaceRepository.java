@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface PlaceRepository extends JpaRepository<Place, Long>{
 
   Optional<Place> findByNameAndLongitudeAndLatitude(String name,Double longitude, Double latitude);
+  Optional<Place> findByName(String name);
+  Boolean existsByName(String name);
 }
