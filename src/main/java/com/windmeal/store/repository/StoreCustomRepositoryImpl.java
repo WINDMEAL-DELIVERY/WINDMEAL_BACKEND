@@ -6,6 +6,7 @@ import static com.windmeal.store.domain.QStore.store;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.windmeal.global.util.TimeUtil;
 import com.windmeal.order.domain.OrderStatus;
@@ -18,13 +19,16 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 
+@Slf4j
 @RequiredArgsConstructor
 public class StoreCustomRepositoryImpl implements StoreCustomRepository {
     private final JPAQueryFactory jpaQueryFactory;
@@ -105,7 +109,7 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
     private List<Long> getCategoryIds(String storeCategory) {
         return jpaQueryFactory.select(category.id)
             .from(category)
-            .where(category.name.contains(storeCategory)).fetch(); //storeCategory 가 포함되는 category_id 조회
+            .where(category.name.contains(storeCategory)).fetch();//storeCategory 가 포함되는 category_id 조회
     }
 
     //음식 종류로 검색(text로 검색 예정)
@@ -113,13 +117,23 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
         if (storeCategory == null) {
             return null;
         } else {
-            return store.id.in(
-                jpaQueryFactory
-                    .select(QStoreCategory.storeCategory.store.id)
-                    .from(QStoreCategory.storeCategory)
-                    .where(QStoreCategory.storeCategory.category.id.in(getCategoryIds(storeCategory)))
-                    .fetch());
+            List<Long> categoryIds = getCategoryIds(storeCategory);
+            if (!categoryIds.isEmpty()) {
+                store.id.in(
+                    // 없는 카테고리에 대해서는 바로 예외가 발생한다.
+                    jpaQueryFactory
+                        .select(QStoreCategory.storeCategory.store.id)
+                        .from(QStoreCategory.storeCategory)
+                        .where(QStoreCategory.storeCategory.category.id.in(categoryIds))
+                        .fetch());
+            }
         }
+        /*
+        Expressions.FLASE 를 사용하면 자꾸 SQL 에러가 발생했다.
+        그래서 아래와 같이 임의로 false 조건을 만들어 전달했다.
+        더 괜찮은 방법을 찾아야 할 듯 하다.
+         */
+        return store.id.eq(-1l);
     }
 
     private BooleanExpression eqOpen(Boolean isOpen) {
