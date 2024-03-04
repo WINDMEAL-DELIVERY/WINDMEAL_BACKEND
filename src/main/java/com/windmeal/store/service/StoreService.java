@@ -58,7 +58,7 @@ public class StoreService {
   @Transactional
   public StoreResponse createStore(StoreCreateRequest request, String imgUrl) {
     Member findMember = memberRepository.findById(request.getMemberId())
-        .orElseThrow(() -> new MemberNotFoundException()); //Member Not Found 예외 추가 예정
+        .orElseThrow(MemberNotFoundException::new); //Member Not Found 예외 추가 예정
     Place place = placeRepository.findByNameAndLongitudeAndLatitude(request.getPlaceName(),request.getLongitude(),request.getLatitude())
         .orElseGet(() -> placeRepository.save(request.toPlaceEntity()));
 
