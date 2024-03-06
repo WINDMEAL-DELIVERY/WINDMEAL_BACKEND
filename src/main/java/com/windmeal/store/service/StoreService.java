@@ -9,6 +9,7 @@ import com.windmeal.model.place.Place;
 import com.windmeal.model.place.PlaceRepository;
 import com.windmeal.order.domain.OrderStatus;
 import com.windmeal.order.dto.response.OrderMapListResponse;
+import com.windmeal.order.exception.InvalidPlaceNameException;
 import com.windmeal.store.domain.Category;
 import com.windmeal.store.domain.MenuCategory;
 import com.windmeal.store.domain.Store;
@@ -59,9 +60,10 @@ public class StoreService {
   public StoreResponse createStore(StoreCreateRequest request, String imgUrl) {
     Member findMember = memberRepository.findById(request.getMemberId())
         .orElseThrow(MemberNotFoundException::new); //Member Not Found 예외 추가 예정
-    Place place = placeRepository.findByNameAndLongitudeAndLatitude(request.getPlaceName(),request.getLongitude(),request.getLatitude())
-        .orElseGet(() -> placeRepository.save(request.toPlaceEntity()));
-
+    if(placeRepository.existsByName(request.getName())) {
+      throw new InvalidPlaceNameException();
+    }
+    Place place = placeRepository.save(request.toPlaceEntity());
     Store savedStore = storeRepository.save(request.toEntity(findMember, imgUrl,place));
     if(!request.getCategoryList().isEmpty()) {
       categoryRepository.createCategories(
