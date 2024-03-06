@@ -34,24 +34,6 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
   private final JPAQueryFactory jpaQueryFactory;
 
   @Override
-  public List<OrderMapListResponse> getOrderMapList(Long storeId, String eta,
-      String storeCategory, Long placeId, OrderStatus orderStatus){
-
-    return jpaQueryFactory.select(Projections.constructor(
-        OrderMapListResponse.class,
-            order.store_id,
-            store.name,
-            order.store_id.count(),
-            store.place.longitude,
-            store.place.latitude
-        ))
-        .from(order)
-        .leftJoin(store).on(store.id.eq(order.store_id))
-        .where(eqStoreId(storeId), eqEta(eta), eqStoreCategory(storeCategory), eqPlace(placeId),eqOrderStatus(orderStatus))
-        .groupBy(order.store_id).fetch();
-  }
-
-  @Override
   public RestSlice<OrderListResponse> getOrderList(Pageable pageable, Long storeId, String eta,
       String storeCategory, Long placeId, Long memberId) {
     List<OrderListResponse> content = jpaQueryFactory.select(Projections.constructor(
@@ -62,6 +44,7 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
             order.place.name,
             order.place.longitude,
             order.place.latitude,
+            order.orderTime,
             order.eta,
             order.deliveryFee,
             store.name,

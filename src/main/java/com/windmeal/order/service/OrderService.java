@@ -59,13 +59,8 @@ public class OrderService {
 
     orderValidator.validate(request);
     // 이름으로만 검색하도록 변경 : 도착지로만 쓰는거니까 상관이 없다.
-//    Place place = placeRepository.findByNameAndLongitudeAndLatitude(request.getPlaceName(),request.getLongitude(),request.getLatitude())
-//        .orElseGet(() -> placeRepository.save(request.toPlaceEntity()));
-    if(placeRepository.existsByName(request.getPlaceName())) {
-      throw new InvalidPlaceNameException();
-    }
     Place place = placeRepository.findByName(request.getPlaceName())
-        .orElseGet(() -> placeRepository.save(request.toPlaceEntity()));
+        .orElseThrow(InvalidPlaceNameException::new);
     Order order = orderRequestMapper.mapFrom(request);
     Money totalPrice = calculateTotalPrice(request);
     String summary = getSummary(totalPrice, request.getMenus().get(0).getName(), calculateTotalSize(request));
@@ -101,21 +96,6 @@ public class OrderService {
     return orderRepository.getOrderList(pageable,storeId,eta,storeCategory,placeId,memberId);
   }
 
-  /**
-   * 지도에 보여줄 데이터 조회
-   * 주문이 추가된 경우, 배달이 성사된 경우 캐시 초기화
-   * @param storeId
-   * @param eta
-   * @param storeCategory
-   * @param placeId
-   * @return
-   */
-  @Cacheable(value = "Orders", key = "0",cacheManager = "contentCacheManager",
-            condition = "#storeId == null&&#eta==null&&#storeCategory==null&&#placeId==null")
-  public List<OrderMapListResponse> getAllOrdersForMap(Long storeId, String eta, String storeCategory,
-      Long placeId, OrderStatus orderStatus) {
-    return orderRepository.getOrderMapList(storeId,eta,storeCategory,placeId,orderStatus);
-  }
   /**
    * 주문 상세 내용 조회
    * @param orderId

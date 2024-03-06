@@ -12,9 +12,6 @@ import org.springframework.data.domain.Slice;
 
 public interface OrderCustomRepository {
 
-  List<OrderMapListResponse> getOrderMapList(Long storeId, String eta,
-      String storeCategory, Long placeId, OrderStatus orderStatus);
-
   RestSlice<OrderListResponse> getOrderList(Pageable pageable, Long storeId, String eta, String storeCategory,
       Long point, Long memberId);
   Integer getOwnOrderedTotalPrice(Long memberId);
