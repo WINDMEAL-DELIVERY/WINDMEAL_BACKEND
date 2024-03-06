@@ -62,9 +62,10 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
                 store.place.latitude
             ))
             .from(store)
-            .leftJoin(order).on(store.id.eq(order.store_id)).on(eqOrderStatus(orderStatus))
+            .leftJoin(order).on(store.id.eq(order.store_id)).on(
+                eqOrderStatus(orderStatus), eqOrderTime(LocalDateTime.now().toString()))
             .where(eqStoreId(storeId), eqEta(eta), eqStoreCategory(storeCategory),
-                eqPlace(placeId), eqOpen(isOpen), eqOrderTime(LocalDateTime.now().toString()))
+                eqPlace(placeId), eqOpen(isOpen))
             .groupBy(store.id).fetch();
     }
 
