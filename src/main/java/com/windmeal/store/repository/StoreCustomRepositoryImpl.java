@@ -1,32 +1,30 @@
 package com.windmeal.store.repository;
 
-import static com.windmeal.order.domain.QOrder.*;
-import static com.windmeal.store.domain.QCategory.category;
-import static com.windmeal.store.domain.QStore.store;
-
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.StringExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.windmeal.global.util.TimeUtil;
 import com.windmeal.order.domain.OrderStatus;
 import com.windmeal.order.dto.response.OrderMapListResponse;
 import com.windmeal.store.domain.QStoreCategory;
 import com.windmeal.store.dto.response.AllStoreResponse;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+
+import static com.windmeal.order.domain.QOrder.order;
+import static com.windmeal.store.domain.QCategory.category;
+import static com.windmeal.store.domain.QStore.store;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -64,7 +62,8 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
                 store.place.latitude
             ))
             .from(store)
-            .leftJoin(order).on(store.id.eq(order.store_id)).on(eqOrderStatus(orderStatus))
+            .leftJoin(order).on(store.id.eq(order.store_id)).on(
+                eqOrderStatus(orderStatus), eqOrderTime(LocalDateTime.now().toString()))
             .where(eqStoreId(storeId), eqEta(eta), eqStoreCategory(storeCategory),
                 eqPlace(placeId), eqOpen(isOpen))
             .groupBy(store.id).fetch();
@@ -78,6 +77,19 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
             LocalTime start = LocalTime.parse(eta);
             LocalTime end = LocalTime.parse(eta).plus(10, ChronoUnit.MINUTES);
             return order.eta.between(now.atTime(start),now.atTime(end));
+        }
+        return null;
+    }
+
+    private BooleanExpression eqOrderTime(String orderTime) {
+        //  "orderTime": "2024-03-06T02:16:06.68306",
+        // 오늘 날짜만 반환
+        if(orderTime != null) {
+            StringExpression formattedDate = Expressions.stringTemplate(
+                "FUNCTION('DATE_FORMAT', {0}, '%Y-%m-%d')", orderTime);
+            StringExpression orderTimeFormattedDate = Expressions.stringTemplate(
+                "FUNCTION('DATE_FORMAT', {0}, '%Y-%m-%d')", order.orderTime);
+            return formattedDate.eq(orderTimeFormattedDate);
         }
         return null;
     }

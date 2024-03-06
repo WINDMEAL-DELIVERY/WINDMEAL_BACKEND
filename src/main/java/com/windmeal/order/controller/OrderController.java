@@ -104,28 +104,6 @@ public class OrderController {
   }
 
 
-  @Operation(summary = "주문 내역 조회 - 지도", description = "주문 내역 리스트를 조회합니다.")
-  @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "OK")
-  })
-  @GetMapping("/order/map")
-  public ResultDataResponseDTO<List<OrderMapListResponse>> getAllOrdersForMap(
-      @Parameter(description = "가게 id", required = false, schema = @Schema(example = "1"))
-      @RequestParam(required = false) Long storeId,
-      @Parameter(description = "도착지 id", required = false, schema = @Schema(example = "1"))
-      @RequestParam(required = false) Long placeId,
-      @Parameter(description = "도착 예정 시간", required = false, schema = @Schema(example = "23:10:00"))
-      @RequestParam(required = false) String eta,
-      @Parameter(description = "검색 키워드", required = false, schema = @Schema(example = "카페"))
-      @RequestParam(required = false) String storeCategory,
-      @Parameter(description = "주문 상태", required = false, schema = @Schema(example = "ORDERED (대소문자 모두 가능)"))
-      @RequestParam(required = false, defaultValue = "ORDERED")OrderStatus orderStatus
-  ){
-    List<OrderMapListResponse> orders = orderService.getAllOrdersForMap(storeId, eta,
-        storeCategory, placeId, orderStatus);
-    return ResultDataResponseDTO.of(orders);
-  }
-
   @Operation(summary = "주문 내역 상세 조회", description = "주문 내역의 상세 내용을 조회합니다.")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "OK"),

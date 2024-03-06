@@ -5,6 +5,6 @@ import com.windmeal.global.exception.GeneralException;
 
 public class InvalidPlaceNameException extends GeneralException {
     public InvalidPlaceNameException() {
-        super(ErrorCode.BAD_REQUEST, "이미 존재하는 장소명입니다.");
+        super(ErrorCode.BAD_REQUEST, "유효하지 않은 장소입니다.");
     }
 }

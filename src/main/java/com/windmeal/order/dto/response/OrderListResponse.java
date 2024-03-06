@@ -2,7 +2,9 @@ package com.windmeal.order.dto.response;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import com.windmeal.generic.domain.Money;
 import com.windmeal.generic.domain.MoneyDeserializer;
@@ -40,7 +42,9 @@ public class OrderListResponse {
   @Schema(description = "위도", example = "1.2345")
   private Double latitude;
 
-
+  @JsonSerialize(using = LocalDateTimeSerializer.class)
+  @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+  private LocalDateTime orderTime;
 
   @JsonSerialize(using = LocalTimeSerializer.class)
   @JsonDeserialize(using = LocalTimeDeserializer.class)
@@ -60,7 +64,7 @@ public class OrderListResponse {
 
 
   public OrderListResponse(Long id, Long memberId, String memberNickName, String placeName,
-      Double longitude, Double latitude, LocalDateTime eta, Money deliveryFee, String name,
+      Double longitude, Double latitude, LocalDateTime orderTime, LocalDateTime eta, Money deliveryFee, String name,
       String summary) {
     this.id = id;
     this.memberId = memberId;
@@ -68,6 +72,7 @@ public class OrderListResponse {
     this.placeName = placeName;
     this.longitude = longitude;
     this.latitude = latitude;
+    this.orderTime = orderTime;
     this.eta = eta.toLocalTime();
     this.deliveryFee = deliveryFee;
     this.name = name;
