@@ -37,7 +37,7 @@ public class S3Util {
     }
 
     private String getDefaultUrl() {
-        return "test";
+        return "none";
     }
 
     private void fileUpload(MultipartFile file, String fileName) {
