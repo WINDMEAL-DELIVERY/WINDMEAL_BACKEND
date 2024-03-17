@@ -81,6 +81,7 @@ public class SecurityConfig {
   public HttpFirewall customStrictHttpFirewall() {
     StrictHttpFirewall firewall = new StrictHttpFirewall();
     firewall.setAllowUrlEncodedDoubleSlash(true);
+    firewall.setAllowUrlEncodedPercent(true);
     return firewall;
   }
 
