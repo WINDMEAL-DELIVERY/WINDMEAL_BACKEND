@@ -31,8 +31,9 @@ public class WebConfig implements WebMvcConfigurer {
   public void addCorsMappings(CorsRegistry registry) {
     registry.addMapping("/**")
         // 요청을 허용할 출처
-        .allowedOrigins(local, host, was_host1,
-            was_host2, ws_host)
+//        .allowedOrigins(local, host, was_host1,
+//            was_host2, ws_host)
+        .allowedOrigins(local)
         .allowedMethods("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
         .allowedHeaders(
             "Content-Type, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Authorization, X-Requested-With, requestId, Correlation-Id")
