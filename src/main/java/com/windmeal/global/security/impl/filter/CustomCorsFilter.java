@@ -1,6 +1,7 @@
 package com.windmeal.global.security.impl.filter;
 
 import java.io.IOException;
+import java.util.HashSet;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -24,9 +25,12 @@ public class CustomCorsFilter implements Filter {
   private String local;
   @Value("${domain.url.ws_host}")
   private String ws_host;
+  private static final HashSet<String> allowedOrigin = new HashSet<>();
   @Override
   public void init(FilterConfig filterConfig) throws ServletException {
     Filter.super.init(filterConfig);
+    allowedOrigin.add(local);
+    allowedOrigin.add(ws_host);
   }
 
   @Override
@@ -34,8 +38,10 @@ public class CustomCorsFilter implements Filter {
       throws IOException, ServletException {
     HttpServletResponse response = (HttpServletResponse) res;
     HttpServletRequest request = (HttpServletRequest) req;
-    response.setHeader("Access-Control-Allow-Origin", ws_host);
-//    response.setHeader("Access-Control-Allow-Origin", local);
+    String origin = request.getHeader("Origin");
+    if(!allowedOrigin.contains(origin))
+      return;
+    response.setHeader("Access-Control-Allow-Origin", origin);
     response.setHeader("Access-Control-Allow-Credentials", "true");
     response.setHeader("Access-Control-Allow-Methods",
         "HEAD, GET, POST, PUT, DELETE, PATCH, OPTIONS");
