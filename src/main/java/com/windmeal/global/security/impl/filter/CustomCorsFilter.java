@@ -39,9 +39,10 @@ public class CustomCorsFilter implements Filter {
     HttpServletResponse response = (HttpServletResponse) res;
     HttpServletRequest request = (HttpServletRequest) req;
     String origin = request.getHeader("Origin");
-    if(!allowedOrigin.contains(origin))
+    log.info(origin);
+    if(origin !=null && !allowedOrigin.contains(origin))
       return;
-    response.setHeader("Access-Control-Allow-Origin", origin);
+    response.setHeader("Access-Control-Allow-Origin", origin == null ? ws_host : origin);
     response.setHeader("Access-Control-Allow-Credentials", "true");
     response.setHeader("Access-Control-Allow-Methods",
         "HEAD, GET, POST, PUT, DELETE, PATCH, OPTIONS");
