@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -111,6 +112,7 @@ public class SecurityConfig {
         .antMatchers("/auth/**").permitAll()
         .antMatchers("/oauth2/**").permitAll()
         .antMatchers("/auth/logout").authenticated()
+        .antMatchers(HttpMethod.GET, "/store/*").permitAll()
         .anyRequest().authenticated()
         .and()
         .apply(new JwtSecurityConfig(aes256Util, objectMapper, tokenProvider))
