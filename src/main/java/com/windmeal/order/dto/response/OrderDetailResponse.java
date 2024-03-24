@@ -47,6 +47,9 @@ public class OrderDetailResponse {
   @Schema(description = "주문 상태", example = "ORDERED")
   private String orderStatus;//주문 상태
 
+  @Schema(description = "주문 요약", example = "이삭토스트 외 1개")
+  private String orderSummary;//주문 요약
+
 
   private List<OrderMenuRequest> orderMenu = new ArrayList<>();
 
@@ -58,6 +61,7 @@ public class OrderDetailResponse {
     this.storeName = store.getName();
     this.latitude=place.getLatitude();
     this.longitude=place.getLongitude();
+    this.orderSummary=order.getSummary();
     this.eta=order.getEta().toLocalTime();
     this.totalPrice=order.getTotalPrice();
     this.deliveryFee=order.getDeliveryFee();
