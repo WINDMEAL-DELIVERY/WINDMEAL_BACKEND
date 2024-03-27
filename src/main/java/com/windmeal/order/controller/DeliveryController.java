@@ -5,6 +5,7 @@ import com.windmeal.global.exception.ExceptionResponseDTO;
 import com.windmeal.global.exception.ResultDataResponseDTO;
 import com.windmeal.global.util.SecurityUtil;
 import com.windmeal.order.dto.request.DeliveryCancelRequest;
+import com.windmeal.order.dto.request.DeliveryCompleteRequest;
 import com.windmeal.order.dto.request.DeliveryCreateRequest;
 import com.windmeal.order.dto.response.DeliveryListResponse;
 import com.windmeal.order.dto.response.OrderingListResponse;
@@ -132,5 +133,23 @@ public class DeliveryController {
     Long memberId = SecurityUtil.getCurrentMemberId();
 
     return ResultDataResponseDTO.of(deliveryService.getOwnDeliveredTotalPrice(memberId));
+  }
+
+
+  @PostMapping("/delivered")
+  @Operation(summary = "배달 완료", description = "진행 중인 배달을 완료시킴")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "OK"),
+      @ApiResponse(responseCode = "400", description = "주문이 배달 중인 상태가 아님",
+          content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class))),
+      @ApiResponse(responseCode = "400", description = "배달원이 일치하지 않음",
+          content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class))),
+      @ApiResponse(responseCode = "404", description = "존재하지 않는 배달",
+          content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class))),
+  })
+  public ResultDataResponseDTO completeDelivery(@RequestBody DeliveryCompleteRequest request) {
+    Long currentMemberId = SecurityUtil.getCurrentMemberId();
+    deliveryService.completeDelivery(request, currentMemberId);
+    return ResultDataResponseDTO.empty();
   }
 }

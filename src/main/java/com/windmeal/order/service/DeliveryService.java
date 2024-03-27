@@ -11,15 +11,13 @@ import com.windmeal.order.domain.DeliveryStatus;
 import com.windmeal.order.domain.Order;
 import com.windmeal.order.domain.OrderCancel;
 import com.windmeal.order.domain.event.DeliveryMatchEvent;
+import com.windmeal.order.dto.request.DeliveryCompleteRequest;
 import com.windmeal.order.dto.request.DeliveryCreateRequest;
 import com.windmeal.order.dto.request.DeliveryCancelRequest;
 import com.windmeal.order.dto.response.DeliveryListResponse;
 import com.windmeal.order.dto.response.OrderingListResponse;
 import com.windmeal.order.dto.response.OwnDeliveryListResponse;
-import com.windmeal.order.exception.DeliverOrdererSameException;
-import com.windmeal.order.exception.DeliveryNotFoundException;
-import com.windmeal.order.exception.OrderAlreadyMatchedException;
-import com.windmeal.order.exception.OrderNotFoundException;
+import com.windmeal.order.exception.*;
 import com.windmeal.order.repository.delivery.DeliveryRepository;
 import com.windmeal.order.repository.order.OrderCancelRepository;
 import com.windmeal.order.repository.order.OrderRepository;
@@ -151,4 +149,18 @@ public class DeliveryService {
     return deliveryRepository.getOwnDelivered(memberId, pageable, startDate, endDate,
         storeCategory);
   }
+
+  public void completeDelivery(DeliveryCompleteRequest request, Long currentMemberId) {
+      Delivery delivery = deliveryRepository.findByOrderId(request.getOrderId())
+          .orElseThrow(OrderNotFoundException::new);
+      if(delivery.getDeliveryStatus() != DeliveryStatus.DELIVERING) {
+          throw new NotProcessingDeliveryException();
+      }
+    Long deliverId = delivery.getDeliver().getId();
+    if(!deliverId.equals(request.getMemberId()) || !deliverId.equals(currentMemberId)) {
+          throw new InvalidDeliverException();
+      }
+      delivery.delivered();
+  }
+
 }
