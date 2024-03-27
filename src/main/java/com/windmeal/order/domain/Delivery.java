@@ -45,4 +45,8 @@ public class Delivery extends BaseTimeEntity {
     public void canceled() {
         this.deliveryStatus=DeliveryStatus.CANCELED;
     }
+
+    public void delivered() {
+        this.deliveryStatus = deliveryStatus.DELIVERED;
+    }
 }
