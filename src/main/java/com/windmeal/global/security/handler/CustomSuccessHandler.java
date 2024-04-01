@@ -99,6 +99,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         (String) attributes.getOrDefault(NICKNAME_KEY, null));
     Optional<String> redirectUri = CookieUtil.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
         .map(Cookie::getValue);
+    log.error(redirectUri.isEmpty() + " ");
     String resultUri =
         nickname.isPresent() ? redirectUri.orElse(DEFAULT_OAUTH_REDIRECT) : NICKNAME_REDIRECT;
     String uriString = UriComponentsBuilder.fromUriString(resultUri)
