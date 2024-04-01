@@ -37,12 +37,13 @@ public class OwnOrderListResponse {
   @Schema(description = "주문 날짜", example = "")
   private LocalDate orderDate;
 
-  public OwnOrderListResponse(Long orderId, Long storeId, String storeName, String summary,
+  public OwnOrderListResponse(Long orderId, Long storeId, String storeName, String storePhoto, String summary,
       OrderStatus orderStatus, LocalDateTime orderDate) {
     this.orderId = orderId;
     this.storeId = storeId;
-    this.storeName = storeName;
     this.summary = summary;
+    this.storeName = storeName;
+    this.storePhoto = storePhoto;
     this.orderStatus = orderStatus.getStatus();
     this.orderDate = orderDate.toLocalDate();
   }

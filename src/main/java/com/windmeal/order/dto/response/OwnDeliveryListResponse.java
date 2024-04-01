@@ -37,12 +37,13 @@ public class OwnDeliveryListResponse {
   @Schema(description = "배달 날짜", example = "")
   private LocalDate deliveryDate;
 
-  public OwnDeliveryListResponse(Long orderId, Long storeId, String storeName, String summary,
+  public OwnDeliveryListResponse(Long orderId, Long storeId, String storeName, String storePhoto, String summary,
       DeliveryStatus deliveryStatus, LocalDateTime deliveryDate) {
     this.orderId = orderId;
     this.storeId = storeId;
-    this.storeName = storeName;
     this.summary = summary;
+    this.storeName = storeName;
+    this.storePhoto = storePhoto;
     this.deliveryStatus = deliveryStatus.getStatus();
     this.deliveryDate = deliveryDate.toLocalDate();
   }
