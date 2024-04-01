@@ -150,9 +150,11 @@ public class DeliveryService {
         storeCategory);
   }
 
+  @Transactional
   public void completeDelivery(DeliveryCompleteRequest request, Long currentMemberId) {
       Delivery delivery = deliveryRepository.findByOrderId(request.getOrderId())
           .orElseThrow(OrderNotFoundException::new);
+
       if(delivery.getDeliveryStatus() != DeliveryStatus.DELIVERING) {
           throw new NotProcessingDeliveryException();
       }
@@ -161,6 +163,7 @@ public class DeliveryService {
           throw new InvalidDeliverException();
       }
       delivery.delivered();
+      delivery.getOrder().delivered();
   }
 
 }
