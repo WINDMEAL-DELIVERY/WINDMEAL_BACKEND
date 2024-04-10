@@ -26,6 +26,8 @@ public class OrderDetailResponse {
 
   @Schema(description = "주문 ID", example = "1")
   private Long id;
+  @Schema(description = "주문자 ID", example = "1")
+  private Long orderer_id;
   @Schema(description = "음식점 (출발지) 이름", example = "신의한컵")
   private String storeName;
   @Schema(description = "장소 이름", example = "가천대학교")
@@ -65,6 +67,7 @@ public class OrderDetailResponse {
     this.eta=order.getEta().toLocalTime();
     this.totalPrice=order.getTotalPrice();
     this.deliveryFee=order.getDeliveryFee();
+    this.orderer_id = order.getOrderer_id();
     this.orderStatus=order.getOrderStatus().getStatus();
     this.orderMenu = orderMenus.stream().map(OrderMenuRequest::from).collect(Collectors.toList());
   }
