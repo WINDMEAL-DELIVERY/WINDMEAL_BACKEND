@@ -2,6 +2,7 @@ package com.windmeal.global.util;
 
 import com.windmeal.global.exception.AesException;
 import com.windmeal.global.exception.ErrorCode;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import javax.crypto.Cipher;
@@ -9,6 +10,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 
+@Slf4j
 @Component
 public class AES256Util {
 
@@ -62,6 +64,7 @@ public class AES256Util {
     try {
       Cipher cipher = Cipher.getInstance(alg);
       // 프론트엔드 키를 먼저 복호화해줌
+      log.info("프론트에서 넘어온 토큰 : " + cipherText);
       SecretKeySpec keySpec = new SecretKeySpec(key_front.getBytes(), "AES");
       IvParameterSpec ivParamSpec = new IvParameterSpec(iv_front.getBytes());
       cipher.init(Cipher.DECRYPT_MODE, keySpec, ivParamSpec);
@@ -69,6 +72,7 @@ public class AES256Util {
       byte[] decodedBytes = Base64.getDecoder().decode(cipherText);
       byte[] decrypted = cipher.doFinal(decodedBytes);
       String tempDecryptedString = new String(decrypted, "UTF-8");
+      log.info("1차 복호화 토큰 : " + tempDecryptedString);
       // 이어서 백엔드 키로 다시 초기화 해준다.
       keySpec = new SecretKeySpec(encryptKey.getBytes(), "AES");
       ivParamSpec = new IvParameterSpec(iv.getBytes());
