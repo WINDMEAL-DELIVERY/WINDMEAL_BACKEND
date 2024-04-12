@@ -61,15 +61,17 @@ public class AES256Util {
   public String doubleDecrypt(String cipherText) throws AesException {
     try {
       Cipher cipher = Cipher.getInstance(alg);
-      SecretKeySpec keySpec = new SecretKeySpec(encryptKey.getBytes(), "AES");
-      IvParameterSpec ivParamSpec = new IvParameterSpec(iv.getBytes());
+      // 프론트엔드 키를 먼저 복호화해줌
+      SecretKeySpec keySpec = new SecretKeySpec(key_front.getBytes(), "AES");
+      IvParameterSpec ivParamSpec = new IvParameterSpec(iv_front.getBytes());
       cipher.init(Cipher.DECRYPT_MODE, keySpec, ivParamSpec);
       // 복호화하기 전에 디코딩해준다.
       byte[] decodedBytes = Base64.getDecoder().decode(cipherText);
       byte[] decrypted = cipher.doFinal(decodedBytes);
       String tempDecryptedString = new String(decrypted, "UTF-8");
-      keySpec = new SecretKeySpec(key_front.getBytes(), "AES");
-      ivParamSpec = new IvParameterSpec(iv_front.getBytes());
+      // 이어서 백엔드 키로 다시 초기화 해준다.
+      keySpec = new SecretKeySpec(encryptKey.getBytes(), "AES");
+      ivParamSpec = new IvParameterSpec(iv.getBytes());
       cipher.init(Cipher.DECRYPT_MODE, keySpec, ivParamSpec);
       decodedBytes = Base64.getDecoder().decode(tempDecryptedString);
       decrypted = cipher.doFinal(decodedBytes);
