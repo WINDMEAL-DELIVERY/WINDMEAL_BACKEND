@@ -75,6 +75,7 @@ public class AES256Util {
       decrypted = cipher.doFinal(decodedBytes);
       return new String(decrypted, "UTF-8");
     } catch (Exception e) {
+      e.printStackTrace();
       throw new AesException(ErrorCode.ENCRYPT_ERROR);
     }
   }
