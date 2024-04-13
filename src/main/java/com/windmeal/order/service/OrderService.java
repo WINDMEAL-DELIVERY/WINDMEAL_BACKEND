@@ -152,7 +152,7 @@ public class OrderService {
   }
 
   public int getOwnOrderedTotalPrice(Long memberId) {
-    return orderRepository.getOwnOrderedTotalPrice(memberId);
+    return orderRepository.getOwnOrderedTotalPrice(memberId) * -1;
   }
 
   public Slice<OwnOrderListResponse> getOwnOrdered(Long memberId, Pageable pageable, LocalDate startDate,
