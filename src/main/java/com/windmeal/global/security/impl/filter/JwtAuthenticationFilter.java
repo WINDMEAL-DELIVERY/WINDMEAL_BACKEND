@@ -44,7 +44,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       String accessToken = resolveToken(request);
       if (accessToken != null) {
         String decrypt = aes256Util.doubleDecrypt(accessToken);
-        log.info(decrypt);
         if (StringUtils.hasText(decrypt) && tokenProvider.validateToken(decrypt)) {
           Authentication authenticated = tokenProvider.getAuthentication(decrypt);
           SecurityContextHolder.getContext().setAuthentication(authenticated);
