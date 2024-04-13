@@ -45,7 +45,7 @@ public class AuthService {
         .orElseThrow(EmptyAccessTokenException::new);
     String accessToken = bearerToken.substring(7);
     try {
-      accessToken = aes256Util.decrypt(accessToken);
+      accessToken = aes256Util.doubleDecrypt(accessToken);
       Authentication authenticationForReissue = tokenProvider.getAuthentication(accessToken);
       UserDetails principal = (UserDetails) authenticationForReissue.getPrincipal();
       Long id = Long.parseLong(principal.getUsername());
