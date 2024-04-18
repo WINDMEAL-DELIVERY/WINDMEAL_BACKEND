@@ -43,7 +43,7 @@ public class DeliveryCustomRepositoryImpl implements DeliveryCustomRepository {
                 order.summary,
                 order.description,
                 place.name,
-                jpaQueryFactory.select(member.nickname).from(member)
+                jpaQueryFactory.select(member.nickname, member.profileImage).from(member)
                     .where(member.id.eq(order.orderer_id)),
                 store.name
             ))
@@ -57,14 +57,6 @@ public class DeliveryCustomRepositoryImpl implements DeliveryCustomRepository {
             eqEta(today)
         )
         .orderBy(delivery.createdDate.desc()).fetch();
-//        .offset(pageable.getOffset())
-//        .limit(pageable.getPageSize() + 1).fetch();
-//    boolean hasNext = false;
-//    if (content.size() > pageable.getPageSize()) {
-//      content.remove(pageable.getPageSize());
-//      hasNext = true;
-//    }
-//    return new SliceImpl(content, pageable, hasNext);
   }
 
   @Override
@@ -78,35 +70,22 @@ public class DeliveryCustomRepositoryImpl implements DeliveryCustomRepository {
                 order.summary,
                 order.description,
                 place.name,
-                jpaQueryFactory.select(member.nickname).from(member)
+                jpaQueryFactory.select(member.nickname, member.profileImage).from(member)
                     .where(member.id.eq(delivery.deliver.id)),
                 store.name
             ))
         .from(delivery)
-//        .leftJoin(delivery).on(order.id.eq(delivery.order.id))
         .rightJoin(delivery.order, order)
         .innerJoin(order.place, place)
         .leftJoin(store).on(order.store_id.eq(store.id))
-//        .innerJoin(delivery.deliver,member)
-
-//        .innerJoin(delivery.deliver,member)
 
         .where(
             order.orderer_id.eq(memberId),
             order.orderStatus.eq(OrderStatus.ORDERED)
                 .or(order.orderStatus.eq(OrderStatus.DELIVERING)),
-//            delivery.deliveryStatus.eq(DeliveryStatus.DELIVERING),
             eqEta(today)
         )
         .orderBy(order.createdDate.desc()).fetch();
-//        .offset(pageable.getOffset())
-//        .limit(pageable.getPageSize() + 1).fetch();
-//    boolean hasNext = false;
-//    if (content.size() > pageable.getPageSize()) {
-//      content.remove(pageable.getPageSize());
-//      hasNext = true;
-//    }
-//    return new SliceImpl(content, pageable, hasNext);
   }
 
   @Override

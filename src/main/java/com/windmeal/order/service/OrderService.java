@@ -2,6 +2,7 @@ package com.windmeal.order.service;
 
 import com.windmeal.generic.domain.Money;
 import com.windmeal.global.wrapper.RestSlice;
+import com.windmeal.member.domain.Member;
 import com.windmeal.member.exception.MemberNotFoundException;
 import com.windmeal.member.repository.BlackListRepository;
 import com.windmeal.member.repository.MemberRepository;
@@ -106,8 +107,9 @@ public class OrderService {
         .orElseThrow(OrderNotFoundException::new);
     Store store = storeRepository.findById(order.getStore_id())
         .orElseThrow(StoreNotFoundException::new);
-
-    return OrderDetailResponse.from(order, store);
+    Member orderer = memberRepository.findById(order.getOrderer_id())
+        .orElseThrow(MemberNotFoundException::new);
+    return OrderDetailResponse.from(order, store, orderer);
   }
 
 
