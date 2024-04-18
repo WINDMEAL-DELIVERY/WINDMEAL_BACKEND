@@ -1,6 +1,7 @@
 package com.windmeal.order.dto.response;
 
 import com.windmeal.generic.domain.Money;
+import com.windmeal.member.domain.Member;
 import com.windmeal.model.place.Place;
 import com.windmeal.order.domain.Order;
 import com.windmeal.order.domain.OrderMenu;
@@ -28,6 +29,8 @@ public class OrderDetailResponse {
   private Long id;
   @Schema(description = "주문자 ID", example = "1")
   private Long orderer_id;
+  @Schema(description = "주문자 프로필 이미지", example = "profile_image/Windmeal_Delivery_default_profile_image.png")
+  private String ordererProfileImage;
   @Schema(description = "음식점 (출발지) 이름", example = "신의한컵")
   private String storeName;
   @Schema(description = "장소 이름", example = "가천대학교")
@@ -57,7 +60,7 @@ public class OrderDetailResponse {
 
 
 
-  public OrderDetailResponse(Order order, List<OrderMenu> orderMenus, Place place, Store store) {
+  public OrderDetailResponse(Order order, List<OrderMenu> orderMenus, Place place, Store store, String ordererProfileImage) {
     this.id = order.getId();
     this.placeName=place.getName();
     this.storeName = store.getName();
@@ -68,12 +71,13 @@ public class OrderDetailResponse {
     this.totalPrice=order.getTotalPrice();
     this.deliveryFee=order.getDeliveryFee();
     this.orderer_id = order.getOrderer_id();
+    this.ordererProfileImage = ordererProfileImage;
     this.orderStatus=order.getOrderStatus().getStatus();
     this.orderMenu = orderMenus.stream().map(OrderMenuRequest::from).collect(Collectors.toList());
   }
 
-  public static OrderDetailResponse from(Order order, Store store) {
-    return new OrderDetailResponse(order, order.getOrderMenus(),order.getPlace(), store);
+  public static OrderDetailResponse from(Order order, Store store, Member orderer) {
+    return new OrderDetailResponse(order, order.getOrderMenus(),order.getPlace(), store, orderer.getProfileImage());
   }
 
 

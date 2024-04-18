@@ -27,11 +27,13 @@ public class DeliveryListResponse {
   private String destinationName;
   @Schema(description = "닉네임", example = "임동동")
   private String nickName;
+  @Schema(description = "주문자 프로필 이미지", example = "profile_image/Windmeal_Delivery_default_profile_image.png")
+  private String ordererProfileImage;
   @Schema(description = "음식점 이름", example = "신의한컵")
   private String storeName;
 
   public DeliveryListResponse(Long deliveryId, Long orderId, DeliveryStatus deliveryStatus, String summary,
-      String description, String destinationName, String ordererNickName, String storeName) {
+      String description, String destinationName, String ordererNickName, String ordererProfileImage, String storeName) {
     this.deliveryId = deliveryId;
     this.orderId = orderId;
     this.deliveryStatus = deliveryStatus.getStatus();
@@ -39,6 +41,7 @@ public class DeliveryListResponse {
     this.description = description;
     this.destinationName = destinationName;
     this.nickName = ordererNickName;
+    this.ordererProfileImage = ordererProfileImage;
     this.storeName = storeName;
   }
 }

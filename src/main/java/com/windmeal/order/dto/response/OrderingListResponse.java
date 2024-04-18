@@ -14,8 +14,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Schema(title = "내가 요청한 주문 목록")
 public class OrderingListResponse {
-//  @Schema(description = "배달 ID", example = "1")
-//  private Long deliveryId;
   @Schema(description = "주문 ID", example = "1")
   private Long orderId;
   @Schema(description = "주문 상태", example = "배달 중")
@@ -28,20 +26,21 @@ public class OrderingListResponse {
   private String destinationName;
   @Schema(description = "닉네임", example = "임동동")
   private String nickName;
+  @Schema(description = "배달기사 프로필 이미지", example = "profile_image/Windmeal_Delivery_default_profile_image.png")
+  private String deliverProfileImage;
   @Schema(description = "음식점 이름", example = "신의한컵")
   private String storeName;
 
   public OrderingListResponse(
-//      Long deliveryId,
       Long orderId, OrderStatus orderStatus, String summary,
-      String description, String destinationName, String ordererNickName, String storeName) {
-//    this.deliveryId = deliveryId;
+      String description, String destinationName, String deliverNickname, String deliverProfileImage, String storeName) {
     this.orderId = orderId;
     this.orderStatus = orderStatus.getStatus();
     this.summary = summary;
     this.description = description;
     this.destinationName = destinationName;
-    this.nickName = ordererNickName;
+    this.nickName = deliverNickname;
+    this.deliverProfileImage = deliverProfileImage;
     this.storeName = storeName;
   }
 }
