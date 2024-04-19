@@ -43,13 +43,17 @@ public class DeliveryCustomRepositoryImpl implements DeliveryCustomRepository {
                 order.summary,
                 order.description,
                 place.name,
-                jpaQueryFactory.select(member.nickname, member.profileImage).from(member)
-                    .where(member.id.eq(order.orderer_id)),
+                // 아래의 2개가 QueryString의 Tuple로 들어간다.
+//                jpaQueryFactory.select(member.nickname, member.profileImage).from(member)
+//                    .where(member.id.eq(order.orderer_id)),
+                member.nickname,
+                member.profileImage,
                 store.name
             ))
         .from(delivery)
         .innerJoin(delivery.order, order)
         .innerJoin(order.place, place)
+        .leftJoin(member).on(member.id.eq(delivery.order.orderer_id))
         .leftJoin(store).on(order.store_id.eq(store.id))
         .where(
             delivery.deliver.id.eq(memberId),
@@ -70,11 +74,14 @@ public class DeliveryCustomRepositoryImpl implements DeliveryCustomRepository {
                 order.summary,
                 order.description,
                 place.name,
-                jpaQueryFactory.select(member.nickname, member.profileImage).from(member)
-                    .where(member.id.eq(delivery.deliver.id)),
+//                jpaQueryFactory.select(member.nickname, member.profileImage).from(member)
+//                    .where(member.id.eq(delivery.deliver.id)),
+                member.nickname,
+                member.profileImage,
                 store.name
             ))
         .from(delivery)
+        .leftJoin(member).on(delivery.deliver.id.eq(member.id))
         .rightJoin(delivery.order, order)
         .innerJoin(order.place, place)
         .leftJoin(store).on(order.store_id.eq(store.id))
