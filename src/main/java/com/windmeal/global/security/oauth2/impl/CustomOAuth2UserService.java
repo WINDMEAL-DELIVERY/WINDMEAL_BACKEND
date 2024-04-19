@@ -35,10 +35,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.client.UnknownContentTypeException;
 
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static com.windmeal.global.constants.S3Constant.WINDMEAL_DEFAULT_PROFILE_URL;
 import static com.windmeal.global.constants.SecurityConstants.*;
@@ -128,11 +125,12 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
   }
 
   private Member createMember(Map<String, Object> attributes) {
+    int randNum = new Random().nextInt(10) + 1;
     Member member = Member.builder()
         .name((String) attributes.get("family_name"))
         .email((String) attributes.get("email"))
         .department((String) attributes.get("given_name"))
-        .profileImage(WINDMEAL_DEFAULT_PROFILE_URL)
+        .profileImage(WINDMEAL_DEFAULT_PROFILE_URL + randNum + ".png")
         .authority(Authority.ROLE_USER)
         .build();
     return member;
