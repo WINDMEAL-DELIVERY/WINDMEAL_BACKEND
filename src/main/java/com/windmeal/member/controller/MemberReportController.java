@@ -2,6 +2,7 @@ package com.windmeal.member.controller;
 
 
 import com.windmeal.global.exception.ErrorCode;
+import com.windmeal.global.exception.ExceptionResponseDTO;
 import com.windmeal.global.exception.ResultDataResponseDTO;
 import com.windmeal.global.util.SecurityUtil;
 import com.windmeal.member.dto.request.MemberReportCreateRequest;
@@ -9,6 +10,7 @@ import com.windmeal.member.dto.response.MemberReportListResponse;
 import com.windmeal.member.service.MemberReportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -35,12 +37,15 @@ public class MemberReportController {
   @Operation(summary = "멤버 신고 추가", description = "멤버 신고 기능입니다.")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "닉네임 설정 성공"),
-      @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없습니다."),
+      @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자",
+          content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class))),
+      @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없습니다.",
+          content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class)))
   })
   @PostMapping("/report")
   public ResultDataResponseDTO createMemberReport(@RequestBody MemberReportCreateRequest request){
     Long currentMemberId = SecurityUtil.getCurrentMemberId();
-    memberReportService.createMemberReport(request.toServiceDto(currentMemberId));
+    memberReportService.createMemberReport(currentMemberId, request);
     return ResultDataResponseDTO.empty(ErrorCode.CREATED);
   }
 
