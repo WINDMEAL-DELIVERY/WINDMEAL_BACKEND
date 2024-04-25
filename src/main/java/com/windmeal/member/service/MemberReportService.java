@@ -9,7 +9,6 @@ import com.windmeal.member.exception.MemberNotFoundException;
 import com.windmeal.member.repository.MemberReportRepository;
 import com.windmeal.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -29,8 +28,8 @@ public class MemberReportService {
 
   private final MemberReportRepository memberReportRepository;
   @Transactional
-  public void createMemberReport(MemberReportCreateRequest request){
-    Member reporter = memberRepository.findById(request.getReporterId())
+  public void createMemberReport(Long currentMemberId, MemberReportCreateRequest request){
+    Member reporter = memberRepository.findById(currentMemberId)
         .orElseThrow(MemberNotFoundException::new);
 
     Member reported = memberRepository.findById(request.getReportedId())
