@@ -29,8 +29,8 @@ public class BlackListService {
     Member requestMember = memberRepository.findById(requestMemberId)
         .orElseThrow(MemberNotFoundException::new);
 
-    Member blackMember = memberRepository.findByEmail(request.getEmail())
-        .orElseThrow(MemberNotFoundException::new);
+    Member blackMember = memberRepository.findById(request.getId()).orElseThrow(
+        MemberNotFoundException::new);
 
     BlackList blackList = BlackList.place(requestMember, blackMember);
     blackListRepository.save(blackList);
