@@ -114,4 +114,9 @@ public class Order extends BaseTimeEntity {
   public void canceled(){
     this.orderStatus=OrderStatus.CANCELED;
   }
+
+
+  public void updateDeliveryFee(Money deliveryFee) {
+    this.deliveryFee = deliveryFee;
+  }
 }
