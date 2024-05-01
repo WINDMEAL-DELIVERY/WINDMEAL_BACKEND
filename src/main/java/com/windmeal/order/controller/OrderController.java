@@ -5,6 +5,7 @@ import com.windmeal.global.exception.ExceptionResponseDTO;
 import com.windmeal.global.exception.ResultDataResponseDTO;
 import com.windmeal.global.util.SecurityUtil;
 import com.windmeal.global.wrapper.RestSlice;
+import com.windmeal.order.dto.request.DeliveryFeeUpdateRequest;
 import com.windmeal.order.dto.request.OrderCreateRequest;
 import com.windmeal.order.dto.request.OrderDeleteRequest;
 import com.windmeal.order.dto.response.OrderDetailResponse;
@@ -143,6 +144,21 @@ public class OrderController {
 
 
     return ResultDataResponseDTO.of(orderService.getOwnOrderedTotalPrice(memberId));
+  }
+
+  @Operation(summary = "배달료 수정", description = "내 주문에서 배달료를 수정함")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "OK"),
+      @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자",
+          content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class))),
+      @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근",
+          content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class)))
+  })
+  @PatchMapping("/ordered/price")
+  public ResultDataResponseDTO getOwnOrderedTotalPrice(@RequestBody DeliveryFeeUpdateRequest request){
+    Long currentMemberId = SecurityUtil.getCurrentMemberId();
+    orderService.updateDeliveryFee(request, currentMemberId);
+    return ResultDataResponseDTO.empty();
   }
 
 }

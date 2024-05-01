@@ -10,6 +10,7 @@ import com.windmeal.model.place.Place;
 import com.windmeal.model.place.PlaceRepository;
 import com.windmeal.order.domain.Order;
 import com.windmeal.order.domain.OrderStatus;
+import com.windmeal.order.dto.request.DeliveryFeeUpdateRequest;
 import com.windmeal.order.dto.request.OrderCreateRequest;
 import com.windmeal.order.dto.request.OrderCreateRequest.OrderMenuRequest;
 import com.windmeal.order.dto.request.OrderDeleteRequest;
@@ -88,10 +89,6 @@ public class OrderService {
     orderRepository.deleteById(request.getOrderId());
   }
 
-
-//  @Cacheable(value = "Orders", key = "#pageable.pageNumber", cacheManager = "contentCacheManager",
-//      condition = "#storeId == null&&#pageable.pageNumber==0"
-//          + "&&#eta==null&&#storeCategory==null&&#placeId==null")
   public RestSlice<OrderListResponse> getAllOrder(Pageable pageable, Long storeId, String eta, String storeCategory,
       Long placeId, Long memberId) {
     return orderRepository.getOrderList(pageable,storeId,eta,storeCategory,placeId,memberId);
@@ -160,5 +157,14 @@ public class OrderService {
   public Slice<OwnOrderListResponse> getOwnOrdered(Long memberId, Pageable pageable, LocalDate startDate,
       LocalDate endDate, String storeCategory) {
     return orderRepository.getOwnOrdered(memberId,pageable,startDate,endDate,storeCategory);
+  }
+
+  public void updateDeliveryFee(DeliveryFeeUpdateRequest request, Long currentMemberId) {
+    Order order = orderRepository.findById(request.getOrderId()).orElseThrow(
+        OrderNotFoundException::new);
+    if(!order.getOrderer_id().equals(currentMemberId)) {
+      throw new OrdererMissMatchException();
+    }
+    order.updateDeliveryFee(request.getDeliveryFee());
   }
 }
