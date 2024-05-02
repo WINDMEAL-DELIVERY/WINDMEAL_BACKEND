@@ -63,19 +63,6 @@ public class Money {
   public boolean isGreaterThanOrEqual(Money other) {
     return price-(other.wons()) >= 0;
   }
-//
-//    public BigDecimal getAmount() {
-//        return amount;
-//    }
-//
-//    public Long longValue() {
-//        return amount.longValue();
-//    }
-//
-//    public Double doubleValue() {
-//        return amount.doubleValue();
-//    }
-//
     public boolean equals(Object object) {
         if (this == object) {
             return true;
@@ -92,8 +79,4 @@ public class Money {
     public int hashCode() {
         return Objects.hashCode(price);
     }
-//
-//    public String toString() {
-//        return amount.toString() + "원";
-//    }
 }

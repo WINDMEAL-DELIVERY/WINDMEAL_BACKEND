@@ -155,10 +155,10 @@ public class OrderController {
           content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class)))
   })
   @PatchMapping("/ordered/price")
-  public ResultDataResponseDTO getOwnOrderedTotalPrice(@RequestBody DeliveryFeeUpdateRequest request){
+  public ResultDataResponseDTO<Integer> getOwnOrderedTotalPrice(@RequestBody DeliveryFeeUpdateRequest request){
     Long currentMemberId = SecurityUtil.getCurrentMemberId();
-    orderService.updateDeliveryFee(request, currentMemberId);
-    return ResultDataResponseDTO.empty();
+    int deliveryFee = orderService.updateDeliveryFee(request, currentMemberId);
+    return ResultDataResponseDTO.of(deliveryFee);
   }
 
 }

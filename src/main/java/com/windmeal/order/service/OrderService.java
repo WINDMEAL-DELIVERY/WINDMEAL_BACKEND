@@ -159,12 +159,14 @@ public class OrderService {
     return orderRepository.getOwnOrdered(memberId,pageable,startDate,endDate,storeCategory);
   }
 
-  public void updateDeliveryFee(DeliveryFeeUpdateRequest request, Long currentMemberId) {
+  @Transactional
+  public int updateDeliveryFee(DeliveryFeeUpdateRequest request, Long currentMemberId) {
     Order order = orderRepository.findById(request.getOrderId()).orElseThrow(
         OrderNotFoundException::new);
     if(!order.getOrderer_id().equals(currentMemberId)) {
       throw new OrdererMissMatchException();
     }
     order.updateDeliveryFee(request.getDeliveryFee());
+    return order.getDeliveryFee().wons();
   }
 }
