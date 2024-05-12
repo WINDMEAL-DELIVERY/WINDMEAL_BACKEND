@@ -6,6 +6,7 @@ import com.windmeal.global.util.SecurityUtil;
 import com.windmeal.member.dto.request.MemberInfoRequest;
 import com.windmeal.member.dto.request.NicknameRequest;
 import com.windmeal.member.dto.response.MemberInfoDTO;
+import com.windmeal.member.dto.response.MyPageDTO;
 import com.windmeal.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -88,7 +89,7 @@ public class MemberController {
           content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class))),
   })
   @GetMapping
-  public ResultDataResponseDTO<MemberInfoDTO> myInfo() {
+  public ResultDataResponseDTO<MyPageDTO> myInfo() {
     Long currentMemberId = SecurityUtil.getCurrentMemberId();
     return ResultDataResponseDTO.of(memberService.myInfoDetails(currentMemberId));
   }

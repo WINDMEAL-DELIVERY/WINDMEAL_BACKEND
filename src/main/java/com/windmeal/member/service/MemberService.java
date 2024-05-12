@@ -8,6 +8,7 @@ import com.windmeal.member.domain.event.AlarmTestEvent;
 import com.windmeal.member.dto.request.MemberInfoRequest;
 import com.windmeal.member.dto.request.NicknameRequest;
 import com.windmeal.member.dto.response.MemberInfoDTO;
+import com.windmeal.member.dto.response.MyPageDTO;
 import com.windmeal.member.exception.DuplicatedNicknameException;
 import com.windmeal.member.exception.MemberNotFoundException;
 import com.windmeal.member.repository.MemberRepository;
@@ -51,10 +52,10 @@ public class MemberService {
     return MemberInfoDTO.of(member.getId(), member.getEmail(), member.getNickname());
   }
 
-  public MemberInfoDTO myInfoDetails(Long currentMemberId) {
+  public MyPageDTO myInfoDetails(Long currentMemberId) {
     Member member = memberRepository.findById(currentMemberId)
         .orElseThrow(MemberNotFoundException::new);
-    return MemberInfoDTO.of(member.getId(), member.getEmail(), member.getNickname());
+    return MyPageDTO.of(member);
   }
 
   public void alarmTest(String msg, Long currentMemberId) {
