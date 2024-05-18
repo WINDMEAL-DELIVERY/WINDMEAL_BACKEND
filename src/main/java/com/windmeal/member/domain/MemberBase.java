@@ -42,4 +42,12 @@ public class MemberBase  extends BaseTimeEntity {
     public MemberBase(Long id) {
         this.id = id;
     }
+
+    public void deleteAccount() {
+        isDeleted = true;
+    }
+
+    public void restoreAccount() {
+        isDeleted = false;
+    }
 }

@@ -3,6 +3,7 @@ package com.windmeal.member.controller;
 import com.windmeal.global.exception.ExceptionResponseDTO;
 import com.windmeal.global.exception.ResultDataResponseDTO;
 import com.windmeal.global.util.SecurityUtil;
+import com.windmeal.member.dto.request.MemberAccountDeleteRequest;
 import com.windmeal.member.dto.request.MemberInfoRequest;
 import com.windmeal.member.dto.request.NicknameRequest;
 import com.windmeal.member.dto.response.MemberInfoDTO;
@@ -95,13 +96,27 @@ public class MemberController {
   }
 
   @Operation(summary = "알람 테스트용 API", description = "프론트엔드 알람 테스트 전용 API")
-
   @GetMapping(value = "/alarm/test")
   public ResultDataResponseDTO alarmTest(
       @Parameter(description = "알람에 담을 메시지", required = false, schema = @Schema(example = "알람 테스트 메시지"))
       @RequestParam(value = "msg") String msg) {
     Long currentMemberId = SecurityUtil.getCurrentMemberId();
     memberService.alarmTest(msg, currentMemberId);
+    return ResultDataResponseDTO.empty();
+  }
+
+  @Operation(summary = "회원 탈퇴", description = "회원탈퇴 api")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "회원 탈퇴 성공"),
+      @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자",
+          content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class))),
+      @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음",
+          content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class))),
+  })
+  @DeleteMapping
+  public ResultDataResponseDTO deleteAccount(MemberAccountDeleteRequest request) {
+    Long currentMemberId = SecurityUtil.getCurrentMemberId();
+    memberService.deleteAccount(request, currentMemberId);
     return ResultDataResponseDTO.empty();
   }
 

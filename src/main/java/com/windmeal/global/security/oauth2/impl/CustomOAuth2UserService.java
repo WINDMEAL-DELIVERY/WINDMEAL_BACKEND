@@ -126,10 +126,11 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
   private Member createMember(Map<String, Object> attributes) {
     int randNum = new Random().nextInt(10) + 1;
+    String fullDepartmentName = (String) attributes.get("given_name");
     Member member = Member.builder()
         .name((String) attributes.get("family_name"))
         .email((String) attributes.get("email"))
-        .department((String) attributes.get("given_name"))
+        .department(fullDepartmentName.replaceAll("^/", ""))
         .profileImage(WINDMEAL_DEFAULT_PROFILE_URL + randNum + ".png")
         .authority(Authority.ROLE_USER)
         .build();
