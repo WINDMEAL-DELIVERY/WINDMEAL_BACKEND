@@ -45,4 +45,12 @@ public class Member extends MemberBase{
     public void updateProfileImage(String profileImage) {
         this.profileImage = profileImage;
     }
+
+    public void deleteAccount() {
+        super.deleteAccount();
+    }
+
+    public void restoreAccount() {
+        super.restoreAccount();
+    }
 }

@@ -5,12 +5,14 @@ import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.global.util.AES256Util;
 import com.windmeal.member.domain.Member;
 import com.windmeal.member.domain.event.AlarmTestEvent;
+import com.windmeal.member.dto.request.MemberAccountDeleteRequest;
 import com.windmeal.member.dto.request.MemberInfoRequest;
 import com.windmeal.member.dto.request.NicknameRequest;
 import com.windmeal.member.dto.response.MemberInfoDTO;
 import com.windmeal.member.dto.response.MyPageDTO;
 import com.windmeal.member.exception.DuplicatedNicknameException;
 import com.windmeal.member.exception.MemberNotFoundException;
+import com.windmeal.member.exception.MemberNotMatchException;
 import com.windmeal.member.repository.MemberRepository;
 import com.windmeal.model.event.EventPublisher;
 import lombok.RequiredArgsConstructor;
@@ -64,4 +66,12 @@ public class MemberService {
     EventPublisher.publish(new AlarmTestEvent(msg, member.getToken()));
   }
 
+
+  public void deleteAccount(MemberAccountDeleteRequest request, Long currentMemberId) {
+    if(!currentMemberId.equals(request.getMemberId())) {
+      throw new MemberNotMatchException();
+    }
+    Member member = memberRepository.findById(request.getMemberId()).orElseThrow(MemberNotFoundException::new);
+    member.deleteAccount();
+  }
 }
