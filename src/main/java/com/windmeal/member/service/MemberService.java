@@ -5,7 +5,6 @@ import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.global.util.AES256Util;
 import com.windmeal.member.domain.Member;
 import com.windmeal.member.domain.event.AlarmTestEvent;
-import com.windmeal.member.dto.request.MemberAccountDeleteRequest;
 import com.windmeal.member.dto.request.MemberInfoRequest;
 import com.windmeal.member.dto.request.NicknameRequest;
 import com.windmeal.member.dto.response.MemberInfoDTO;
