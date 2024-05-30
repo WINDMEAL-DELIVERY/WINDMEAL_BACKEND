@@ -1,7 +1,6 @@
 package com.windmeal.member.service;
 
 
-import com.windmeal.global.exception.ErrorCode;
 import com.windmeal.global.util.AES256Util;
 import com.windmeal.member.domain.Member;
 import com.windmeal.member.domain.event.AlarmTestEvent;
@@ -11,7 +10,6 @@ import com.windmeal.member.dto.response.MemberInfoDTO;
 import com.windmeal.member.dto.response.MyPageDTO;
 import com.windmeal.member.exception.DuplicatedNicknameException;
 import com.windmeal.member.exception.MemberNotFoundException;
-import com.windmeal.member.exception.MemberNotMatchException;
 import com.windmeal.member.repository.MemberRepository;
 import com.windmeal.model.event.EventPublisher;
 import lombok.RequiredArgsConstructor;
