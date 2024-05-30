@@ -114,6 +114,7 @@ public class SecurityConfig {
         .antMatchers("/auth/logout").authenticated()
         .antMatchers(HttpMethod.GET, "/store/**").permitAll()
         .antMatchers(HttpMethod.GET, "/order/**").permitAll()
+        .antMatchers(HttpMethod.GET, "/menu/**").permitAll()
         .anyRequest().authenticated()
         .and()
         .apply(new JwtSecurityConfig(aes256Util, objectMapper, tokenProvider))
