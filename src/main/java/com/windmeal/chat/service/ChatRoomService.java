@@ -2,6 +2,7 @@ package com.windmeal.chat.service;
 
 import com.windmeal.chat.domain.ChatroomDocument;
 import com.windmeal.chat.dto.request.ChatRoomSaveRequest;
+import com.windmeal.chat.dto.response.ChatRoomExistsResponse;
 import com.windmeal.chat.dto.response.ChatRoomResponse;
 import com.windmeal.chat.repository.ChatroomDocumentRepository;
 import com.windmeal.member.domain.Member;
@@ -55,6 +56,13 @@ public class ChatRoomService {
         chatRoom.getOrderId(), owner.getToken());
   }
 
+
+  public ChatRoomExistsResponse checkChatroom (Long orderId, Long currentMemberId) {
+    Order order = orderRepository.findById(orderId).orElseThrow(OrderNotFoundException::new);
+    ChatroomDocument byOrderIdAndGuestId =
+        chatroomDocumentRepository.findByOrderIdAndGuestId(order.getId(), currentMemberId);
+    return new ChatRoomExistsResponse(byOrderIdAndGuestId.getId());
+  }
 
 }
 
