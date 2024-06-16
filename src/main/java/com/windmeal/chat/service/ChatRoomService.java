@@ -59,9 +59,9 @@ public class ChatRoomService {
 
   public ChatRoomExistsResponse checkChatroom (Long orderId, Long currentMemberId) {
     Order order = orderRepository.findById(orderId).orElseThrow(OrderNotFoundException::new);
-    ChatroomDocument byOrderIdAndGuestId =
+    ChatroomDocument chatroomDocument =
         chatroomDocumentRepository.findByOrderIdAndGuestId(order.getId(), currentMemberId);
-    return new ChatRoomExistsResponse(byOrderIdAndGuestId.getId());
+    return new ChatRoomExistsResponse(chatroomDocument != null ? chatroomDocument.getId() : null);
   }
 
 }
