@@ -61,7 +61,13 @@ public class ChatRoomService {
     Order order = orderRepository.findById(orderId).orElseThrow(OrderNotFoundException::new);
     ChatroomDocument chatroomDocument =
         chatroomDocumentRepository.findByOrderIdAndGuestId(order.getId(), currentMemberId);
-    return new ChatRoomExistsResponse(chatroomDocument != null ? chatroomDocument.getId() : null);
+    if(chatroomDocument == null) {
+      return ChatRoomExistsResponse.nullInstance();
+    }
+
+    Member owner = memberRepository.findById(
+        order.getOrderer_id()).orElseThrow(MemberNotFoundException::new);
+    return new ChatRoomExistsResponse(chatroomDocument.getId(), owner.getToken());
   }
 
 }
